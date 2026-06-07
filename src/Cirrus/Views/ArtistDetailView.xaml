@@ -1,0 +1,337 @@
+﻿<local:ArtistDetailViewBase
+    x:Class="Cirrus.Views.ArtistDetailView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commanding="using:Cirrus.Commanding"
+    xmlns:community="using:CommunityToolkit.WinUI"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    xmlns:modelAlbums="using:Cirrus.Models.Business.Album"
+    xmlns:modelArtist="using:Cirrus.Models.Network.Artist"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commanding:PlayFromListCommand x:Key="PlayFromListCommand" />
+        <commanding:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+        <Style x:Key="AlbumListViewStyle" TargetType="ListView">
+            <Setter Property="SelectionMode" Value="None" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel Orientation="Horizontal" Margin="-8 0" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate x:DataType="modelAlbums:OnlineAlbum">
+                        <controls:NavigatiableDisplayCard Title="{x:Bind Title}"
+                                                          IsExplicit="{x:Bind IsExplicit}"
+                                                          Subtitle="{x:Bind PublishTime.Year}"
+                                                          Image="{x:Bind ArtworkImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                                                          DataContext="{Binding Mode=OneWay}"
+                                                          Width="200" Margin="8" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="FullLengthAlbumsVisibilityGroup">
+                <VisualState x:Name="FullLengthAlbumsCollapsed" />
+                <VisualState x:Name="FullLengthAlbumsVisible">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.FullLengthAlbums}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="FullLengthAlbumsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="SingleAlbumsVisibilityGroup">
+                <VisualState x:Name="SingleAlbumsVisible" />
+                <VisualState x:Name="SingleAlbumsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.SingleAlbums}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SingleAlbumsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="LiveAlbumsVisibilityGroup">
+                <VisualState x:Name="LiveAlbumsVisible" />
+                <VisualState x:Name="LiveAlbumsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.LiveAlbums}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="LiveAlbumsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="DescriptionVisibilityGroup">
+                <VisualState x:Name="DescriptionVisible" />
+                <VisualState x:Name="DescriptionCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Description, Mode=OneWay}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="DescriptionPanel.Visibility" Value="Collapsed" />
+                        <Setter Target="SimilarArtistsPanel.(Grid.Column)" Value="0" />
+                        <Setter Target="SimilarArtistsPanel.(Grid.ColumnSpan)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="SimilarArtistsVisibilityGroup">
+                <VisualState x:Name="SimilarArtistsVisible" />
+                <VisualState x:Name="SimilarArtistsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.SimilarArtists}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SimilarArtistsPanel.Visibility" Value="Collapsed" />
+                        <Setter Target="DescriptionPanel.(Grid.ColumnSpan)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
+                     Background="Transparent"
+                     IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        <Border x:Name="FloatingHeader"
+                Canvas.ZIndex="1"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
+                Visibility="Collapsed"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="4" Margin="32 16" Padding="16">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
+            </animations:Implicit.HideAnimations>
+            <layout:Row Spacing="16">
+                <Border Width="50" Height="50" CornerRadius="25"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Image
+                        Source="{x:Bind ViewModel.Artist.SquaredAvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                        Width="50" Height="50" Margin="-1" />
+                </Border>
+                <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" FontSize="20" FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </layout:Row>
+        </Border>
+        <ScrollViewer x:Name="RootScrollViewer">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:ViewChangedEventTriggerBehavior>
+                    <behaviors:InvokeCommandActionEx Command="{x:Bind ScrollViewerViewChangedCommand}" />
+                </behaviors:ViewChangedEventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+            <StackPanel Padding="16 16 16 80">
+                <StackPanel x:Name="ViewHeader" Canvas.ZIndex="1" VerticalAlignment="Top"
+                            Spacing="8"
+                            Visibility="{x:Bind ViewModel.Artist, Mode=OneWay, Converter={StaticResource EmptyObjectJudgeConverter}}">
+                    <animations:Implicit.Animations>
+                        <animations:OpacityAnimation Duration="0:0:0.300" />
+                    </animations:Implicit.Animations>
+                    <Border x:Name="ArtistAvatarBorder" Width="200" Height="200" CornerRadius="100"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                        <Image
+                            Source="{x:Bind ViewModel.Artist.SquaredAvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                            Width="200" Height="200" Margin="-1" />
+                    </Border>
+                    <layout:Row>
+                        <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" FontSize="24"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                        <layout:Spacer layout:Row.ColumnWidth="*" />
+                        <Button VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}" FontSize="16" />
+                            </StackPanel>
+                            <Button.Flyout>
+                                <MenuFlyout Placement="RightEdgeAlignedTop">
+                                    <MenuFlyout.MenuFlyoutPresenterStyle>
+                                        <Style TargetType="MenuFlyoutPresenter">
+                                            <Setter Property="MinWidth" Value="250" />
+                                        </Style>
+                                    </MenuFlyout.MenuFlyoutPresenterStyle>
+                                    <MenuFlyoutItem x:Uid="MenuFlyoutItems/Share"
+                                                    Icon="{community:FontIcon Glyph=&#xE72D;}"
+                                                    Command="{StaticResource ShareCommand}"
+                                                    CommandParameter="{x:Bind ViewModel.Artist, Mode=OneWay}" />
+                                    <MenuFlyoutItem x:Uid="MenuFlyoutItems/CopyLink"
+                                                    Icon="{community:FontIcon Glyph=&#xE71B;}"
+                                                    Command="{StaticResource CopyLinkCommand}"
+                                                    CommandParameter="{x:Bind ViewModel.Artist, Mode=OneWay}" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </layout:Row>
+                </StackPanel>
+                <Grid Margin="0 16"
+                      Visibility="{x:Bind ViewModel.Tracks.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}">
+                    <TextBlock x:Uid="Views/ArtistDetailView/Sections/Tracks/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <Button Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Right"
+                            Command="{StaticResource PlayFromListCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xF5B0;" FontSize="12" />
+                            <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <ListView Style="{StaticResource TrackListViewHorizontalStyle}" ItemsSource="{x:Bind ViewModel.Tracks}"
+                          SelectionMode="None" Padding="-4 0"
+                          Visibility="{x:Bind ViewModel.Tracks.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}">
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:WheelEventRelayBehavior />
+                    </interactivity:Interaction.Behaviors>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Vertical" MaximumRowsOrColumns="5" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                            <controls:TrackListItem Style="{StaticResource ArtistTrackListItemStyle}"
+                                                    DataContext="{x:Bind Track}" Width="400" Margin="4"
+                                                    PlayFromListCommand="{StaticResource PlayFromListCommand}"
+                                                    ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel x:Name="FullLengthAlbumsPanel" Margin="0 12 0 0">
+                    <TextBlock x:Uid="Views/ArtistDetailView/Sections/FullLengthAlbums/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.FullLengthAlbums}"
+                              Style="{StaticResource AlbumListViewStyle}">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="SingleAlbumsPanel" Margin="0 12 0 0">
+                    <TextBlock x:Uid="Views/ArtistDetailView/Sections/SingleAlbums/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.SingleAlbums}"
+                              Style="{StaticResource AlbumListViewStyle}">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="LiveAlbumsPanel" Margin="0 12 0 0">
+                    <TextBlock x:Uid="Views/ArtistDetailView/Sections/LiveAlbums/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.LiveAlbums}"
+                              Style="{StaticResource AlbumListViewStyle}">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </ListView>
+                </StackPanel>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" MaxWidth="600" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel x:Name="DescriptionPanel"
+                                Margin="0 12">
+                        <TextBlock x:Uid="Views/ArtistDetailView/Sections/Description/Header"
+                                   FontSize="20" FontWeight="Medium"
+                                   Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                   VerticalAlignment="Center" />
+                        <Button Style="{StaticResource TextBlockButtonStyle}"
+                                Margin="-4 10" MaxHeight="150" Padding="4" CornerRadius="4"
+                                Command="{x:Bind ViewModel.ShowDescriptionTeachingTipCommand}">
+                            <TextBlock Text="{x:Bind ViewModel.Description, Mode=OneWay}"
+                                       Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                        </Button>
+                        <TeachingTip
+                            IsOpen="{x:Bind ViewModel.IsDescriptionTeachingTipOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PreferredPlacement="Center" IsLightDismissEnabled="True">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" TextWrapping="Wrap"
+                                           FontSize="20" FontWeight="SemiBold"
+                                           Foreground="{ThemeResource SystemAccentColor}" />
+                                <TextBlock Text="{x:Bind ViewModel.Description, Mode=OneWay}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </TeachingTip>
+                    </StackPanel>
+                    <StackPanel x:Name="SimilarArtistsPanel"
+                                Grid.Column="1" Margin="0 12">
+                        <TextBlock x:Uid="Views/ArtistDetailView/Sections/SimilarArtists/Header"
+                                   FontSize="20" FontWeight="Medium"
+                                   Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                   VerticalAlignment="Center" />
+                        <ListView ItemsSource="{x:Bind ViewModel.SimilarArtists}"
+                                  Margin="-4 0" Padding="0"
+                                  SelectionMode="None" IsItemClickEnabled="True">
+                            <interactivity:Interaction.Behaviors>
+                                <behaviors:WheelEventRelayBehavior />
+                            </interactivity:Interaction.Behaviors>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <ContentPresenter Padding="4" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="modelArtist:ArtistDetail">
+                                    <controls:NavigatiableDisplayCard
+                                        Style="{StaticResource CircleNavigationDisplayCardStyle}" Width="128"
+                                        CornerRadius="60"
+                                        Image="{x:Bind AvatarImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=240}"
+                                        Title="{x:Bind Name}"
+                                        DataContext="{Binding Mode=OneWay}" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</local:ArtistDetailViewBase>

@@ -1,0 +1,79 @@
+﻿<winuiEx:WindowEx
+    xmlns:winuiEx="using:WinUIEx"
+    x:Class="Cirrus.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:communityBehaviors="using:CommunityToolkit.WinUI.Behaviors"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    mc:Ignorable="d" MinWidth="800" MinHeight="600"
+    Title="{x:Bind ViewModel.ApplicationName}">
+    <Window.SystemBackdrop>
+        <MicaBackdrop Kind="BaseAlt" />
+    </Window.SystemBackdrop>
+    <Frame x:Name="HostFrame">
+        <Grid x:Name="RootGrid">
+            <controls:SidebarView x:Name="RootSidebarView" Margin="0 48 0 0">
+                <Grid BorderThickness="1 1 0 0" CornerRadius="8 0 0 0"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                    <Grid HorizontalAlignment="Stretch" MaxWidth="2000">
+                        <Frame x:Name="ContentFrame" />
+                        <InfoBar Severity="{x:Bind ViewModel.NotificationSeverity, Mode=OneWay}"
+                                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8" IsClosable="False">
+                            <interactivity:Interaction.Behaviors>
+                                <communityBehaviors:StackedNotificationsBehavior x:Name="NotificationQueue" />
+                            </interactivity:Interaction.Behaviors>
+                        </InfoBar>
+                        <controls:PlaybackControlBar VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                                                     Margin="32 16" MaxWidth="968" />
+                    </Grid>
+                </Grid>
+            </controls:SidebarView>
+            <TitleBar x:Name="TitleBar" VerticalAlignment="Top" Margin="1"
+                      Title="{x:Bind ViewModel.ApplicationName}"
+                      IsBackButtonVisible="{x:Bind NavigationStack.CanNavigateBack, Mode=OneWay}"
+                      IsPaneToggleButtonVisible="True">
+                <interactivity:Interaction.Behaviors>
+                    <behaviors:BackRequestedEventTriggerBehavior>
+                        <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.NavigateBackCommand}" />
+                    </behaviors:BackRequestedEventTriggerBehavior>
+                    <behaviors:PaneToggleRequestedEventTriggerBehavior>
+                        <interactivity:InvokeCommandAction Command="{x:Bind RootSidebarView.TogglePaneCommand}" />
+                    </behaviors:PaneToggleRequestedEventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+                <TitleBar.IconSource>
+                    <ImageIconSource ImageSource="/Assets/ApplicationIcon.ico" />
+                </TitleBar.IconSource>
+                <TitleBar.RightHeader>
+                    <controls:AccountButton />
+                </TitleBar.RightHeader>
+            </TitleBar>
+            <Grid x:Name="TitleBarGrid" Height="48" Padding="6 0" VerticalAlignment="Top" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Command="{x:Bind ViewModel.NavigateBackCommand}"
+                        Visibility="{x:Bind NavigationStack.CanNavigateBack, Mode=OneWay}"
+                        Style="{StaticResource TextBlockButtonStyle}"
+                        Padding="0" Width="36" Height="36" CornerRadius="4">
+                    <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                              Glyph="{StaticResource FontIconGlyphArrowLeft}" FontSize="14"
+                              Foreground="{ThemeResource SystemBaseMediumColor}" />
+                </Button>
+                <Image Grid.Column="1" VerticalAlignment="Center"
+                       Source="ms-appx:///Assets/ApplicationIcon.ico" Width="24" />
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}"
+                           Text="{x:Bind ViewModel.ApplicationName}" />
+                <controls:AccountButton Grid.Column="3" HorizontalAlignment="Right" Margin="0 0 150 0" />
+            </Grid>
+            <controls:Drawer x:Name="PlaybackDrawer" />
+        </Grid>
+    </Frame>
+</winuiEx:WindowEx>

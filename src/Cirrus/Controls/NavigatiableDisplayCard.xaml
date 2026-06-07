@@ -1,0 +1,376 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Controls"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:primitives="using:Cirrus.Behaviors.Primitives">
+    <Style TargetType="local:NavigatiableDisplayCard">
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:NavigatiableDisplayCard">
+                    <Grid x:Name="RootGrid" Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="TitleStates">
+                                <VisualState x:Name="HideTitle" />
+                                <VisualState x:Name="ShowTitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="TitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SubtitleStates">
+                                <VisualState x:Name="HideSubtitle" />
+                                <VisualState x:Name="ShowSubtitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="SubtitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Storyboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FocusMaskRectangle"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </VisualState.Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Storyboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FocusMaskRectangle"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </VisualState.Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Storyboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FocusMaskRectangle"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.5" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </VisualState.Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="OperationButtonStates">
+                                <VisualState x:Name="HideOperationButtons" />
+                                <VisualState x:Name="ShowOperationButtons">
+                                    <VisualState.Setters>
+                                        <Setter Target="PlayButton.Visibility" Value="Visible" />
+                                        <Setter Target="MoreButton.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:PointerEnteredEventTriggerBehavior>
+                                <behaviors:PointerEnteredEventTriggerBehavior.EventTriggerFilter>
+                                    <primitives:PointerDeviceTypeBlockEventTriggerFilter DeviceType="Touch" />
+                                </behaviors:PointerEnteredEventTriggerBehavior.EventTriggerFilter>
+                                <interactivity:GoToStateAction StateName="ShowOperationButtons" />
+                            </behaviors:PointerEnteredEventTriggerBehavior>
+                            <behaviors:PointerEnteredEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerEnteredEventTriggerBehavior>
+                            <behaviors:PointerPressedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Pressed" />
+                            </behaviors:PointerPressedEventTriggerBehavior>
+                            <behaviors:PointerReleasedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerReleasedEventTriggerBehavior>
+                            <behaviors:PointerExitedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                                <interactivity:GoToStateAction StateName="HideOperationButtons" />
+                            </behaviors:PointerExitedEventTriggerBehavior>
+                            <behaviors:PointerCaptureLostEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                            </behaviors:PointerCaptureLostEventTriggerBehavior>
+                            <behaviors:TappedEventTriggerBehavior>
+                                <interactivity:InvokeCommandAction Command="{StaticResource NavigateCommand}"
+                                                                   CommandParameter="{Binding}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:TappedEventTriggerBehavior>
+                            <behaviors:RightTappedEventTriggerBehavior>
+                                <behaviors:InvokeCommandActionEx
+                                    Command="{StaticResource ShowCollectionContextFlyoutCommand}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:RightTappedEventTriggerBehavior>
+                        </interactivity:Interaction.Behaviors>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                              BorderThickness="1"
+                              CornerRadius="{TemplateBinding CornerRadius}">
+                            <local:SquaredPanel>
+                                <Image Source="{TemplateBinding Image}" />
+                            </local:SquaredPanel>
+                            <ContentPresenter Content="{TemplateBinding CustomContent}" />
+                            <Rectangle x:Name="FocusMaskRectangle" Opacity="0">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#00000000" Offset="0" />
+                                        <GradientStop Color="#7F000000" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <Button x:Name="PlayButton" Visibility="Collapsed"
+                                    Command="{StaticResource PlayCollectionCommand}" CommandParameter="{Binding}"
+                                    VerticalAlignment="Bottom"
+                                    Margin="8" Padding="0" Width="32" Height="32" CornerRadius="16"
+                                    Style="{ThemeResource AcrylicAccentButtonStyle}">
+                                <interactivity:Interaction.Behaviors>
+                                    <behaviors:TappedEventTriggerBehavior>
+                                        <interactivity:InvokeCommandAction
+                                            Command="{StaticResource BlockEventPassCommand}" />
+                                    </behaviors:TappedEventTriggerBehavior>
+                                </interactivity:Interaction.Behaviors>
+                                <FontIcon Glyph="{StaticResource FontIconGlyphPlayFilled}"
+                                          FontFamily="{StaticResource CirrusIconSetFontFamily}" Margin="0 0 1 0" />
+                            </Button>
+                            <Button x:Name="MoreButton" Visibility="Collapsed"
+                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    Margin="8" Padding="0" Width="32" Height="32" CornerRadius="16"
+                                    Style="{ThemeResource AcrylicAccentButtonStyle}">
+                                <interactivity:Interaction.Behaviors>
+                                    <behaviors:TappedEventTriggerBehavior>
+                                        <behaviors:InvokeCommandActionEx
+                                            Command="{StaticResource ShowCollectionContextFlyoutCommand}" />
+                                        <interactivity:InvokeCommandAction
+                                            Command="{StaticResource BlockEventPassCommand}" />
+                                    </behaviors:TappedEventTriggerBehavior>
+                                </interactivity:Interaction.Behaviors>
+                                <FontIcon Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}"
+                                          FontFamily="{StaticResource CirrusIconSetFontFamily}" Margin="0 0 1 0" />
+                            </Button>
+                        </Grid>
+                        <StackPanel Grid.Row="1">
+                            <layout:Row Margin="0 4 0 0" Spacing="4">
+                                <TextBlock x:Name="TitleTextBlock" Visibility="Collapsed"
+                                           TextTrimming="CharacterEllipsis"
+                                           FontSize="14" FontWeight="Medium"
+                                           Foreground="{ThemeResource SystemBaseMediumHighColor}"
+                                           Text="{TemplateBinding Title}" />
+                                <FontIcon Glyph="{ThemeResource FontIconGlyphExplicit}"
+                                          FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Visibility="{Binding Path=IsExplicit, RelativeSource={RelativeSource Mode=TemplatedParent}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                          Foreground="{ThemeResource ExplicitIconForeground}"
+                                          FontSize="14"
+                                          layout:Row.Priority="1" />
+                            </layout:Row>
+                            <TextBlock x:Name="SubtitleTextBlock" Visibility="Collapsed"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontSize="12" Foreground="{ThemeResource SystemBaseMediumColor}"
+                                       Text="{TemplateBinding Subtitle}" Margin="0 2 0 0" />
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="CircleNavigationDisplayCardStyle" TargetType="local:NavigatiableDisplayCard">
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:NavigatiableDisplayCard">
+                    <Grid x:Name="RootGrid" Background="Transparent"
+                          BorderThickness="1" BorderBrush="Transparent" Padding="8" CornerRadius="8">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="TitleStates">
+                                <VisualState x:Name="HideTitle" />
+                                <VisualState x:Name="ShowTitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="TitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SubtitleStates">
+                                <VisualState x:Name="HideSubtitle" />
+                                <VisualState x:Name="ShowSubtitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="SubtitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootGrid.Background"
+                                                Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                                        <Setter Target="RootGrid.BorderBrush"
+                                                Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootGrid.Background"
+                                                Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+                                        <Setter Target="RootGrid.BorderBrush"
+                                                Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:PointerEnteredEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerEnteredEventTriggerBehavior>
+                            <behaviors:PointerPressedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Pressed" />
+                            </behaviors:PointerPressedEventTriggerBehavior>
+                            <behaviors:PointerReleasedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerReleasedEventTriggerBehavior>
+                            <behaviors:PointerExitedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                            </behaviors:PointerExitedEventTriggerBehavior>
+                            <behaviors:PointerCaptureLostEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                            </behaviors:PointerCaptureLostEventTriggerBehavior>
+                            <behaviors:TappedEventTriggerBehavior>
+                                <interactivity:InvokeCommandAction Command="{StaticResource NavigateCommand}"
+                                                                   CommandParameter="{Binding}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:TappedEventTriggerBehavior>
+                            <behaviors:RightTappedEventTriggerBehavior>
+                                <behaviors:InvokeCommandActionEx
+                                    Command="{StaticResource ShowCollectionContextFlyoutCommand}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:RightTappedEventTriggerBehavior>
+                        </interactivity:Interaction.Behaviors>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                              BorderThickness="1"
+                              CornerRadius="{TemplateBinding CornerRadius}">
+                            <local:SquaredPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-2">
+                                <Image Source="{TemplateBinding Image}" />
+                            </local:SquaredPanel>
+                        </Grid>
+                        <StackPanel Grid.Row="1">
+                            <TextBlock x:Name="TitleTextBlock" Visibility="Collapsed" HorizontalAlignment="Center"
+                                       FontSize="12" FontWeight="Medium"
+                                       Foreground="{ThemeResource SystemBaseMediumHighColor}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{TemplateBinding Title}" Margin="0 8 0 0" />
+                            <TextBlock x:Name="SubtitleTextBlock" Visibility="Collapsed" HorizontalAlignment="Center"
+                                       FontSize="10" Foreground="{ThemeResource SystemBaseMediumColor}"
+                                       Text="{TemplateBinding Subtitle}" Margin="0 4 0 0" />
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ChartNavigationDisplayCardStyle" TargetType="local:NavigatiableDisplayCard">
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:NavigatiableDisplayCard">
+                    <Grid x:Name="RootGrid" Background="Transparent" ColumnSpacing="4"
+                          BorderThickness="1" BorderBrush="Transparent" Padding="4" CornerRadius="4">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="TitleStates">
+                                <VisualState x:Name="HideTitle" />
+                                <VisualState x:Name="ShowTitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="TitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SubtitleStates">
+                                <VisualState x:Name="HideSubtitle" />
+                                <VisualState x:Name="ShowSubtitle">
+                                    <VisualState.Setters>
+                                        <Setter Target="SubtitleTextBlock.Visibility" Value="Visible" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootGrid.Background"
+                                                Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                                        <Setter Target="RootGrid.BorderBrush"
+                                                Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootGrid.Background"
+                                                Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+                                        <Setter Target="RootGrid.BorderBrush"
+                                                Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:PointerEnteredEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerEnteredEventTriggerBehavior>
+                            <behaviors:PointerPressedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Pressed" />
+                            </behaviors:PointerPressedEventTriggerBehavior>
+                            <behaviors:PointerReleasedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="PointerOver" />
+                            </behaviors:PointerReleasedEventTriggerBehavior>
+                            <behaviors:PointerExitedEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                            </behaviors:PointerExitedEventTriggerBehavior>
+                            <behaviors:PointerCaptureLostEventTriggerBehavior>
+                                <interactivity:GoToStateAction StateName="Normal" />
+                            </behaviors:PointerCaptureLostEventTriggerBehavior>
+                            <behaviors:TappedEventTriggerBehavior>
+                                <interactivity:InvokeCommandAction Command="{StaticResource NavigateCommand}"
+                                                                   CommandParameter="{Binding}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:TappedEventTriggerBehavior>
+                            <behaviors:RightTappedEventTriggerBehavior>
+                                <behaviors:InvokeCommandActionEx
+                                    Command="{StaticResource ShowCollectionContextFlyoutCommand}" />
+                                <interactivity:InvokeCommandAction Command="{StaticResource BlockEventPassCommand}" />
+                            </behaviors:RightTappedEventTriggerBehavior>
+                        </interactivity:Interaction.Behaviors>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                              BorderThickness="1" Padding="-1"
+                              CornerRadius="{TemplateBinding CornerRadius}">
+                            <local:SquaredPanel>
+                                <Image Source="{TemplateBinding Image}" />
+                            </local:SquaredPanel>
+                        </Grid>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                            <TextBlock x:Name="TitleTextBlock" Visibility="Collapsed"
+                                       FontSize="14" FontWeight="Medium"
+                                       Foreground="{ThemeResource SystemBaseMediumHighColor}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{TemplateBinding Title}" />
+                            <TextBlock x:Name="SubtitleTextBlock" Visibility="Collapsed"
+                                       FontSize="12" Foreground="{ThemeResource SystemBaseMediumColor}"
+                                       TextTrimming="CharacterEllipsis" MaxLines="1"
+                                       Text="{TemplateBinding Subtitle}" />
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

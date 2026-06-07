@@ -1,0 +1,106 @@
+﻿<local:CloudDriveViewBase
+    x:Class="Cirrus.Views.CloudDriveView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commanding="using:Cirrus.Commanding"
+    xmlns:community="using:CommunityToolkit.WinUI"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commanding:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+        <commanding:PlayFromListCommand x:Key="PlayFromListCommand" />
+    </Page.Resources>
+    <interactivity:Interaction.Behaviors>
+        <behaviors:LoadedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+        </behaviors:LoadedEventTriggerBehavior>
+    </interactivity:Interaction.Behaviors>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="TracksVisibilityGroup">
+                <VisualState x:Name="TracksVisible" />
+                <VisualState x:Name="TracksCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Tracks}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="TrackListView.Opacity" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
+                     Background="Transparent"
+                     IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        <Border x:Name="FloatingHeader"
+                Canvas.ZIndex="1"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
+                Visibility="Collapsed"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="4" Margin="32 16" Padding="24">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
+            </animations:Implicit.HideAnimations>
+            <layout:Row
+                Spacing="16" HorizontalAlignment="Stretch">
+                <TextBlock x:Uid="Views/CloudDriveView/Header"
+                           CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                           VerticalAlignment="Center" />
+                <layout:Spacer layout:Row.ColumnWidth="*" />
+                <Button Style="{ThemeResource AccentButtonStyle}"
+                        Command="{StaticResource PlayFromListCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xF5B0;" FontSize="12" />
+                        <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
+                    </StackPanel>
+                </Button>
+            </layout:Row>
+        </Border>
+        <ListView x:Name="TrackListView"
+                  Style="{StaticResource TrackListViewStyle}"
+                  SelectionMode="None"
+                  Padding="16 8 16 88"
+                  ItemsSource="{x:Bind ViewModel.Tracks}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                    <controls:TrackListItem DataContext="{x:Bind Track}"
+                                            Index="{x:Bind Index, Mode=OneWay}"
+                                            PlayFromListCommand="{StaticResource PlayFromListCommand}"
+                                            ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Header>
+                <layout:Row x:Name="ViewHeader"
+                            Margin="32"
+                            Spacing="16" HorizontalAlignment="Stretch">
+                    <animations:Implicit.Animations>
+                        <animations:OpacityAnimation Duration="0:0:0.300" />
+                    </animations:Implicit.Animations>
+                    <TextBlock x:Uid="Views/CloudDriveView/Header"
+                               CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                               VerticalAlignment="Center" />
+                    <layout:Spacer layout:Row.ColumnWidth="*" />
+                    <Button Style="{ThemeResource AccentButtonStyle}"
+                            Command="{StaticResource PlayFromListCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xF5B0;" FontSize="12" />
+                            <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
+                        </StackPanel>
+                    </Button>
+                </layout:Row>
+            </ListView.Header>
+        </ListView>
+    </Grid>
+</local:CloudDriveViewBase>

@@ -1,0 +1,53 @@
+<UserControl
+    x:Class="Cirrus.Controls.AccountButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Button BorderThickness="0" Width="48" Height="48"
+            CornerRadius="0" Background="Transparent" Padding="0">
+        <Border CornerRadius="100" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefault}"
+                Background="{ThemeResource CardBackgroundFillColorDefault}">
+            <Image Width="28" Height="28" Margin="-1"
+                   Source="{x:Bind App.CurrentAccount.UserProfile.AvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=56, FallbackValue=ms-appx:///Assets/MenuIcons/AnonymousPerson.svg}" />
+        </Border>
+        <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedRight">
+                <local:CustomContentMenuFlyoutItem Command="{x:Bind NavigateToUserDetailViewCommand}"
+                                                   Visibility="{x:Bind App.CurrentAccount.IsLoggedIn, Mode=OneWay, FallbackValue=False, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Width="240">
+                        <Border CornerRadius="100" BorderThickness="1"
+                                BorderBrush="{ThemeResource CardStrokeColorDefault}">
+                            <Image Width="40" Height="40" Margin="-2"
+                                   Source="{x:Bind App.CurrentAccount.UserProfile.AvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=80}" />
+                        </Border>
+                        <TextBlock Text="{x:Bind App.CurrentAccount.UserProfile.Nickname, Mode=OneWay}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </local:CustomContentMenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="Controls/AccountButton/LogOutMenuFlyoutItem"
+                                Visibility="{x:Bind App.CurrentAccount.IsLoggedIn, Mode=OneWay, FallbackValue=False, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Command="{x:Bind LogOutCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <ImageIcon Source="ms-appx:///Assets/MenuIcons/LogOutUnpadded.svg" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="Controls/AccountButton/LogInMenuFlyoutItem"
+                                Command="{x:Bind ShowLoginDialogCommand}" MinWidth="240"
+                                Visibility="{x:Bind App.CurrentAccount.IsLoggedIn, Mode=OneWay, FallbackValue=False, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}">
+                    <MenuFlyoutItem.Icon>
+                        <ImageIcon Source="ms-appx:///Assets/MenuIcons/AccountUnpadded.svg" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Uid="Controls/AccountButton/SettingsMenuFlyoutItem"
+                                Command="{x:Bind NavigateToSettingsViewCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <ImageIcon Source="ms-appx:///Assets/MenuIcons/SettingsUnpadded.svg" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyout>
+        </Button.Flyout>
+    </Button>
+</UserControl>

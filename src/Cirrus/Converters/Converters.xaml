@@ -1,0 +1,19 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Converters"
+    xmlns:community="using:CommunityToolkit.WinUI.Converters">
+    <community:BoolNegationConverter x:Key="BoolNegationConverter" />
+    <community:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <community:DoubleToVisibilityConverter x:Key="PositiveNumberVisibilityConverter" GreaterThan="0" />
+    <local:EmptyObjectJudgeConverter x:Key="EmptyObjectJudgeConverter" />
+    <local:EqualityConverter x:Key="EqualityConverter" />
+    <local:LanguageResourceConverter x:Key="LanguageResourceConverter" />
+    <local:LargeNumberUnitConverter x:Key="LargeNumberUnitConverter" />
+    <local:LineBreakRemovalConverter x:Key="LineBreakRemovalConverter" />
+    <local:MultipleEntityNamesConverter x:Key="MultipleEntityNamesConverter" />
+    <local:NeteaseImageResizeConverter x:Key="NeteaseImageResizeConverter" />
+    <local:StringQueryConverter x:Key="StringQueryConverter" />
+    <local:TimeSpanConverter x:Key="TimeSpanConverter" />
+    <local:TrackSourceConverter x:Key="TrackSourceConverter" />
+</ResourceDictionary>

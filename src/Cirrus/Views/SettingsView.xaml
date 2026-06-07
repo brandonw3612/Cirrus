@@ -1,0 +1,450 @@
+﻿<local:SettingsViewBase mc:Ignorable="d"
+                        x:Class="Cirrus.Views.SettingsView"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:local="using:Cirrus.Views"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:behaviors="using:Cirrus.Behaviors"
+                        xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
+                        xmlns:controls="using:Cirrus.Controls"
+                        xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+                        xmlns:liveModels="using:Cirrus.LiveModels">
+    <interactivity:Interaction.Behaviors>
+        <behaviors:LoadedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+        </behaviors:LoadedEventTriggerBehavior>
+    </interactivity:Interaction.Behaviors>
+    <Grid>
+        <Grid Canvas.ZIndex="1" Margin="16" MaxWidth="968" VerticalAlignment="Top">
+            <Border x:Name="HeaderFloatingBackBorder"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                    CornerRadius="8" Height="80" Margin="16 0"
+                    Opacity="1">
+            </Border>
+            <Border VerticalAlignment="Center">
+                <TextBlock x:Name="HeaderTextBlock" x:Uid="Views/SettingsView/Header"
+                           CharacterSpacing="-20" FontSize="24" FontWeight="Bold" MaxLines="2"
+                           TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+            </Border>
+        </Grid>
+        <ScrollViewer x:Name="RootScrollViewer">
+            <Border HorizontalAlignment="Stretch">
+                <StackPanel Margin="16 112 16 92" Spacing="32" MaxWidth="1000">
+                    <!--Account-->
+                    <!-- <StackPanel Spacing="4"> -->
+                    <!--     <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Account" -->
+                    <!--                FontSize="16" FontWeight="Medium" Margin="4" /> -->
+                    <!--     <communityControls:SettingsCard Header="Link to Last.fm"> -->
+                    <!--         <communityControls:SettingsCard.HeaderIcon> -->
+                    <!--             <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}" -->
+                    <!--                       Glyph="{StaticResource FontIconGlyphLastFm}" -->
+                    <!--                       Foreground="#ffba0000" /> -->
+                    <!--         </communityControls:SettingsCard.HeaderIcon> -->
+                    <!--         <communityControls:SettingsCard.Description> -->
+                    <!--             <HyperlinkButton x:Uid="Views/SettingsView/AboutThisOptionHyperlinkButton" -->
+                    <!--                              Margin="-6 0" Padding="4 1"> -->
+                    <!--                 <interactivity:Interaction.Behaviors> -->
+                    <!--                     <behaviors:ClickEventTriggerBehavior> -->
+                    <!--                         <primitives:InvokeCommandActionEx -->
+                    <!--                             Command="{x:Bind ViewModel.ShowAttachedFlyoutCommand}" /> -->
+                    <!--                     </behaviors:ClickEventTriggerBehavior> -->
+                    <!--                 </interactivity:Interaction.Behaviors> -->
+                    <!--                 <FlyoutBase.AttachedFlyout> -->
+                    <!--                     <Flyout LightDismissOverlayMode="Off" Placement="BottomEdgeAlignedLeft"> -->
+                    <!--                         <TextBlock FontFamily="{StaticResource ContentControlThemeFontFamily}" -->
+                    <!--                                    Foreground="CornflowerBlue" TextWrapping="Wrap" Width="400" -->
+                    <!--                                    Text="Helper goes here." /> -->
+                    <!--                     </Flyout> -->
+                    <!--                 </FlyoutBase.AttachedFlyout> -->
+                    <!--             </HyperlinkButton> -->
+                    <!--         </communityControls:SettingsCard.Description> -->
+                    <!--     </communityControls:SettingsCard> -->
+                    <!-- </StackPanel> -->
+                    <!--Appearance-->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Appearance"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <!--Theme-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Appearance/Theme">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE790;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ComboBox ItemsSource="{x:Bind ViewModel.AvailableThemes}"
+                                      SelectedItem="{x:Bind ViewModel.ApplicationThemeBound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="liveModels:LocalizedText">
+                                        <TextBlock Text="{x:Bind Localized}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </communityControls:SettingsCard>
+                        <!--Language-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Appearance/Language">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF2B7;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ComboBox ItemsSource="{x:Bind ViewModel.AvailableLanguages}"
+                                      SelectedItem="{x:Bind ViewModel.ApplicationLanguageBound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="liveModels:StaticText">
+                                        <TextBlock Text="{x:Bind DisplayText}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </communityControls:SettingsCard>
+                        <!--Font-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Appearance/Font">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8D2;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ComboBox ItemsSource="{x:Bind ViewModel.AvailableFonts}"
+                                      SelectedItem="{x:Bind ViewModel.DisplayFontBound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="liveModels:StaticText">
+                                        <TextBlock Text="{x:Bind DisplayText}"
+                                                   FontFamily="{x:Bind (FontFamily)Attachment}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </communityControls:SettingsCard>
+                        <!--Performance and experience-->
+                        <communityControls:SettingsExpander x:Uid="Views/SettingsView/Appearance/Performance"
+                                                            IsExpanded="True">
+                            <communityControls:SettingsExpander.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}" Glyph="&#xE904;" />
+                            </communityControls:SettingsExpander.HeaderIcon>
+                            <communityControls:SettingsExpander.Items>
+                                <communityControls:SettingsCard ContentAlignment="Left">
+                                    <CheckBox x:Uid="Views/SettingsView/Appearance/PerformanceSubmodule/BatterySaver"
+                                              IsChecked="{x:Bind ViewModel.IsBatterySaverEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </communityControls:SettingsCard>
+                                <communityControls:SettingsCard ContentAlignment="Left"
+                                                                IsEnabled="{x:Bind ViewModel.IsBatterySaverEnabled, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                                    <CheckBox x:Uid="Views/SettingsView/Appearance/PerformanceSubmodule/VerbatimLyrics"
+                                              IsChecked="{x:Bind ViewModel.IsBxbLyricsEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </communityControls:SettingsCard>
+                                <communityControls:SettingsCard ContentAlignment="Left"
+                                                                IsEnabled="{x:Bind ViewModel.IsBatterySaverEnabled, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                                    <CheckBox x:Uid="Views/SettingsView/Appearance/PerformanceSubmodule/DynaBack"
+                                              IsChecked="{x:Bind ViewModel.IsDynaBackEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </communityControls:SettingsCard>
+                            </communityControls:SettingsExpander.Items>
+                        </communityControls:SettingsExpander>
+                    </StackPanel>
+                    <!--Interaction-->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Interaction"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <!--Keyboard shortcuts-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Interaction/KeyboardShortcuts">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEDA7;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <Button Command="{x:Bind ViewModel.ShowKeyboardShortcutsCustomizationDialogCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE771;"
+                                              FontSize="14" />
+                                    <TextBlock
+                                        x:Uid="Views/SettingsView/Interaction/KeyboardShortcutsSubmodule/CustomizeButtonText" />
+                                </StackPanel>
+                            </Button>
+                        </communityControls:SettingsCard>
+                        <!--Run in background-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Interaction/RunsInBackground">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xEF1F;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch x:Uid="Views/SettingsView/EnabledDisabledToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.RunsInBackground, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </communityControls:SettingsCard>
+                        <!--Desktop lyrics with HotLyric-->
+                        <communityControls:SettingsCard
+                            x:Uid="Views/SettingsView/Interaction/DesktopLyricsWithHotLyric"
+                            Visibility="{x:Bind ViewModel.IsHotLyricInstalled, Mode=OneWay}">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphTextboxAlignBottomCenter}" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch x:Uid="Views/SettingsView/Interaction/DesktopLyricsWithoutHotLyricSubmodule"
+                                          IsOn="{x:Bind ViewModel.IsHotLyricAutoLaunched, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </communityControls:SettingsCard>
+                        <!--Desktop lyrics without HotLyric-->
+                        <communityControls:SettingsCard
+                            x:Uid="Views/SettingsView/Interaction/DesktopLyricsWithoutHotLyric"
+                            Visibility="{x:Bind ViewModel.IsHotLyricInstalled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphTextboxAlignBottomCenter}" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <Button Command="{x:Bind ViewModel.LaunchStoreForHotLyricCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                              Glyph="{StaticResource FontIconGlyphStoreMicrosoft}" FontSize="18"
+                                              VerticalAlignment="Center" />
+                                    <TextBlock
+                                        x:Uid="Views/SettingsView/Interaction/HotLyricNotInstalled/StoreButtonText" />
+                                </StackPanel>
+                            </Button>
+                        </communityControls:SettingsCard>
+                    </StackPanel>
+                    <!--Playback-->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Playback"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <!--Audio output device-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Playback/AudioOutputDevice">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7F5;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <Button>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xEBDE;" FontSize="16" />
+                                    <TextBlock
+                                        x:Uid="Views/SettingsView/Playback/AudioOutputDeviceSubmodule/SelectDeviceContent" />
+                                </StackPanel>
+                            </Button>
+                        </communityControls:SettingsCard>
+                        <!--Audio quality-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Playback/AudioQuality">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8D6;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ComboBox ItemsSource="{x:Bind ViewModel.AvailableAudioQualities}"
+                                      SelectedItem="{x:Bind ViewModel.PreferredAudioQualityBound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="200">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="liveModels:LocalizedText">
+                                        <TextBlock Text="{x:Bind Localized}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </communityControls:SettingsCard>
+                        <!--Legacy playback control-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Playback/DirectSwitch">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8AB;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch x:Uid="Views/SettingsView/EnabledDisabledToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.IsDirectSwitchEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <communityControls:SettingsCard.Description>
+                                <HyperlinkButton x:Uid="Views/SettingsView/AboutThisOptionHyperlinkButton"
+                                                 Margin="-6 0" Padding="4 1">
+                                    <interactivity:Interaction.Behaviors>
+                                        <behaviors:ClickEventTriggerBehavior>
+                                            <behaviors:InvokeCommandActionEx
+                                                Command="{x:Bind ViewModel.ShowAttachedFlyoutCommand}" />
+                                        </behaviors:ClickEventTriggerBehavior>
+                                    </interactivity:Interaction.Behaviors>
+                                    <FlyoutBase.AttachedFlyout>
+                                        <Flyout LightDismissOverlayMode="Off" Placement="BottomEdgeAlignedLeft">
+                                            <TextBlock
+                                                x:Uid="Views/SettingsView/Playback/DirectSwitchSubmodule/Description"
+                                                FontFamily="{StaticResource ContentControlThemeFontFamily}"
+                                                Foreground="{ThemeResource AccentTextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" Width="400" />
+                                        </Flyout>
+                                    </FlyoutBase.AttachedFlyout>
+                                </HyperlinkButton>
+                            </communityControls:SettingsCard.Description>
+                        </communityControls:SettingsCard>
+                        <!--Audio crossfade-->
+                        <communityControls:SettingsExpander x:Uid="Views/SettingsView/Playback/AudioCrossfade"
+                                                            IsExpanded="{x:Bind ViewModel.IsAudioCrossfadeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <communityControls:SettingsExpander.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphAudioCrossfade}" />
+                            </communityControls:SettingsExpander.HeaderIcon>
+                            <communityControls:SettingsExpander.Content>
+                                <ToggleSwitch x:Uid="Views/SettingsView/EnabledDisabledToggleSwitch"
+                                              IsOn="{x:Bind ViewModel.IsAudioCrossfadeEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </communityControls:SettingsExpander.Content>
+                            <communityControls:SettingsExpander.Items>
+                                <communityControls:SettingsCard
+                                    x:Uid="Views/SettingsView/Playback/AudioCrossfadeSubmodule/CrossfadeLength">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock
+                                            x:Uid="Views/SettingsView/Playback/AudioCrossfadeSubmodule/CrossfadeLengthLimit/Minimum" />
+                                        <controls:GlidySlider Minimum="3" Maximum="12"
+                                                              Value="{x:Bind ViewModel.AudioCrossfadeDuration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              Width="200" Height="16" />
+                                        <TextBlock
+                                            x:Uid="Views/SettingsView/Playback/AudioCrossfadeSubmodule/CrossfadeLengthLimit/Maximum" />
+                                    </StackPanel>
+                                </communityControls:SettingsCard>
+                            </communityControls:SettingsExpander.Items>
+                        </communityControls:SettingsExpander>
+                    </StackPanel>
+                    <!--Network-->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Network"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Network/IpFix">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE709;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch x:Uid="Views/SettingsView/EnabledDisabledToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.IsIpFixOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </communityControls:SettingsCard>
+                        <!--Application web proxy-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Network/Proxy">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE968;" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <Button Command="{x:Bind ViewModel.ShowNetworkProxyConfigDialogCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE90F;" FontSize="16" />
+                                    <TextBlock x:Uid="Views/SettingsView/Network/ConfigProxyButtonContent" />
+                                </StackPanel>
+                            </Button>
+                        </communityControls:SettingsCard>
+                        <!--Use HTTP for web requests-->
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Network/HttpFallback">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphArrowHookDownLeft}" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch x:Uid="Views/SettingsView/EnabledDisabledToggleSwitch"
+                                          IsOn="{x:Bind ViewModel.IsHttpFallbackEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </communityControls:SettingsCard>
+                    </StackPanel>
+                    <!--Storage-->
+                    <!-- <StackPanel Spacing="4"> -->
+                    <!--     <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Storage" -->
+                    <!--                FontSize="16" FontWeight="Medium" Margin="4" /> -->
+                    <!--     ~1~Manage your data@1@ -->
+                    <!--     <communityControls:SettingsCard Header="Manage your data"> -->
+                    <!--         <communityControls:SettingsCard.HeaderIcon> -->
+                    <!--             <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF156;" /> -->
+                    <!--         </communityControls:SettingsCard.HeaderIcon> -->
+                    <!--         <communityControls:SettingsCard.Description> -->
+                    <!--             <HyperlinkButton x:Uid="Views/SettingsView/AboutThisOptionHyperlinkButton" /> -->
+                    <!--         </communityControls:SettingsCard.Description> -->
+                    <!--     </communityControls:SettingsCard> -->
+                    <!-- </StackPanel> -->
+                    <!--About-->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/About"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <!--Open-Source project references-->
+                        <communityControls:SettingsExpander x:Uid="Views/SettingsView/About/OpenSource"
+                                                            IsExpanded="True">
+                            <communityControls:SettingsExpander.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphCode}" />
+                            </communityControls:SettingsExpander.HeaderIcon>
+                            <communityControls:SettingsExpander.Items>
+                                <communityControls:SettingsCard ContentAlignment="Left">
+                                    <StackPanel>
+                                        <HyperlinkButton Content="Binaryify/NeteaseCloudMusicApi"
+                                                         NavigateUri="https://github.com/Binaryify/NeteaseCloudMusicApi" />
+                                        <HyperlinkButton Content="brandonw3612/Copycat"
+                                                         NavigateUri="https://github.com/brandonw3612/Copycat" />
+                                        <HyperlinkButton Content="brandonw3612/Pulse.NET"
+                                                         NavigateUri="https://github.com/brandonw3612/Pulse.NET" />
+                                        <HyperlinkButton Content="codebude/QRCoder"
+                                                         NavigateUri="https://github.com/codebude/QRCoder" />
+                                        <HyperlinkButton Content="CommunityToolkit/dotnet"
+                                                         NavigateUri="https://github.com/CommunityToolkit/dotnet" />
+                                        <HyperlinkButton Content="CommunityToolkit/Windows"
+                                                         NavigateUri="https://github.com/CommunityToolkit/Windows" />
+                                        <HyperlinkButton Content="dotMorten/WinUIEx"
+                                                         NavigateUri="https://github.com/dotMorten/WinUIEx" />
+                                        <HyperlinkButton Content="dotnet/roslyn"
+                                                         NavigateUri="https://github.com/dotnet/roslyn" />
+                                        <HyperlinkButton Content="HavenDV/H.NotifyIcon"
+                                                         NavigateUri="https://github.com/HavenDV/H.NotifyIcon" />
+                                        <HyperlinkButton Content="JamesNK/Newtonsoft.Json"
+                                                         NavigateUri="https://github.com/JamesNK/Newtonsoft.Json" />
+                                        <HyperlinkButton Content="loresoft/Injectio"
+                                                         NavigateUri="https://github.com/loresoft/Injectio" />
+                                        <HyperlinkButton Content="microsoft/CsWinRT"
+                                                         NavigateUri="https://github.com/microsoft/cswinrt" />
+                                        <HyperlinkButton Content="microsoft/fluentui-system-icons"
+                                                         NavigateUri="https://github.com/microsoft/fluentui-system-icons" />
+                                        <HyperlinkButton Content="microsoft/microsoft-ui-xaml"
+                                                         NavigateUri="https://github.com/microsoft/microsoft-ui-xaml" />
+                                        <HyperlinkButton Content="microsoft/windowsappsdk"
+                                                         NavigateUri="https://github.com/microsoft/windowsappsdk" />
+                                        <HyperlinkButton Content="Microsoft/XamlBehaviors"
+                                                         NavigateUri="https://github.com/Microsoft/XamlBehaviors" />
+                                        <HyperlinkButton Content="4OTbIPE/imageex"
+                                                         NavigateUri="https://github.com/4OTbIPE/imageex" />
+                                    </StackPanel>
+                                </communityControls:SettingsCard>
+                            </communityControls:SettingsExpander.Items>
+                        </communityControls:SettingsExpander>
+                        <!--Specifications-->
+                        <communityControls:SettingsExpander x:Uid="Views/SettingsView/About/Spec"
+                                                            IsExpanded="True">
+                            <communityControls:SettingsExpander.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphInfo}" />
+                            </communityControls:SettingsExpander.HeaderIcon>
+                            <communityControls:SettingsExpander.Items>
+                                <communityControls:SettingsCard ContentAlignment="Left">
+                                    <Grid Margin="8" ColumnSpacing="48" RowSpacing="12" HorizontalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock FontWeight="Medium"
+                                                   Text="{x:Bind ViewModel.ApplicationName}" />
+                                        <RichTextBlock Grid.Column="1" Grid.Row="0">
+                                            <Paragraph>
+                                                <Run>A project by</Run>
+                                                <Hyperlink NavigateUri="https://github.com/brandonw3612">@brandonw3612</Hyperlink>
+                                                <Run>. Made with love in the Netherlands.</Run>
+                                            </Paragraph>
+                                        </RichTextBlock>
+                                        <TextBlock FontWeight="Medium" Grid.Column="0" Grid.Row="1"
+                                                   x:Uid="Views/SettingsView/About/SpecSubmodule/FrameworkVersion" />
+                                        <TextBlock Grid.Column="1" Grid.Row="1"
+                                                   Text="{x:Bind ViewModel.FrameworkVersion}" />
+                                        <TextBlock FontWeight="Medium" Grid.Column="0" Grid.Row="2"
+                                                   x:Uid="Views/SettingsView/About/SpecSubmodule/AppVersion" />
+                                        <TextBlock Grid.Column="1" Grid.Row="2"
+                                                   Text="{x:Bind ViewModel.ApplicationVersion}" />
+                                        <TextBlock FontWeight="Medium" Grid.Column="0" Grid.Row="3"
+                                                   x:Uid="Views/SettingsView/About/SpecSubmodule/InstalledDate" />
+                                        <TextBlock Grid.Column="1" Grid.Row="3"
+                                                   Text="{x:Bind ViewModel.InstalledDate}" />
+                                    </Grid>
+                                </communityControls:SettingsCard>
+                                <communityControls:SettingsCard ContentAlignment="Left">
+                                    <communityControls:WrapPanel Orientation="Horizontal" HorizontalSpacing="8"
+                                                                 VerticalSpacing="8">
+                                        <Button Command="{x:Bind ViewModel.GoToUpdatesAndExperiencesCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE895;" FontSize="14" />
+                                                <TextBlock x:Uid="Views/SettingsView/About/SpecSubmodule/AppUpdate" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Command="{x:Bind ViewModel.ViewOnGitHubCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="{StaticResource FontIconGlyphGitHub}"
+                                                          FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                                          FontSize="16" />
+                                                <TextBlock x:Uid="Views/SettingsView/About/SpecSubmodule/ViewOnGitHub" />
+                                            </StackPanel>
+                                        </Button>
+                                    </communityControls:WrapPanel>
+                                </communityControls:SettingsCard>
+                            </communityControls:SettingsExpander.Items>
+                        </communityControls:SettingsExpander>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</local:SettingsViewBase>

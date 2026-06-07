@@ -1,0 +1,77 @@
+<notifyIcon:TaskbarIcon
+    x:Class="Cirrus.Controls.SystemTrayIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:notifyIcon="using:H.NotifyIcon"
+    xmlns:viewModels="using:Cirrus.ViewModels"
+    mc:Ignorable="d"
+    ToolTipText="{x:Bind ViewModel.ApplicationName}"
+    LeftClickCommand="{x:Bind ViewModel.RestoreMainWindowCommand}"
+    ContextMenuMode="SecondWindow">
+    <notifyIcon:TaskbarIcon.DataContext>
+        <viewModels:SystemTrayIconViewModel x:Name="ViewModel" />
+    </notifyIcon:TaskbarIcon.DataContext>
+    <notifyIcon:TaskbarIcon.IconSource>
+        <BitmapImage UriSource="/Assets/ApplicationIcon.ico" />
+    </notifyIcon:TaskbarIcon.IconSource>
+    <notifyIcon:TaskbarIcon.ContextFlyout>
+        <MenuFlyout>
+            <MenuFlyoutItem Text="{x:Bind ViewModel.PSB.TrackTitle, Mode=OneWay}" IsEnabled="False">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xEC4F;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="{x:Bind ViewModel.PSB.Artists, Mode=OneWay}" IsEnabled="False">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE91B;" FontFamily="{StaticResource CirrusIconSetFontFamily}" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Uid="SystemTrayIcon/Previous"
+                            Command="{x:Bind ViewModel.PreviousTrackCommand}"
+                            Visibility="{x:Bind ViewModel.PSB.IsPreviousAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE892;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Uid="SystemTrayIcon/Play"
+                            Command="{x:Bind ViewModel.PlayPauseCommand}"
+                            Visibility="{x:Bind ViewModel.PSB.IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE768;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Uid="SystemTrayIcon/Pause"
+                            Command="{x:Bind ViewModel.PlayPauseCommand}"
+                            Visibility="{x:Bind ViewModel.PSB.IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE769;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Uid="SystemTrayIcon/Next"
+                            Command="{x:Bind ViewModel.NextTrackCommand}"
+                            Visibility="{x:Bind ViewModel.PSB.IsNextAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE893;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem
+                Text="{x:Bind Path=ViewModel.ApplicationName, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=SystemTrayMenu/ReopenWindow/Format}"
+                Command="{x:Bind ViewModel.RestoreMainWindowCommand}"
+                MinWidth="200">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8A7;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Uid="SystemTrayMenu/ExitApplication"
+                            Command="{x:Bind ViewModel.ExitApplicationCommand}"
+                            MinWidth="200">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE711;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </notifyIcon:TaskbarIcon.ContextFlyout>
+</notifyIcon:TaskbarIcon>

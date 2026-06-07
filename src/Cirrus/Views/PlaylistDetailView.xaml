@@ -1,0 +1,279 @@
+﻿<local:PlaylistDetailViewBase
+    x:Class="Cirrus.Views.PlaylistDetailView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commanding="using:Cirrus.Commanding"
+    xmlns:community="using:CommunityToolkit.WinUI"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    xmlns:modelArtist="using:Cirrus.Models.Network.Artist"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commanding:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+        <commanding:PlayFromListCommand x:Key="PlayFromListCommand" />
+    </Page.Resources>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState />
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Artists}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="FeaturedArtistsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
+                     Background="Transparent"
+                     IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        <Border x:Name="FloatingHeader"
+                Canvas.ZIndex="1"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
+                Visibility="Collapsed"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="4" Margin="32 16" Padding="16">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
+            </animations:Implicit.HideAnimations>
+            <layout:Row Spacing="16">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        CornerRadius="8" Width="60" Height="60" x:Name="FloatingHeaderCoverImageContainer">
+                    <Image Stretch="Uniform"
+                           Source="{x:Bind ViewModel.Playlist.CoverImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=480}"
+                           Width="60" Height="60" />
+                </Border>
+                <StackPanel VerticalAlignment="Center"
+                            layout:Row.ColumnWidth="*">
+                    <TextBlock Text="{x:Bind ViewModel.Playlist.Title, Mode=OneWay}"
+                               FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button Content="{x:Bind ViewModel.Playlist.Creator.Nickname, Mode=OneWay}"
+                            Style="{StaticResource TextBlockButtonStyle}" FontSize="16" CornerRadius="4"
+                            Padding="4 2" Margin="-4 0"
+                            Command="{StaticResource NavigateCommand}"
+                            CommandParameter="{x:Bind ViewModel.Playlist.Creator, Mode=OneWay}" />
+                </StackPanel>
+                <Button Style="{ThemeResource AccentButtonStyle}"
+                        Command="{StaticResource PlayFromListCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xF5B0;" FontSize="12" />
+                        <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
+                    </StackPanel>
+                </Button>
+            </layout:Row>
+        </Border>
+        <ListView x:Name="TrackListView"
+                  Style="{StaticResource TrackListViewStyle}"
+                  SelectionMode="None"
+                  Padding="16 16 16 80"
+                  ItemsSource="{x:Bind ViewModel.Tracks}">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:LoadedEventTriggerBehavior>
+                    <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+                </behaviors:LoadedEventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                    <controls:TrackListItem DataContext="{x:Bind Track}"
+                                            Index="{x:Bind Index, Mode=OneWay}"
+                                            PlayFromListCommand="{StaticResource PlayFromListCommand}"
+                                            ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Header>
+                <Border x:Name="ViewHeader"
+                        Visibility="{x:Bind ViewModel.Playlist, Converter={StaticResource EmptyObjectJudgeConverter}, Mode=OneWay}"
+                        Margin="0 0 0 16" VerticalAlignment="Top"
+                        Padding="16"
+                        CornerRadius="8"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <animations:Implicit.Animations>
+                        <animations:OpacityAnimation Duration="0:0:0.300" />
+                    </animations:Implicit.Animations>
+                    <layout:Row Spacing="16">
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                CornerRadius="8" Width="240" Height="240">
+                            <Image Stretch="Uniform"
+                                   Source="{x:Bind ViewModel.Playlist.CoverImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=480}"
+                                   Width="240" Height="240" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Bottom">
+                            <TextBlock x:Name="HeaderTitleTextBlock"
+                                       Text="{x:Bind ViewModel.Playlist.Title, Mode=OneWay}"
+                                       FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+                            <Button x:Name="HeaderCreatorButton"
+                                    Content="{x:Bind ViewModel.Playlist.Creator.Nickname, Mode=OneWay}"
+                                    Style="{StaticResource TextBlockButtonStyle}" FontSize="20"
+                                    CornerRadius="4"
+                                    Padding="4 2" Margin="-4 4 -4 0"
+                                    Command="{StaticResource NavigateCommand}"
+                                    CommandParameter="{x:Bind ViewModel.Playlist.Creator, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.UpdatedTimeText, Mode=OneWay}"
+                                       Visibility="{x:Bind ViewModel.UpdatedTimeText, Converter={StaticResource EmptyObjectJudgeConverter}, Mode=OneWay}"
+                                       Margin="0 4 0 0" />
+                            <Button Style="{StaticResource TextBlockButtonStyle}" FontSize="12"
+                                    CornerRadius="4"
+                                    Padding="4 2" Margin="-4 4 -4 0"
+                                    Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                    Command="{x:Bind ViewModel.ShowDescriptionTeachingTipCommand}"
+                                    Visibility="{x:Bind ViewModel.Playlist.Description, Mode=OneWay, FallbackValue=Collapsed, Converter={StaticResource EmptyObjectJudgeConverter}}">
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.Playlist.Description, Mode=OneWay, Converter={StaticResource LineBreakRemovalConverter}}"
+                                    MaxLines="3" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                            </Button>
+                            <TeachingTip
+                                IsOpen="{x:Bind ViewModel.IsDescriptionTeachingTipOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                PreferredPlacement="Center" IsLightDismissEnabled="True">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="{x:Bind ViewModel.Playlist.Title, Mode=OneWay}"
+                                               TextWrapping="Wrap"
+                                               FontSize="20" FontWeight="SemiBold"
+                                               Foreground="{ThemeResource SystemAccentColor}" />
+                                    <TextBlock Text="{x:Bind ViewModel.Playlist.Creator.Nickname, Mode=OneWay}"
+                                               TextWrapping="Wrap"
+                                               FontSize="16" FontWeight="Medium"
+                                               Foreground="{ThemeResource SystemBaseMediumLowColor}" />
+                                    <TextBlock Text="{x:Bind ViewModel.Playlist.Description, Mode=OneWay}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </TeachingTip>
+                            <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
+                                <Button x:Name="HeaderPlayButton" Style="{ThemeResource AccentButtonStyle}"
+                                        Command="{StaticResource PlayFromListCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xF5B0;" FontSize="12" />
+                                        <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Margin="4 0 0 0" Style="{StaticResource RedButtonStyle}"
+                                        Command="{x:Bind ViewModel.StartStationCommand}"
+                                        Visibility="{x:Bind ViewModel.IsIntelligentListSupported, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Glyph="&#xE91D;"
+                                                  FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                                  FontSize="16" />
+                                        <TextBlock
+                                            x:Uid="Views/PlaylistDetailView/IntelligentPlayButtonContent" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Margin="4 0 0 0"
+                                        Command="{StaticResource SubscribePlaylistCommand}"
+                                        CommandParameter="{x:Bind ViewModel.Playlist, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsSubscribable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Glyph="{StaticResource FontIconGlyphCollectionAdd}"
+                                                  FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                                  FontSize="16" />
+                                        <TextBlock x:Uid="Views/PlaylistDetailView/SubscribeButtonContent" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Margin="4 0 0 0"
+                                        Command="{StaticResource UnsubscribePlaylistCommand}"
+                                        CommandParameter="{x:Bind ViewModel.Playlist, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsSubscribed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                                        <TextBlock x:Uid="Views/PlaylistDetailView/UnsubscribeButtonContent" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Margin="4 0 0 0" VerticalAlignment="Stretch">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                                  Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}"
+                                                  FontSize="16" />
+                                    </StackPanel>
+                                    <Button.Flyout>
+                                        <MenuFlyout Placement="RightEdgeAlignedTop">
+                                            <MenuFlyout.MenuFlyoutPresenterStyle>
+                                                <Style TargetType="MenuFlyoutPresenter">
+                                                    <Setter Property="MinWidth" Value="250" />
+                                                </Style>
+                                            </MenuFlyout.MenuFlyoutPresenterStyle>
+                                            <MenuFlyoutItem x:Uid="MenuFlyoutItems/Share"
+                                                            Icon="{community:FontIcon Glyph=&#xE72D;}"
+                                                            Command="{StaticResource ShareCommand}"
+                                                            CommandParameter="{x:Bind ViewModel.Playlist, Mode=OneWay}" />
+                                            <MenuFlyoutItem x:Uid="MenuFlyoutItems/CopyLink"
+                                                            Icon="{community:FontIcon Glyph=&#xE71B;}"
+                                                            Command="{StaticResource CopyLinkCommand}"
+                                                            CommandParameter="{x:Bind ViewModel.Playlist, Mode=OneWay}" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </layout:Row>
+                </Border>
+            </ListView.Header>
+            <ListView.Footer>
+                <StackPanel>
+                    <StackPanel Margin="12" Spacing="4">
+                        <TextBlock Text="{x:Bind ViewModel.TrackCountDurationString, Mode=OneWay}"
+                                   Visibility="{x:Bind ViewModel.TrackCountDurationString, Mode=OneWay, Converter={StaticResource EmptyObjectJudgeConverter}}"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}" />
+                        <TextBlock Text="{x:Bind ViewModel.CreatedDateString, Mode=OneWay}"
+                                   Visibility="{x:Bind ViewModel.CreatedDateString, Mode=OneWay, Converter={StaticResource EmptyObjectJudgeConverter}}"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}" />
+                    </StackPanel>
+                    <StackPanel x:Name="FeaturedArtistsPanel">
+                        <TextBlock x:Uid="Views/PlaylistDetailView/FeaturedArtistsHeader"
+                                   Margin="4 0" FontSize="20" FontWeight="SemiBold"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}"
+                                   Visibility="{x:Bind ViewModel.Artists.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}" />
+                        <ListView ItemsSource="{x:Bind ViewModel.Artists}"
+                                  Padding="0 0 0 12"
+                                  SelectionMode="None" IsItemClickEnabled="True">
+                            <interactivity:Interaction.Behaviors>
+                                <behaviors:WheelEventRelayBehavior />
+                            </interactivity:Interaction.Behaviors>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsStackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <ContentPresenter Padding="4" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="modelArtist:ArtistDetail2">
+                                    <controls:NavigatiableDisplayCard
+                                        Style="{StaticResource CircleNavigationDisplayCardStyle}" Width="128"
+                                        CornerRadius="60"
+                                        Image="{x:Bind AvatarImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=240}"
+                                        Title="{x:Bind Name}"
+                                        DataContext="{Binding Mode=OneWay}" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </StackPanel>
+            </ListView.Footer>
+        </ListView>
+    </Grid>
+</local:PlaylistDetailViewBase>

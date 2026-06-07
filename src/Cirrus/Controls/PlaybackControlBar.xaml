@@ -1,0 +1,211 @@
+﻿<UserControl
+    x:Class="Cirrus.Controls.PlaybackControlBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:communityAnimations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:layout="using:Cirrus.Layout"
+    mc:Ignorable="d">
+    <interactivity:Interaction.Behaviors>
+        <behaviors:LoadedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+        </behaviors:LoadedEventTriggerBehavior>
+        <behaviors:SizeChangedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+        </behaviors:SizeChangedEventTriggerBehavior>
+        <behaviors:TappedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind TappedCommand}" />
+        </behaviors:TappedEventTriggerBehavior>
+    </interactivity:Interaction.Behaviors>
+    <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Compact" />
+                <VisualState x:Name="Basic">
+                    <VisualState.Setters>
+                        <Setter Target="BasicOperationButtonPanel.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Full">
+                    <VisualState.Setters>
+                        <Setter Target="BasicOperationButtonPanel.Visibility" Value="Visible" />
+                        <Setter Target="ExtendedOperationButtonPanel.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Border Grid.RowSpan="2" Grid.ColumnSpan="3" x:Name="BackgroundBorder"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8" BorderThickness="1" />
+        <controls:GlidySlider x:Name="TimelineSlider" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="2"
+                              Margin="60 -6 22 0" Opacity="0" VerticalAlignment="Top" Height="16"
+                              Minimum="0"
+                              Maximum="{x:Bind ViewModel.PlaybackServiceBridge.DurationMilliseconds, Mode=OneWay}"
+                              Value="{x:Bind ViewModel.PlaybackServiceBridge.CurrentPositionMilliseconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <communityAnimations:Implicit.ShowAnimations>
+                <communityAnimations:OpacityAnimation Delay="0:0:0.100" Duration="0:0:0.400" To="1" />
+                <communityAnimations:OffsetAnimation Duration="0:0:0.500" To="76,-10,0" />
+            </communityAnimations:Implicit.ShowAnimations>
+            <communityAnimations:Implicit.HideAnimations>
+                <communityAnimations:OpacityAnimation Duration="0:0:0.400" To="0" />
+                <communityAnimations:OffsetAnimation Delay="0:0:0.200" Duration="0:0:0.500" To="60,-6,0" />
+            </communityAnimations:Implicit.HideAnimations>
+        </controls:GlidySlider>
+        <Border x:Name="AlbumArtworkBorder" Grid.Column="0" CornerRadius="4" Margin="6"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                Background="{ThemeResource CardBackgroundFillColorDefault}">
+            <Image
+                Source="{x:Bind ViewModel.PlaybackServiceBridge.AlbumArtworkUri, Mode=OneWay,
+                            Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=192}"
+                Width="48" Height="48" />
+        </Border>
+        <StackPanel x:Name="TrackInfoPanel" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                    Margin="60 0 26 0" Spacing="2">
+            <layout:Row Spacing="2">
+                <TextBlock Text="{x:Bind ViewModel.PlaybackServiceBridge.TrackTitle, Mode=OneWay}"
+                           FontSize="14" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                <FontIcon Glyph="{ThemeResource FontIconGlyphExplicit}"
+                          FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                          Visibility="{x:Bind ViewModel.PlaybackServiceBridge.IsExplicit, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                          Foreground="{ThemeResource ExplicitIconForeground}"
+                          FontSize="16"
+                          layout:Row.Priority="1" />
+            </layout:Row>
+            <TextBlock Text="{x:Bind ViewModel.PlaybackServiceBridge.Artists, Mode=OneWay}"
+                       FontSize="12" Foreground="{ThemeResource SystemBaseMediumColor}"
+                       TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="6 0"
+                    Visibility="{x:Bind ViewModel.PlaybackServiceBridge.IsControlAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel x:Name="BasicOperationButtonPanel" Visibility="Collapsed"
+                        Orientation="Horizontal" Spacing="4">
+                <Button Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}"
+                        VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xEB51;" FontSize="16" Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                </Button>
+                <Button Command="{x:Bind ViewModel.PreviousCommand}"
+                        Visibility="{x:Bind ViewModel.PlaybackServiceBridge.IsPreviousAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}"
+                        VerticalAlignment="Center">
+                    <FontIcon Glyph="{StaticResource FontIconGlyphRewindFilled}" FontSize="20"
+                              FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                              Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                </Button>
+                <Button Command="{x:Bind ViewModel.PlayPauseCommand}"
+                        Width="48" Height="48" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}">
+                    <communityControls:SwitchPresenter AllowFocusOnInteraction="False"
+                                                       Value="{x:Bind ViewModel.PlaybackServiceBridge.IsPlaying, Mode=OneWay}">
+                        <communityControls:Case Value="{StaticResource BooleanValueTrue}">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphPauseFilled}" FontSize="28"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="{StaticResource BooleanValueFalse}">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphPlayFilled}" FontSize="28"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                    </communityControls:SwitchPresenter>
+                </Button>
+                <Button Command="{x:Bind ViewModel.NextCommand}"
+                        Visibility="{x:Bind ViewModel.PlaybackServiceBridge.IsNextAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}">
+                    <FontIcon Glyph="{StaticResource FontIconGlyphFastForwardFilled}" FontSize="20"
+                              FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                              Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                </Button>
+            </StackPanel>
+            <StackPanel x:Name="ExtendedOperationButtonPanel" Visibility="Collapsed"
+                        Orientation="Horizontal" Spacing="4" Margin="4 0 0 0">
+                <Button Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Command="{x:Bind ViewModel.SwitchPlaybackModeCommand}"
+                        Visibility="{x:Bind ViewModel.PlaybackServiceBridge.IsPlaybackModeSwitchable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Style="{ThemeResource TextBlockButtonStyle}"
+                        VerticalAlignment="Center">
+                    <communityControls:SwitchPresenter AllowFocusOnInteraction="False"
+                                                       Value="{x:Bind ViewModel.PlaybackServiceBridge.CurrentPlaybackMode, Mode=OneWay}">
+                        <communityControls:Case Value="Sequential">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphNavigationFilled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="RepeatAll">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphRepeatAllFilled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="RepeatOne">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphRepeatOneFilled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="Shuffle">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphShuffleFilled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                    </communityControls:SwitchPresenter>
+                </Button>
+                <Button Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}"
+                        VerticalAlignment="Center">
+                    <communityControls:SwitchPresenter AllowFocusOnInteraction="False"
+                                                       Value="{x:Bind ViewModel.PlaybackServiceBridge.VolumeLevel, Mode=OneWay}">
+                        <communityControls:Case Value="0">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphSpeaker0Filled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="1">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphSpeaker1Filled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                        <communityControls:Case Value="2">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphSpeaker2Filled}" FontSize="16"
+                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                                      Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                        </communityControls:Case>
+                    </communityControls:SwitchPresenter>
+                    <Button.Flyout>
+                        <Flyout FlyoutPresenterStyle="{ThemeResource TransparentFlyoutPresenterStyle}">
+                            <Border Background="{ThemeResource SystemControlAcrylicElementBrush}">
+                                <controls:GlidySlider Width="30" Height="120" CornerRadius="8" AnimationScaleFactor="1"
+                                                      UpdateOnInteraction="True"
+                                                      Orientation="Vertical"
+                                                      Minimum="0" Maximum="1"
+                                                      Value="{x:Bind ViewModel.PlaybackServiceBridge.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Border>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+                <Button Width="36" Height="36" CornerRadius="4" Padding="0"
+                        Style="{ThemeResource TextBlockButtonStyle}"
+                        VerticalAlignment="Center"
+                        DataContext="{x:Bind ViewModel.PlaybackServiceBridge.CurrentTrack, Mode=OneWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:TappedEventTriggerBehavior>
+                            <behaviors:InvokeCommandActionEx Command="{StaticResource ShowTrackContextFlyoutCommand}" />
+                        </behaviors:TappedEventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
+                    <FontIcon Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}" FontSize="16"
+                              FontFamily="{ThemeResource CirrusIconSetFontFamily}"
+                              Foreground="{ThemeResource SystemBaseMediumHighColor}" />
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,1006 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SystemTrayMenu.ExitApplication.Text" xml:space="preserve">
+    <value>退出</value>
+    <comment>系统托盘菜单项 - 用于退出应用程序</comment>
+  </data>
+  <data name="SystemTrayMenu.ReopenWindow.Format" xml:space="preserve">
+    <value>啟動 {0}</value>
+    <comment>系统托盘菜单项 - 用于重新打开应用窗口</comment>
+  </data>
+  <data name="Views.SearchView.TrendingKeywordsHeader.Text" xml:space="preserve">
+    <value>熱門搜索</value>
+    <comment>热搜列表Header</comment>
+  </data>
+  <data name="Views.SearchView.HistoryKeywordsHeader.Text" xml:space="preserve">
+    <value>搜索歷史</value>
+    <comment>搜索历史列表Header</comment>
+  </data>
+  <data name="Views.SearchView.ClearHistoryButton.Content" xml:space="preserve">
+    <value>清空</value>
+    <comment>清空历史记录按钮Content</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.Browse.Caption" xml:space="preserve">
+    <value>發現</value>
+    <comment>侧边栏导航按钮 - 发现 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.CloudDrive.Caption" xml:space="preserve">
+    <value>音樂雲盤</value>
+    <comment>侧边栏导航按钮 - 云盘 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.ForYou.Caption" xml:space="preserve">
+    <value>個性推薦</value>
+    <comment>侧边栏导航按钮 - 个性推荐 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.Library.Caption" xml:space="preserve">
+    <value>我的收藏</value>
+    <comment>侧边栏导航按钮 - 收藏 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.PlaybackHistory.Caption" xml:space="preserve">
+    <value>播放歷史</value>
+    <comment>侧边栏导航按钮 - 播放历史 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.Search.Caption" xml:space="preserve">
+    <value>搜索</value>
+    <comment>侧边栏导航按钮 - 搜索 - Caption</comment>
+  </data>
+  <data name="Controls.SidebarView.SidebarButtons.Station.Caption" xml:space="preserve">
+    <value>私人 FM</value>
+    <comment>侧边栏导航按钮 - 私人FM - Caption</comment>
+  </data>
+  <data name="Views.SettingsView.ThemeName.Dark" xml:space="preserve">
+    <value>深色模式</value>
+    <comment>设置页 - 主题ComboBox - 深色模式 Content</comment>
+  </data>
+  <data name="Views.SettingsView.ThemeName.Default" xml:space="preserve">
+    <value>使用系統設置（默認）</value>
+    <comment>设置页 - 主题ComboBox - 默认主题 Content</comment>
+  </data>
+  <data name="Views.SettingsView.ThemeName.Light" xml:space="preserve">
+    <value>淺色模式</value>
+    <comment>设置页 - 主题ComboBox - 浅色模式 Content</comment>
+  </data>
+  <data name="Views.SettingsView.LanguageName.Default" xml:space="preserve">
+    <value>匹配系統設置（默認）</value>
+    <comment>设置页 - 语言ComboBox - 系统默认 Content</comment>
+  </data>
+  <data name="Views.SettingsView.Header.Text" xml:space="preserve">
+    <value>設置</value>
+    <comment>设置页 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.About.Text" xml:space="preserve">
+    <value>關於</value>
+    <comment>设置页 - 关于模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Account.Text" xml:space="preserve">
+    <value>賬戶</value>
+    <comment>设置页 - 账户模块- Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Appearance.Text" xml:space="preserve">
+    <value>外觀</value>
+    <comment>设置页 - 外观模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Interaction.Text" xml:space="preserve">
+    <value>交互</value>
+    <comment>设置页 - 交互模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Network.Text" xml:space="preserve">
+    <value>網絡</value>
+    <comment>设置页 - 网络模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Playback.Text" xml:space="preserve">
+    <value>播放</value>
+    <comment>设置页 - 播放模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.SectionHeaders.Storage.Text" xml:space="preserve">
+    <value>存儲空間</value>
+    <comment>设置页 - 存储空间模块 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.Font.Header" xml:space="preserve">
+    <value>顯示字體</value>
+    <comment>设置页 - 外观模块 - 字体 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.Language.Header" xml:space="preserve">
+    <value>語言</value>
+    <comment>设置页 - 外观模块 - 语言 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.Performance.Header" xml:space="preserve">
+    <value>性能與體驗</value>
+    <comment>设置页 - 外观模块 - 性能与体验 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.Theme.Header" xml:space="preserve">
+    <value>主題</value>
+    <comment>设置页 - 外观模块 - 主题 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.PerformanceSubmodule.BatterySaver.Content" xml:space="preserve">
+    <value>啟用節電模式</value>
+    <comment>设置页 - 外观模式 - 性能与体验 - 节电模式 CheckBox Content</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.PerformanceSubmodule.DynaBack.Content" xml:space="preserve">
+    <value>在播放控制頁中啟用動態背景效果</value>
+    <comment>设置页 - 外观模块 - 性能与体验 - 动态背景 CheckBox Content</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.PerformanceSubmodule.VerbatimLyrics.Content" xml:space="preserve">
+    <value>在受支持的歌曲中啟用逐字歌詞</value>
+    <comment>设置页 - 外观模块 - 性能与体验 - 逐字歌词 CheckBox Content</comment>
+  </data>
+  <data name="Controls.KeyboardRecordBox.WarningText" xml:space="preserve">
+    <value>*輸入不符合限制。</value>
+    <comment>键盘录制控件 - 输入不符合规范警告文本</comment>
+  </data>
+  <data name="Controls.Buttons.Save.Content" xml:space="preserve">
+    <value>保存</value>
+    <comment>保存 Button Content</comment>
+  </data>
+  <data name="Dialogs.KeyboardShortcutsCustomizationDialog.Title" xml:space="preserve">
+    <value>鍵盤快捷鍵</value>
+    <comment>键盘快捷键定制对话框 - 标题</comment>
+  </data>
+  <data name="Dialogs.KeyboardShortcutsCustomizationDialogContent.Error.Text" xml:space="preserve">
+    <value>*保存配置前請確保各項快捷鍵均滿足上方的限制。</value>
+    <comment>键盘快捷键定制对话框 - 错误提示 TextBlock Text</comment>
+  </data>
+  <data name="Dialogs.KeyboardShortcutsCustomizationDialogContent.Tip.Text" xml:space="preserve">
+    <value>提示：鍵盤快捷鍵需要設定一個主鍵（可以是字母、數字、方向控制鍵），此外您也可以選擇性地加入修飾鍵（Shift，Ctrl，Alt）。</value>
+    <comment>键盘快捷键定制对话框 - 设置提示 TextBlock Text</comment>
+  </data>
+  <data name="Controls.Buttons.Cancel.Content" xml:space="preserve">
+    <value>取消</value>
+    <comment>取消 Button Content</comment>
+  </data>
+  <data name="KeyboardShortcuts.DecreaseVolume.Name" xml:space="preserve">
+    <value>減小音量</value>
+    <comment>键盘快捷键动作 - 减小音量</comment>
+  </data>
+  <data name="KeyboardShortcuts.IncreaseVolume.Name" xml:space="preserve">
+    <value>增大音量</value>
+    <comment>键盘快捷键动作 - 增大音量</comment>
+  </data>
+  <data name="KeyboardShortcuts.Next.Name" xml:space="preserve">
+    <value>下一曲</value>
+    <comment>键盘快捷键动作 - 下一曲</comment>
+  </data>
+  <data name="KeyboardShortcuts.PlayPause.Name" xml:space="preserve">
+    <value>播放 / 暫停</value>
+    <comment>键盘快捷键动作 - 播放 / 暂停</comment>
+  </data>
+  <data name="KeyboardShortcuts.Previous.Name" xml:space="preserve">
+    <value>上一曲</value>
+    <comment>键盘快捷键动作 - 上一曲</comment>
+  </data>
+  <data name="Dialogs.KeyboardShortcutsCustomizationDialogContent.RestoreDefault.Content" xml:space="preserve">
+    <value>恢復默認</value>
+    <comment>键盘快捷键定制对话框 - 恢复默认 Button Content</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.KeyboardShortcuts.Header" xml:space="preserve">
+    <value>鍵盤快捷鍵</value>
+    <comment>设置页 - 交互模块 - 键盘快捷键 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithHotLyric.Description" xml:space="preserve">
+    <value>“熱詞” 已在此設備上準備就緒。</value>
+    <comment>设置页 - 交互模块 - 桌面歌词 Description （HotLyric已安装)</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithHotLyric.Header" xml:space="preserve">
+    <value>桌面歌詞</value>
+    <comment>设置页 - 交互模块 - 桌面歌词 Header (HotLyric已安装)</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithoutHotLyric.Header" xml:space="preserve">
+    <value>桌面歌詞</value>
+    <comment>设置页 - 交互模块 - 桌面歌词 Header (HotLyric未安装)</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.KeyboardShortcutsSubmodule.CustomizeButtonText.Text" xml:space="preserve">
+    <value>自定義</value>
+    <comment>设置页 - 交互模块 - 键盘快捷键 - 自定义按钮 Text</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithoutHotLyricSubmodule.OffContent" xml:space="preserve">
+    <value>隨應用自啟動</value>
+    <comment>设置页 - 交互模块 - 热词 - 自启动 Content</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithoutHotLyricSubmodule.OnContent" xml:space="preserve">
+    <value>隨應用自啟動</value>
+    <comment>设置页 - 交互模块 - 热词 - 自启动 Content</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.HotLyricNotInstalled.StoreButtonText.Text" xml:space="preserve">
+    <value>在 Microsoft Store 中查看</value>
+    <comment>设置页 - 交互模块 - 热词 - 商店按钮 Text</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.DesktopLyricsWithoutHotLyric.Description" xml:space="preserve">
+    <value>我們推薦使用 ”熱詞“ 配合 Cirrus 在你的桌面上顯示歌詞。”熱詞“ 現於 Microsoft Store 提供。</value>
+    <comment>设置页 - 交互模块 - 桌面歌词 - Description (HotLyric未安装)</comment>
+  </data>
+  <data name="Dialogs.LoginDialog.Title" xml:space="preserve">
+    <value>登錄</value>
+    <comment>登录对话框 - 标题</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.LoginMethods.Cellphone.Content" xml:space="preserve">
+    <value>電話號碼</value>
+    <comment>登录对话框 - 验证方式 - 电话号码 Content</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.LoginMethods.Mail.Content" xml:space="preserve">
+    <value>郵箱</value>
+    <comment>登录对话框 - 验证方式 - 邮箱 Content</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.LoginMethods.QR.Content" xml:space="preserve">
+    <value>二維碼</value>
+    <comment>登录对话框 - 验证方式 - 二维码 Content</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.CellphoneNumber.PlaceholderText" xml:space="preserve">
+    <value>電話號碼</value>
+    <comment>登录对话框 - 电话号码输入框 Placeholder</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.EmailAddress.PlaceholderText" xml:space="preserve">
+    <value>郵箱地址</value>
+    <comment>登录对话框 - 邮箱地址输入框 Placeholder</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.Password.PlaceholderText" xml:space="preserve">
+    <value>密碼</value>
+    <comment>登录对话框 - 密码输入框 Placeholder</comment>
+  </data>
+  <data name="MessageBoxes.LogOut.Content" xml:space="preserve">
+    <value>確認退出當前賬號嗎？後續如需使用該賬號，需要重新進行身份驗證。</value>
+    <comment>退出登录消息框 Content</comment>
+  </data>
+  <data name="MessageBoxes.LogOut.PrimaryButtonText" xml:space="preserve">
+    <value>確認退出</value>
+    <comment>退出登录消息框 PrimaryButtonText</comment>
+  </data>
+  <data name="Controls.Buttons.OK.Content" xml:space="preserve">
+    <value>好</value>
+    <comment>确认按钮 Content</comment>
+  </data>
+  <data name="MessageBoxes.Error.Title" xml:space="preserve">
+    <value>錯誤</value>
+    <comment>错误消息框</comment>
+  </data>
+  <data name="Exceptions.Authentication.LoginFailedExceptionFormat" xml:space="preserve">
+    <value>登錄失敗。詳細信息：{0}</value>
+    <comment>登陆失败消息提示 Format</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.LoginButton.TextContent.Text" xml:space="preserve">
+    <value>登錄</value>
+    <comment>登录对话框 - 登录按钮 Content</comment>
+  </data>
+  <data name="Views.SettingsView.Interaction.RunsInBackground.Header" xml:space="preserve">
+    <value>在後臺運行 Cirrus</value>
+    <comment>设置页 - 交互模块 - 后台运行 Header</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.AuthedMessage" xml:space="preserve">
+    <value>大功告成。</value>
+    <comment>登录对话框 - 已授权 - Message</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.AwaitingAuthMessage" xml:space="preserve">
+    <value>請在移動客戶端上授權此次登錄請求。</value>
+    <comment>登录对话框 - 二维码待授权 - Message</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.AwaitingScanMessage" xml:space="preserve">
+    <value>請使用 網易雲音樂 移動客戶端掃描上方二維碼。</value>
+    <comment>登录对话框 - 二维码待扫描 - Message</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.FetchingKeyMessage" xml:space="preserve">
+    <value>正在獲取二維碼……</value>
+    <comment>登录对话框 - 正在获取二维码 - Message</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.KeyFetchErrorMessage" xml:space="preserve">
+    <value>目前暫時無法獲取登錄二維碼。</value>
+    <comment>登录对话框 - 无法获取QrCodeKey - Error Message</comment>
+  </data>
+  <data name="Dialogs.LoginDialogContent.MobileAuth.QrExpiredMessage" xml:space="preserve">
+    <value>二維碼已過期。即將重新生成……</value>
+    <comment>登录对话框 - 二维码过期 - Message</comment>
+  </data>
+  <data name="Controls.AccountButton.LogInMenuFlyoutItem.Text" xml:space="preserve">
+    <value>登錄</value>
+    <comment>账户按钮 - 登录菜单项 - Text</comment>
+  </data>
+  <data name="Controls.AccountButton.LogOutMenuFlyoutItem.Text" xml:space="preserve">
+    <value>退出當前賬戶</value>
+    <comment>账户按钮 - 退出菜单项 - Text</comment>
+  </data>
+  <data name="Controls.AccountButton.SettingsMenuFlyoutItem.Text" xml:space="preserve">
+    <value>設置</value>
+    <comment>账户按钮 - 设置菜单项 - Text</comment>
+  </data>
+  <data name="Views.SettingsView.Appearance.FontName.Default" xml:space="preserve">
+    <value>默認字體</value>
+    <comment>设置页 - 外观模块 - 默认字体 Caption</comment>
+  </data>
+  <data name="Views.SettingsView.EnabledDisabledToggleSwitch.OffContent" xml:space="preserve">
+    <value>禁用</value>
+    <comment>设置页 - 启用 / 禁用开关 - 禁用 Content</comment>
+  </data>
+  <data name="Views.SettingsView.EnabledDisabledToggleSwitch.OnContent" xml:space="preserve">
+    <value>啓用</value>
+    <comment>设置页 - 启用 / 禁用开关 - 启用 Content</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.AudioOutputDeviceSwitch.Content" xml:space="preserve">
+    <value>切換音頻輸出設備后需要重新啓動才能使設置生效。立即重新啓動嗎？</value>
+    <comment>消息框 - 重启 - 切换音频输出设备 Content</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.CancelButtonText" xml:space="preserve">
+    <value>稍後重新啓動</value>
+    <comment>消息框 - 重启 - 取消 Button Text</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.FontSwitch.Content" xml:space="preserve">
+    <value>切換應用顯示字體后需要重新啓動才能使設置生效。立即重新啓動嗎？</value>
+    <comment>消息框 - 重启 - 切换字体 Content</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.LanguageSwitch.Content" xml:space="preserve">
+    <value>切換應用語言后需要重新啓動才能使設置生效。立即重新啓動嗎？</value>
+    <comment>消息框 - 重启 - 切换语言 Content</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.PrimaryButtonText" xml:space="preserve">
+    <value>立即重新啓動</value>
+    <comment>消息框 - 重启 - 确认Button Text</comment>
+  </data>
+  <data name="MessageBoxes.RequestRestart.Title" xml:space="preserve">
+    <value>需要重新啓動</value>
+    <comment>消息框 - 重启 - 标题</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioOutputDevice.Header" xml:space="preserve">
+    <value>音頻輸出設備</value>
+    <comment>设置页 - 播放模块 - 音频输出设备 Header</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Higher" xml:space="preserve">
+    <value>高質量（320 kbps）</value>
+    <comment>设置页 - 音频质量 ComboBox - 高</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.HiRes" xml:space="preserve">
+    <value>高解析度無損（最高192 kHz / 24 bit）</value>
+    <comment>设置页 - 音频质量 ComboBox - Hi-Res</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Lossless" xml:space="preserve">
+    <value>無損（最高48 kHz / 16 bit）</value>
+    <comment>设置页 - 音频质量 ComboBox - 无损</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Master" xml:space="preserve">
+    <value>（192 kHz / 24 bit）</value>
+    <comment>设置页 - 音频质量 ComboBox - 母带</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Spatial" xml:space="preserve">
+    <value>空間音頻（96 kHz / 24 bit）</value>
+    <comment>设置页 - 音频质量 ComboBox - Spatial</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Standard" xml:space="preserve">
+    <value>標準（128 kbps）</value>
+    <comment>设置页 - 音频质量 ComboBox - 标准</comment>
+  </data>
+  <data name="Views.SettingsView.AudioQuality.Surround" xml:space="preserve">
+    <value>環繞音頻（最高支持5.1聲道）</value>
+    <comment>设置页 - 音频质量 ComboBox - Surround</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioQuality.Header" xml:space="preserve">
+    <value>音頻質量</value>
+    <comment>设置页 - 播放模块 - 音频质量 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioOutputDeviceSubmodule.SelectDeviceContent.Text" xml:space="preserve">
+    <value>選擇設備</value>
+    <comment>设置页 - 播放模块 - 音频输出设备 - 选择按钮 Text</comment>
+  </data>
+  <data name="Views.SettingsView.AboutThisOptionHyperlinkButton.Content" xml:space="preserve">
+    <value>關於此選項</value>
+    <comment>设置页 - 关于此选项 Hyperlink Button Content</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioCrossfade.Header" xml:space="preserve">
+    <value>音頻交叉淡化</value>
+    <comment>设置页 - 播放模块 - 音频交叉淡化 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioCrossfadeSubmodule.CrossfadeLength.Header" xml:space="preserve">
+    <value>交叉淡化時長</value>
+    <comment>设置页 - 播放模块 - 音频交叉淡化 - 淡化时长 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioCrossfadeSubmodule.CrossfadeLengthLimit.Maximum.Text" xml:space="preserve">
+    <value>12秒</value>
+    <comment>设置页 - 播放模块 - 音频交叉淡化 - 淡化时长- 最大限制</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.AudioCrossfadeSubmodule.CrossfadeLengthLimit.Minimum.Text" xml:space="preserve">
+    <value>3秒</value>
+    <comment>设置页 - 播放模块 - 音频交叉淡化 - 淡化时长- 最小限制</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.DirectSwitch.Header" xml:space="preserve">
+    <value>傳統播放控制</value>
+    <comment>设置页 - 播放模块 - 传统播放控制 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Playback.DirectSwitchSubmodule.Description.Text" xml:space="preserve">
+    <value>默認情況下，Cirrus提供原生播放體驗。在歌曲播放一段時間後執行“上一曲”指令時將返回歌曲開頭；與此同時，切換播放項目不會改變播放/暫停狀態。為了兼容中國大陸部分智能設備的控制功能，開啟本選項後，執行“上一曲”指令時，Cirrus不考慮歌曲進度，並直接切換至上一首歌曲，並且完成切換後強制播放項目。</value>
+    <comment>设置页 - 播放模块 - 传统播放控制 - Description</comment>
+  </data>
+  <data name="Dialogs.NetworkProxyConfigDialog.Title" xml:space="preserve">
+    <value>網絡代理設置</value>
+    <comment>对话框 - 网络代理设置 - 标题</comment>
+  </data>
+  <data name="Dialogs.NetworkProxyConfigDialogContent.ProxyModes.Custom" xml:space="preserve">
+    <value>使用自定義代理</value>
+    <comment>对话框 - 网络代理设置 - 代理模式 - 自定义代理</comment>
+  </data>
+  <data name="Dialogs.NetworkProxyConfigDialogContent.ProxyModes.Off" xml:space="preserve">
+    <value>關閉</value>
+    <comment>对话框 - 网络代理设置 - 代理模式 - 关闭</comment>
+  </data>
+  <data name="Dialogs.NetworkProxyConfigDialogContent.ProxyModes.System" xml:space="preserve">
+    <value>使用系統代理</value>
+    <comment>对话框 - 网络代理设置 - 代理模式 - 系统代理</comment>
+  </data>
+  <data name="Views.SettingsView.Network.ConfigProxyButtonContent.Text" xml:space="preserve">
+    <value>配置</value>
+    <comment>设置页 - 网络 - 代理 - 设置按钮Content</comment>
+  </data>
+  <data name="Views.SettingsView.Network.Proxy.Header" xml:space="preserve">
+    <value>應用網絡代理</value>
+    <comment>设置页 - 网络 - 代理 Header</comment>
+  </data>
+  <data name="Views.SettingsView.Network.HttpFallback.Header" xml:space="preserve">
+    <value>網絡請求降級至 HTTP 協議</value>
+    <comment>设置页 - 网络 - HTTP 请求 Header</comment>
+  </data>
+  <data name="Views.SettingsView.About.OpenSource.Header" xml:space="preserve">
+    <value>開源項目引用</value>
+    <comment>设置页 - 关于 - 开源项目 Header</comment>
+  </data>
+  <data name="Views.SettingsView.About.Spec.Header" xml:space="preserve">
+    <value>規格</value>
+    <comment>设置页 - 关于 - 规格 Header</comment>
+  </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.AppUpdate.Text" xml:space="preserve">
+    <value>更新與預覽體驗</value>
+    <comment>设置页 - 关于 - 规格 - 版本更新 / 预览</comment>
+  </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.AppVersion.Text" xml:space="preserve">
+    <value>應用版本</value>
+    <comment>设置页 - 关于 - 规格 - 应用版本</comment>
+  </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.FrameworkVersion.Text" xml:space="preserve">
+    <value>.NET 版本</value>
+    <comment>设置页 - 关于 - 规格 - .NET 版本</comment>
+  </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.InstalledDate.Text" xml:space="preserve">
+    <value>安裝與</value>
+    <comment>设置页 - 关于 - 规格 - 安装日期</comment>
+  </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.ViewOnGitHub.Text" xml:space="preserve">
+    <value>在 GitHub 上查看</value>
+    <comment>设置页 - 关于 - 规格 - GitHub</comment>
+  </data>
+  <data name="Views.UserDetailView.Header.FollowerRun.Text" xml:space="preserve">
+    <value>關注者</value>
+    <comment>用户详情页 - Header - 关注者Button Suffix</comment>
+  </data>
+  <data name="Views.UserDetailView.Header.FollowingRun.Text" xml:space="preserve">
+    <value>正在關注</value>
+    <comment>用户详情页 - Header - 正在关注Button Suffix</comment>
+  </data>
+  <data name="Views.UserDetailView.List.ContributedPlaylists.Header" xml:space="preserve">
+    <value>參與貢獻的歌單</value>
+    <comment>用户详情页 - List - 贡献歌单 - Header</comment>
+  </data>
+  <data name="Views.UserDetailView.List.MusicTaste.Header" xml:space="preserve">
+    <value>音樂偏好</value>
+    <comment>用户详情页 - List - 音乐偏好 - Header</comment>
+  </data>
+  <data name="Views.UserDetailView.List.SubscribedPlaylists.Header" xml:space="preserve">
+    <value>訂閲的歌單</value>
+    <comment>用户详情页 - List - 订阅歌单 - Header</comment>
+  </data>
+  <data name="Controls.Buttons.NavigateBack.Content" xml:space="preserve">
+    <value>返回上一頁</value>
+    <comment>按钮 - 返回上一页 Content</comment>
+  </data>
+  <data name="Controls.Buttons.Reload.Content" xml:space="preserve">
+    <value>重新加載</value>
+    <comment>按钮 - 重新加载 - Content</comment>
+  </data>
+  <data name="MessageBoxes.PageLoadNetworkIssue.Content.Format" xml:space="preserve">
+    <value>加載當前頁面時遇到了錯誤。以下是錯誤的詳細信息:
+{0}</value>
+    <comment>消息框 - 页面加载常规错误 Content Format</comment>
+  </data>
+  <data name="MessageBoxes.PageLoadUnsolvableIssue.Content" xml:space="preserve">
+    <value>加載當前頁面時遇到了無法解決的錯誤。如需報告該錯誤，請在應用設置中啟用“與開發者共享診斷信息”。</value>
+    <comment>消息框 - 页面加载灾难性错误 Content</comment>
+  </data>
+  <data name="MenuFlyoutItems.Play.Text" xml:space="preserve">
+    <value>播放</value>
+    <comment>弹出菜单 - 播放 - Text</comment>
+  </data>
+  <data name="MessageBoxes.DeletePlaylist.Content" xml:space="preserve">
+    <value>刪除歌單後你可以在移動客戶端上恢復歌單。確認刪除嗎？</value>
+    <comment>消息框- 歌单删除确认 Content</comment>
+  </data>
+  <data name="MessageBoxes.DeletePlaylist.PrimaryButton.Content" xml:space="preserve">
+    <value>確認刪除</value>
+    <comment>消息框 - 歌单删除确认 - PrimaryButtonContent</comment>
+  </data>
+  <data name="Notifications.PlaylistRemovalFailed" xml:space="preserve">
+    <value>歌單刪除失敗。</value>
+    <comment>消息提示 - 歌单移除失败</comment>
+  </data>
+  <data name="Notifications.PlaylistRemovalSucceeded" xml:space="preserve">
+    <value>歌單已刪除。</value>
+    <comment>消息提示 - 歌单成功移除</comment>
+  </data>
+  <data name="MessageBoxes.UnsubscribePlaylist.CancelButton.Content" xml:space="preserve">
+    <value>保留訂閱</value>
+    <comment>消息框 - 歌单取消订阅确认 CancelButtonContent</comment>
+  </data>
+  <data name="MessageBoxes.UnsubscribePlaylist.Content" xml:space="preserve">
+    <value>確認取消訂閱該歌單嗎？</value>
+    <comment>消息框 - 歌单取消订阅确认 Content</comment>
+  </data>
+  <data name="MessageBoxes.UnsubscribePlaylist.PrimaryButton.Content" xml:space="preserve">
+    <value>確認取消訂閱</value>
+    <comment>消息框 - 歌单取消订阅确认 PrimaryButtonContent</comment>
+  </data>
+  <data name="Notifications.PlaylistUnsubscriptionFailed" xml:space="preserve">
+    <value>歌單取消訂閱失敗。</value>
+    <comment>消息提示 - 歌单取消订阅失败</comment>
+  </data>
+  <data name="Notifications.PlaylistUnsubscriptionSucceeded" xml:space="preserve">
+    <value>歌單已取消訂閱。</value>
+    <comment>消息提示 - 歌单成功取消订阅</comment>
+  </data>
+  <data name="MenuFlyoutItems.CopyLink.Text" xml:space="preserve">
+    <value>複製鏈接</value>
+    <comment>弹出菜单 - 复制链接 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.Delete.Text" xml:space="preserve">
+    <value>刪除</value>
+    <comment>弹出菜单 - 删除 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.Share.Text" xml:space="preserve">
+    <value>共享</value>
+    <comment>弹出菜单 - 共享 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.Subscribe.Text" xml:space="preserve">
+    <value>訂閲</value>
+    <comment>弹出菜单 - 订阅 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.Unsubscribe.Text" xml:space="preserve">
+    <value>取消訂閲</value>
+    <comment>弹出菜单 - 取消订阅 - Text</comment>
+  </data>
+  <data name="Notifications.PlaylistSubscriptionFailed" xml:space="preserve">
+    <value>歌單訂閱失敗。</value>
+    <comment>消息提示 - 歌单订阅失败</comment>
+  </data>
+  <data name="Notifications.PlaylistSubscriptionSucceeded" xml:space="preserve">
+    <value>歌單已訂閲。</value>
+    <comment>消息提示 - 歌单成功订阅</comment>
+  </data>
+  <data name="Notifications.LinkCopied" xml:space="preserve">
+    <value>鏈接已複製。</value>
+    <comment>消息提示 - 复制链接</comment>
+  </data>
+  <data name="Views.UserDetailView.PlaybackRecord.Subtitle.Format" xml:space="preserve">
+    <value>累計聽歌{0}首</value>
+    <comment>用户详情页 - 播放记录 - Subtitle Format</comment>
+  </data>
+  <data name="Views.UserDetailView.PlaybackRecord.Title.Format" xml:space="preserve">
+    <value>{0}的聽歌排行</value>
+    <comment>用户详情页 - 播放记录 - Title Format</comment>
+  </data>
+  <data name="Views.UserDetailView.Playlist.Subtitle.Format" xml:space="preserve">
+    <value>{0}首歌曲</value>
+    <comment>用户详情页 - 歌单 - Subtitle Format</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.NormalPlaylistUpdatedTime.Format" xml:space="preserve">
+    <value>更新於{0}</value>
+    <comment>歌单页 - 常规列表更新时间 Format</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.CreatedDateFormat" xml:space="preserve">
+    <value>創建於{0}</value>
+    <comment>歌曲详情页 - 创建时间 Format</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.TrackCountDurationFormat" xml:space="preserve">
+    <value>共{0}首歌曲，總時長{1}</value>
+    <comment>歌单详情页 - 曲目数时长 Format</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.FeaturedArtistsHeader.Text" xml:space="preserve">
+    <value>包含表演者</value>
+    <comment>歌单详情页 - 包含表演者 - Header</comment>
+  </data>
+  <data name="Notifications.TrackPended" xml:space="preserve">
+    <value>歌曲已添加到播放隊列</value>
+    <comment>消息提示 - 歌曲添加到队列</comment>
+  </data>
+  <data name="MenuFlyoutItems.PlayLast.Text" xml:space="preserve">
+    <value>最後播放</value>
+    <comment>弹出菜单 - 最后播放 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.PlayNext.Text" xml:space="preserve">
+    <value>下一首播放</value>
+    <comment>弹出菜单 - 下一首播放 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.AddToPlaylist.Text" xml:space="preserve">
+    <value>添加到歌單</value>
+    <comment>弹出菜单 - 添加到歌单 - Text</comment>
+  </data>
+  <data name="MenuFlyoutItems.Artists.Text" xml:space="preserve">
+    <value>表演者</value>
+    <comment>弹出菜单 - 表演者 - Text</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.MyFavoritesTitle" xml:space="preserve">
+    <value>我喜歡的音樂</value>
+    <comment>歌单详情页 - 本人Likelist - Title Replacement</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.IntelligentPlayButtonContent.Text" xml:space="preserve">
+    <value>心動模式</value>
+    <comment>歌单详情页 - 心动模式Button - Text</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.PlayAllButtonContent.Text" xml:space="preserve">
+    <value>播放全部</value>
+    <comment>歌单详情页 - 播放全部Button - Text</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.SubscribeButtonContent.Text" xml:space="preserve">
+    <value>收藏</value>
+    <comment>歌单详情页 - 收藏Button - Text</comment>
+  </data>
+  <data name="Views.PlaylistDetailView.UnsubscribeButtonContent.Text" xml:space="preserve">
+    <value>已收藏</value>
+    <comment>歌单详情页 - 取消收藏Button - Text</comment>
+  </data>
+  <data name="Views.AlbumDetailView.PublishDateFormat" xml:space="preserve">
+    <value>發布於{0}</value>
+    <comment>专辑详情页 - 发布时间 Format</comment>
+  </data>
+  <data name="Views.AlbumDetailView.TrackCountDurationFormat" xml:space="preserve">
+    <value>共{0}首歌曲，總時長{1}</value>
+    <comment>专辑详情页 - 曲目数时长 Format</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.FullLengthAlbums.Header.Text" xml:space="preserve">
+    <value>專輯</value>
+    <comment>表演者详情页 - 全长专辑 Header</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.LiveAlbums.Header.Text" xml:space="preserve">
+    <value>現場</value>
+    <comment>表演者详情页 - 现场专辑 Header</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.SingleAlbums.Header.Text" xml:space="preserve">
+    <value>EP / 單曲</value>
+    <comment>表演者详情页 - EP单曲 Header</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.Tracks.Header.Text" xml:space="preserve">
+    <value>熱門歌曲</value>
+    <comment>表演者详情页 - 热门歌曲 Header</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.Description.Header.Text" xml:space="preserve">
+    <value>簡介</value>
+    <comment>表演者详情页 - 简介 - Header</comment>
+  </data>
+  <data name="Views.ArtistDetailView.Sections.SimilarArtists.Header.Text" xml:space="preserve">
+    <value>相似表演者</value>
+    <comment>表演者详情页 - 相似表演者 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.Header.Text" xml:space="preserve">
+    <value>發現</value>
+    <comment>发现页 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.Charts.Header.Text" xml:space="preserve">
+    <value>排行榜</value>
+    <comment>发现页 - 排行榜 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.FeaturedPlaylists.Header.Text" xml:space="preserve">
+    <value>精選歌單</value>
+    <comment>发现页 - 精选歌单 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.NewAlbums.Header.Text" xml:space="preserve">
+    <value>最新專輯</value>
+    <comment>发现页 - 最新专辑 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.NewTracks.Header.Text" xml:space="preserve">
+    <value>新歌速遞</value>
+    <comment>发现页 - 新歌速递 - Header</comment>
+  </data>
+  <data name="Views.BrowseView.TopArtists.Header.Text" xml:space="preserve">
+    <value>熱門表演者</value>
+    <comment>发现页 - 热门表演者 - Header</comment>
+  </data>
+  <data name="Views.CloudDriveView.Header.Text" xml:space="preserve">
+    <value>音樂雲盤</value>
+    <comment>云盘页 - Header</comment>
+  </data>
+  <data name="Views.LibraryView.FooterButton.Content" xml:space="preserve">
+    <value>加載更多內容</value>
+    <comment>个人收藏页 - Footer Button - Content</comment>
+  </data>
+  <data name="Views.LibraryView.Categories.Albums.Content" xml:space="preserve">
+    <value>專輯</value>
+    <comment>个人收藏页 - 内容分类 - 专辑 - Header</comment>
+  </data>
+  <data name="Views.LibraryView.Categories.Artists.Content" xml:space="preserve">
+    <value>表演者</value>
+    <comment>个人收藏页 - 内容分类 - 专辑 - Header</comment>
+  </data>
+  <data name="Views.LibraryView.Header.Text" xml:space="preserve">
+    <value>我的收藏</value>
+    <comment>个人收藏页 - Header - Text</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.CheckForUpdatesButton.Content" xml:space="preserve">
+    <value>檢查更新</value>
+    <comment>软件更新页 - 检查更新 - Button Content</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.IndicatorText.Checking" xml:space="preserve">
+    <value>正在檢查更新……</value>
+    <comment>软件更新页 - 状态 - 检查 Text</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.IndicatorText.ServiceError" xml:space="preserve">
+    <value>更新服務出錯。</value>
+    <comment>软件更新页 - 状态 - 出错 Text </comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.IndicatorText.UpdatesAvailable" xml:space="preserve">
+    <value>有更新可用。</value>
+    <comment>软件更新页 - 状态 - 可更新 Text</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.IndicatorText.UpToDate" xml:space="preserve">
+    <value>當前已是最新版本。</value>
+    <comment>软件更新页 - 状态 - 最新 Text</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.UpdateCheckedTimeFormatString" xml:space="preserve">
+    <value>上次檢查時間：{0}。</value>
+    <comment>软件更新页 - 检查时间 - Format</comment>
+  </data>
+  <data name="Views.WebLoginWindow.TitleTextBlock.Text" xml:space="preserve">
+    <value>網頁登錄</value>
+    <comment>网页登录对话框 - 标题 - Text</comment>
+  </data>
+  <data name="Views.WebLoginView.InstructionTextBlock.Text" xml:space="preserve">
+    <value>在上方網頁中登錄妳的雲音樂賬號。
+完成後點擊右側"驗證"按鈕，我們將驗證登錄狀態。</value>
+    <comment>网页登录对话框 - 操作说明 - Text</comment>
+  </data>
+  <data name="Views.WebLoginView.VerifyButton.Content" xml:space="preserve">
+    <value>驗證</value>
+    <comment>网页登录对话框 - 验证按钮 - Content</comment>
+  </data>
+  <data name="Views.SettingsView.Network.IpFix.Header" xml:space="preserve">
+    <value>漫遊</value>
+    <comment>设置页 - 网络 - 漫游 - Header</comment>
+  </data>
+  <data name="Views.SettingsView.Network.IpFix.Description" xml:space="preserve">
+    <value>啟用此選項以在中國大陸以外的地區收聽音樂。</value>
+    <comment>设置页 - 网络 - 漫游 - Description</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.DownloadButton.Content" xml:space="preserve">
+    <value>下載</value>
+    <comment>软件更新页 - 下载 - Button Content</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.AdditionalOptionsTextBlock.Text" xml:space="preserve">
+    <value>附加選項</value>
+    <comment>SoftwareUpdateView - AdditionalOptions</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.EnablePreviewCheckBox.Content" xml:space="preserve">
+    <value>啟用預覽構建版本</value>
+    <comment>软件更新页- 启用预览版本 - CheckBox - Content</comment>
+  </data>
+  <data name="Views.HistoryView.Categories.Albums.Content" xml:space="preserve">
+    <value>專輯</value>
+    <comment>播放历史页 - 分类 - 专辑 - Label</comment>
+  </data>
+  <data name="Views.HistoryView.Categories.Tracks.Content" xml:space="preserve">
+    <value>歌曲</value>
+    <comment>播放历史页 - 分类 - 歌曲 - Label</comment>
+  </data>
+  <data name="Views.HistoryView.Categories.Playlists.Content" xml:space="preserve">
+    <value>歌單</value>
+    <comment>播放历史页 - 分类 - 歌单 - Label</comment>
+  </data>
+  <data name="Views.HistoryView.Header.Text" xml:space="preserve">
+    <value>播放歷史</value>
+    <comment>播放历史页 - Header</comment>
+  </data>
+  <data name="Views.SoftwareUpdateView.HeaderTextBlock.Text" xml:space="preserve">
+    <value>更新與預覽體驗</value>
+    <comment>软件更新页 - Header</comment>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.Title" xml:space="preserve">
+    <value>通過代理登錄</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.ProxyAddressCaption.Text" xml:space="preserve">
+    <value>在網易雲音樂中，設置以下代理服務器。</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.AddressCaption.Text" xml:space="preserve">
+    <value>IP 地址</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.PortCaption.Text" xml:space="preserve">
+    <value>端口</value>
+  </data>
+  <data name="Controls.Buttons.Finish.Content" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.State.Capturing.Text" xml:space="preserve">
+    <value>正在捕獲請求</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.State.Verifying.Text" xml:space="preserve">
+    <value>正在驗證</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.State.ReadyTextFormat" xml:space="preserve">
+    <value>已作爲“{0}”登錄</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.State.Preparing.Text" xml:space="preserve">
+    <value>正在準備代理服務器</value>
+  </data>
+  <data name="SystemTrayIcon.Previous.Text" xml:space="preserve">
+    <value>上一曲</value>
+  </data>
+  <data name="SystemTrayIcon.Play.Text" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="SystemTrayIcon.Pause.Text" xml:space="preserve">
+    <value>暫停</value>
+  </data>
+  <data name="SystemTrayIcon.Next.Text" xml:space="preserve">
+    <value>下一曲</value>
+  </data>
+  <data name="Dialogs.ProxyLoginDialog.State.Error.Text" xml:space="preserve">
+    <value>發生了錯誤。</value>
+  </data>
+  <data name="Views.SearchResultView.Header.Format" xml:space="preserve">
+    <value>“{0}”的搜索結果</value>
+  </data>
+  <data name="Views.SearchResultView.LoadMoreButton.Content" xml:space="preserve">
+    <value>加載更多</value>
+  </data>
+  <data name="Views.SearchResultView.ViewMoreButton.Content" xml:space="preserve">
+    <value>查看更多</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.TopResultsSegmentedItem.Content" xml:space="preserve">
+    <value>熱門結果</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.ArtistsSegmentedItem.Content" xml:space="preserve">
+    <value>表演者</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.AlbumsSegmentedItem.Content" xml:space="preserve">
+    <value>專輯</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.TracksSegmentedItem.Content" xml:space="preserve">
+    <value>歌曲</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.PlaylistsSegmentedItem.Content" xml:space="preserve">
+    <value>歌單</value>
+  </data>
+  <data name="Views.SearchResultView.Categories.ProfilesSegmentedItem.Content" xml:space="preserve">
+    <value>用戶</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.ArtistsHeader.Text" xml:space="preserve">
+    <value>熱門表演者</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.AlbumsHeader.Text" xml:space="preserve">
+    <value>熱門專輯</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.TracksHeader.Text" xml:space="preserve">
+    <value>熱門歌曲</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.PlaylistsHeader.Text" xml:space="preserve">
+    <value>熱門歌單</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.ProfilesHeader.Text" xml:space="preserve">
+    <value>熱門用戶</value>
+  </data>
+  <data name="Views.SearchResultView.TopResults.QuerySuggestionsHeader.Text" xml:space="preserve">
+    <value>相關搜索</value>
+  </data>
+  <data name="Views.ChartView.HeaderFormat" xml:space="preserve">
+    <value>{0}的聽歌排行</value>
+  </data>
+  <data name="Views.ChartView.Categories.OneWeek.Content" xml:space="preserve">
+    <value>最近七天</value>
+  </data>
+  <data name="Views.ChartView.Categories.AllTime.Content" xml:space="preserve">
+    <value>所有時間</value>
+  </data>
+</root>

@@ -1,0 +1,51 @@
+﻿<local:ProxyLoginDialogContentBase
+    x:Class="Cirrus.Dialogs.ProxyLoginDialogContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d" Margin="0 12 0 0" MinWidth="240">
+    <StackPanel Spacing="8">
+        <TextBlock Opacity="0.6" x:Uid="Dialogs/ProxyLoginDialog/ProxyAddressCaption" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock x:Uid="Dialogs/ProxyLoginDialog/AddressCaption" VerticalAlignment="Center" />
+            <TextBox Text="127.0.0.1" IsReadOnly="True" Padding="12 6" MinWidth="0" />
+            <TextBlock x:Uid="Dialogs/ProxyLoginDialog/PortCaption" VerticalAlignment="Center" />
+            <TextBox Text="{x:Bind ViewModel.Port, Mode=OneWay}" IsReadOnly="True" Padding="12 6" MinWidth="0" />
+        </StackPanel>
+        <controls:SwitchPresenter Value="{x:Bind ViewModel.State, Mode=OneWay}">
+            <controls:Case Value="Preparing">
+                <TextBlock x:Uid="Dialogs/ProxyLoginDialog/State/Preparing"
+                           Foreground="{ThemeResource AccentTextFillColorSecondaryBrush}" />
+            </controls:Case>
+            <controls:Case Value="Capturing">
+                <TextBlock x:Uid="Dialogs/ProxyLoginDialog/State/Capturing"
+                           Foreground="{ThemeResource AccentTextFillColorSecondaryBrush}" />
+            </controls:Case>
+            <controls:Case Value="Verifying">
+                <TextBlock x:Uid="Dialogs/ProxyLoginDialog/State/Verifying"
+                           Foreground="{ThemeResource AccentTextFillColorSecondaryBrush}" />
+            </controls:Case>
+            <controls:Case Value="Ready">
+                <TextBlock Opacity="0.6"
+                           Text="{x:Bind ViewModel.UserNickname, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Dialogs/ProxyLoginDialog/State/ReadyTextFormat}" />
+            </controls:Case>
+            <controls:Case Value="Error">
+                <TextBlock x:Uid="Dialogs/ProxyLoginDialog/State/Error"
+                           Foreground="Crimson" />
+            </controls:Case>
+        </controls:SwitchPresenter>
+        <ProgressBar IsIndeterminate="True"
+                     Visibility="{x:Bind ViewModel.IsReady, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}" />
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0 24 0 0" Spacing="8">
+            <Button x:Uid="Controls/Buttons/Finish"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    IsEnabled="{x:Bind ViewModel.IsReady, Mode=OneWay}"
+                    Command="{x:Bind FinishCommand}" />
+            <Button x:Uid="Controls/Buttons/Cancel"
+                    Command="{x:Bind CancelCommand}" />
+        </StackPanel>
+    </StackPanel>
+</local:ProxyLoginDialogContentBase>

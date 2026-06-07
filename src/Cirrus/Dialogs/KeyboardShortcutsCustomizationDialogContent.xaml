@@ -1,0 +1,44 @@
+<local:KeyboardShortcutsCustomizationDialogContentBase
+    x:Class="Cirrus.Dialogs.KeyboardShortcutsCustomizationDialogContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    xmlns:local="using:Cirrus.Dialogs"
+    xmlns:primitives="using:Cirrus.Utilities.Primitives"
+    Margin="0 -40 0 -8"
+    mc:Ignorable="d">
+    <Grid Width="400">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Button x:Uid="Dialogs/KeyboardShortcutsCustomizationDialogContent/RestoreDefault"
+                HorizontalAlignment="Right" Command="{x:Bind LoadDefaultConfigCommand}" />
+        <ScrollViewer Grid.Row="1" Margin="-16 0" Padding="0 16">
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Shortcuts}">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="liveModels:LocalizedText">
+                        <StackPanel Spacing="4" Margin="0 4" Width="400">
+                            <TextBlock Text="{x:Bind Localized}" />
+                            <controls:KeyboardRecordBox
+                                Keys="{x:Bind Attachment.(primitives:KeyboardShortcut.Keys), Mode=TwoWay}"
+                                Width="400" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+        <TextBlock x:Uid="Dialogs/KeyboardShortcutsCustomizationDialogContent/Tip"
+                   Grid.Row="2" TextWrapping="Wrap"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+        <TextBlock x:Uid="Dialogs/KeyboardShortcutsCustomizationDialogContent/Error"
+                   Visibility="{x:Bind ViewModel.IsRecheckRequired, Mode=OneWay}"
+                   Margin="0 8"
+                   Grid.Row="3" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+    </Grid>
+</local:KeyboardShortcutsCustomizationDialogContentBase>

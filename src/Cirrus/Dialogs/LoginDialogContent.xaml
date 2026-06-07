@@ -1,0 +1,109 @@
+﻿<local:LoginDialogContentBase
+    x:Class="Cirrus.Dialogs.LoginDialogContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:Cirrus.Dialogs"
+    xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:communityConverters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:controls="using:Cirrus.Controls"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <communityConverters:DoubleToVisibilityConverter x:Key="LoginButtonVisibilityConverter" LessThan="2" />
+    </Page.Resources>
+    <Grid MinWidth="240" Margin="-24 12 -24 -25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <communityControls:Segmented x:Name="LoginMethodsSegmented"
+                                     SelectedIndex="{x:Bind ViewModel.SelectedLoginMethodIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     HorizontalAlignment="Center" Margin="24 0">
+            <communityControls:Segmented.Items>
+                <communityControls:SegmentedItem Tag="Cellphone" x:Uid="Dialogs/LoginDialogContent/LoginMethods/Cellphone">
+                    <communityControls:SegmentedItem.Icon>
+                        <FontIcon Glyph="&#xE8EA;" />
+                    </communityControls:SegmentedItem.Icon>
+                </communityControls:SegmentedItem>
+                <communityControls:SegmentedItem Tag="Mail" x:Uid="Dialogs/LoginDialogContent/LoginMethods/Mail">
+                    <communityControls:SegmentedItem.Icon>
+                        <FontIcon Glyph="&#xE715;" />
+                    </communityControls:SegmentedItem.Icon>
+                </communityControls:SegmentedItem>
+                <communityControls:SegmentedItem Tag="QR" x:Uid="Dialogs/LoginDialogContent/LoginMethods/QR">
+                    <communityControls:SegmentedItem.Icon>
+                        <FontIcon Glyph="&#xED14;" />
+                    </communityControls:SegmentedItem.Icon>
+                </communityControls:SegmentedItem>
+            </communityControls:Segmented.Items>
+        </communityControls:Segmented>
+        <communityControls:SwitchPresenter Grid.Row="1" Margin="24" Value="{x:Bind LoginMethodsSegmented.SelectedItem.(communityControls:SegmentedItem.Tag)}">
+            <communityControls:Case Value="Cellphone">
+                <Grid RowSpacing="8" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBox PlaceholderText="+86" InputScope="TelephoneCountryCode" Text="{x:Bind ViewModel.CountryCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             x:Uid="Dialogs/LoginDialogContent/CellphoneNumber"
+                             InputScope="TelephoneNumber"
+                             Text="{x:Bind ViewModel.CellphoneNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <PasswordBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                 x:Uid="Dialogs/LoginDialogContent/Password"
+                                 Password="{x:Bind ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </communityControls:Case>
+            <communityControls:Case Value="Mail">
+                <Grid RowSpacing="8" ColumnSpacing="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBox x:Uid="Dialogs/LoginDialogContent/EmailAddress"
+                             Text="{x:Bind ViewModel.MailAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <PasswordBox Grid.Row="1"
+                                 x:Uid="Dialogs/LoginDialogContent/Password"
+                                 Password="{x:Bind ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </communityControls:Case>
+            <communityControls:Case Value="QR">
+                <StackPanel Spacing="16">
+                    <Border HorizontalAlignment="Center" Padding="20" CornerRadius="16"
+                            BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefault}">
+                        <controls:QrCode CodeSource="{x:Bind ViewModel.MobileAuthenticator.QrCodeKey, Mode=OneWay}"
+                                         MaxWidth="200" />
+                    </Border>
+                    <TextBlock Text="{x:Bind ViewModel.MobileAuthenticator.CurrentStatus, Mode=OneWay}"
+                               HorizontalAlignment="Center" FontWeight="Medium" />
+                </StackPanel>
+            </communityControls:Case>
+        </communityControls:SwitchPresenter>
+        <Grid Grid.Row="2" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" Padding="24" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Style="{ThemeResource AccentButtonStyle}"
+                    HorizontalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.LoginCommand}"
+                    Visibility="{x:Bind ViewModel.SelectedLoginMethodIndex, Mode=OneWay, Converter={StaticResource LoginButtonVisibilityConverter}}">
+                <communityControls:SwitchPresenter Value="{x:Bind ViewModel.LoginCommand.IsRunning, Mode=OneWay}">
+                    <communityControls:Case Value="{StaticResource BooleanValueTrue}">
+                        <ProgressRing Width="16" Height="16" Foreground="White" IsActive="True" />
+                    </communityControls:Case>
+                    <communityControls:Case Value="{StaticResource BooleanValueFalse}">
+                        <TextBlock x:Uid="Dialogs/LoginDialogContent/LoginButton/TextContent" />
+                    </communityControls:Case>
+                </communityControls:SwitchPresenter>
+            </Button>
+            <Button Grid.Column="1" x:Uid="Controls/Buttons/Cancel" HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.CancelCommand}" />
+        </Grid>
+    </Grid>
+</local:LoginDialogContentBase>

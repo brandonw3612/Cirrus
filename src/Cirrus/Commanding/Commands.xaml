@@ -1,0 +1,17 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Commanding">
+    <local:BlockEventPassCommand x:Key="BlockEventPassCommand" />
+    <local:CopyLinkCommand x:Key="CopyLinkCommand" />
+    <local:MultipleTargetNavigateCommand x:Key="MultipleTargetNavigateCommand" />
+    <local:NavigateCommand x:Key="NavigateCommand" />
+    <local:PlayCollectionCommand x:Key="PlayCollectionCommand" />
+    <local:ShareCommand x:Key="ShareCommand" />
+    <local:ShowCollectionContextFlyoutCommand x:Key="ShowCollectionContextFlyoutCommand" />
+    <local:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+    <local:SkipToTrackCommand x:Key="SkipToTrackCommand" />
+    <local:SubscribePlaylistCommand x:Key="SubscribePlaylistCommand" />
+    <local:TrackSourceNavigateCommand x:Key="TrackSourceNavigateCommand" />
+    <local:UnsubscribePlaylistCommand x:Key="UnsubscribePlaylistCommand" />
+</ResourceDictionary>

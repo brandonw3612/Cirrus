@@ -1,0 +1,180 @@
+﻿<local:UserDetailViewBase
+    x:Class="Cirrus.Views.UserDetailView"
+    x:Name="CurrentView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    xmlns:modelPlaylist="using:Cirrus.Models.Business.Playlist"
+    xmlns:modelUser="using:Cirrus.Models.Business.User"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <CollectionViewSource x:Name="PlaylistCollectionViewSource"
+                              Source="{x:Bind ViewModel.Playlists, Mode=OneWay}"
+                              IsSourceGrouped="True" />
+    </Page.Resources>
+    <interactivity:Interaction.Behaviors>
+        <behaviors:SizeChangedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.SizeChangedCommand}" />
+        </behaviors:SizeChangedEventTriggerBehavior>
+    </interactivity:Interaction.Behaviors>
+    <Grid>
+        <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
+                     Background="Transparent"
+                     IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        <Border x:Name="FloatingHeader"
+                Canvas.ZIndex="1"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
+                Visibility="Collapsed"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="4" Margin="32 16" Padding="16">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
+            </animations:Implicit.HideAnimations>
+            <layout:Row Spacing="16">
+                <Border Width="50" Height="50" CornerRadius="25"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Image
+                        Source="{x:Bind ViewModel.Profile.AvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                        Width="50" Height="50" Margin="-1" />
+                </Border>
+                <TextBlock Text="{x:Bind ViewModel.Profile.Nickname, Mode=OneWay}" FontSize="20" FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </layout:Row>
+        </Border>
+        <GridView x:Name="PlaylistGridView" ItemsSource="{x:Bind PlaylistCollectionViewSource.View, Mode=OneWay}"
+                  Padding="16 16 16 80">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:LoadedEventTriggerBehavior>
+                    <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+                </behaviors:LoadedEventTriggerBehavior>
+            </interactivity:Interaction.Behaviors>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" AreStickyGroupHeadersEnabled="False" Margin="-8 0"
+                                   ItemWidth="{Binding ElementName=CurrentView, Path=ViewModel.NavigatiableCardWidth, Mode=OneWay}" />
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+            <GridView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True">
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate x:DataType="liveModels:NavigatiableGroup">
+                            <TextBlock Text="{x:Bind GroupHeader}" Margin="8"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       FontSize="24" FontWeight="SemiBold" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                    <GroupStyle.HeaderContainerStyle>
+                        <Style TargetType="Control">
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="MinHeight" Value="0" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Control">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.HeaderContainerStyle>
+                </GroupStyle>
+            </GridView.GroupStyle>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="8" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="GridViewItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </GridView.ItemContainerStyle>
+            <GridView.ItemTemplateSelector>
+                <local:UserPlaylistDataTemplateSelector>
+                    <local:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
+                        <DataTemplate x:DataType="modelUser:TopChart">
+                            <controls:NavigatiableDisplayCard Image="ms-appx:///Assets/Images/PlaybackRecord.svg"
+                                                              Title="{x:Bind Nickname, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/PlaybackRecord/Title/Format}"
+                                                              Subtitle="{x:Bind PlayedTrackCount, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/PlaybackRecord/Subtitle/Format}"
+                                                              DataContext="{Binding Mode=OneWay}" />
+                        </DataTemplate>
+                    </local:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
+                    <local:UserPlaylistDataTemplateSelector.PlaylistTemplate>
+                        <DataTemplate x:DataType="modelPlaylist:OnlinePlaylist">
+                            <controls:NavigatiableDisplayCard
+                                Image="{x:Bind CoverImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                                Title="{x:Bind Title}"
+                                Subtitle="{x:Bind TrackCount, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/Playlist/Subtitle/Format}"
+                                DataContext="{Binding Mode=OneWay}">
+                                <Grid>
+                                    <Border VerticalAlignment="Top" HorizontalAlignment="Right" Padding="6 4"
+                                            Margin="4" CornerRadius="4"
+                                            Background="{ThemeResource AltColorAcrylicControlBackgroundBrush}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <FontIcon Glyph="&#xE768;" FontSize="12" />
+                                            <TextBlock
+                                                Text="{x:Bind Plays, Converter={StaticResource LargeNumberUnitConverter}}"
+                                                FontSize="12" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </controls:NavigatiableDisplayCard>
+                        </DataTemplate>
+                    </local:UserPlaylistDataTemplateSelector.PlaylistTemplate>
+                </local:UserPlaylistDataTemplateSelector>
+            </GridView.ItemTemplateSelector>
+            <GridView.Header>
+                <StackPanel x:Name="ViewHeader"
+                            Padding="16" Spacing="8"
+                            CornerRadius="8"
+                            Visibility="{x:Bind ViewModel.Profile, Converter={StaticResource EmptyObjectJudgeConverter}, Mode=OneWay}"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <animations:Implicit.Animations>
+                        <animations:OpacityAnimation Duration="0:0:0.300" />
+                    </animations:Implicit.Animations>
+                    <PersonPicture x:Name="UserAvatarImage"
+                                   HorizontalAlignment="Left"
+                                   ProfilePicture="{x:Bind ViewModel.Profile.AvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=200}"
+                                   Height="100" Width="100" />
+                    <TextBlock Text="{x:Bind ViewModel.Profile.Nickname, Mode=OneWay}"
+                               HorizontalAlignment="Left"
+                               FontSize="32" FontWeight="SemiBold" Margin="4 0" />
+                    <StackPanel x:Name="SocialStatusPanel" Orientation="Horizontal" Spacing="5"
+                                HorizontalAlignment="Left">
+                        <Button Style="{ThemeResource TextBlockButtonStyle}" Padding="4 2" CornerRadius="4">
+                            <TextBlock FontSize="16">
+                                <Run Text="{x:Bind ViewModel.Profile.FollowingCount, Mode=OneWay}" FontSize="16"
+                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <Run x:Uid="Views/UserDetailView/Header/FollowingRun" FontSize="12"
+                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                            </TextBlock>
+                        </Button>
+                        <Button Style="{ThemeResource TextBlockButtonStyle}" Padding="4 2" CornerRadius="4">
+                            <TextBlock>
+                                <Run Text="{x:Bind ViewModel.Profile.FollowerCount, Mode=OneWay}" FontSize="16"
+                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <Run x:Uid="Views/UserDetailView/Header/FollowerRun" FontSize="12"
+                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+                            </TextBlock>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </GridView.Header>
+        </GridView>
+    </Grid>
+</local:UserDetailViewBase>

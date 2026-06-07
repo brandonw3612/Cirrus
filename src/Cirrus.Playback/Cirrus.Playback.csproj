@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net10.0-windows10.0.26100.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <IsAotCompatible>true</IsAotCompatible>
+        <Platforms>x64;ARM64</Platforms>
+        <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+        <OutputPath>../../build/Cirrus.Playback/$(Configuration)</OutputPath>
+        <Configurations>Debug;Release;Production</Configurations>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework.Contains(windows))'">
+        <WindowsSdkPackageVersion>10.0.26100.84</WindowsSdkPackageVersion>
+        <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+        <UseWinUI>true</UseWinUI>
+        <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+        <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="PlatformSpecific/**/*" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework.Contains(windows))'">
+        <Compile Include="PlatformSpecific/Windows/**/*" />
+    </ItemGroup>
+    
+    <PropertyGroup Condition="'$(TargetFramework.Contains(windows))' AND $([MSBuild]::IsOSPlatform('OSX'))">
+        <EnableWindowsTargeting>True</EnableWindowsTargeting>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cirrus.Models\Cirrus.Models.csproj" />
+        <ProjectReference Include="..\Cirrus.Base\Cirrus.Base.csproj" />
+        <ProjectReference Include="..\Cirrus.Network\Cirrus.Network.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Pulse.NET" Version="0.0.4-alpha" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework.Contains(windows))'">
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.1.0" />
+    </ItemGroup>
+    
+</Project>

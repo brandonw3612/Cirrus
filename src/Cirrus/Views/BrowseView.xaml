@@ -1,0 +1,330 @@
+﻿<local:BrowseViewBase
+    x:Class="Cirrus.Views.BrowseView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:albumModel="using:Cirrus.Models.Business.Album"
+    xmlns:artistModel="using:Cirrus.Models.Network.Artist"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commanding="using:Cirrus.Commanding"
+    xmlns:community="using:CommunityToolkit.WinUI"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    xmlns:playlistModel="using:Cirrus.Models.Business.Playlist"
+    xmlns:publicModel="using:Cirrus.Models.Network.Public"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commanding:PlayFromListCommand x:Key="PlayFromListCommand" />
+        <commanding:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+    </Page.Resources>
+    <interactivity:Interaction.Behaviors>
+        <behaviors:LoadedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+        </behaviors:LoadedEventTriggerBehavior>
+        <behaviors:SizeChangedEventTriggerBehavior>
+            <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+        </behaviors:SizeChangedEventTriggerBehavior>
+    </interactivity:Interaction.Behaviors>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="BannersVisibilityGroup">
+                <VisualState x:Name="BannersVisible" />
+                <VisualState x:Name="BannersCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Banners, Mode=OneWay}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="BannersFlipView.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="FeaturedPlaylistsVisibilityGroup">
+                <VisualState x:Name="FeaturedPlaylistsVisible" />
+                <VisualState x:Name="FeaturedPlaylistsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.TrendingPlaylists}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="FeaturedPlaylistsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="NewTracksVisibilityGroup">
+                <VisualState x:Name="NewTracksVisible" />
+                <VisualState x:Name="NewTracksCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.NewTracks}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NewTracksPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="NewAlbumsVisibilityGroup">
+                <VisualState x:Name="NewAlbumsVisible" />
+                <VisualState x:Name="NewAlbumsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.NewAlbums}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NewAlbumsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="ChartsVisibilityGroup">
+                <VisualState x:Name="ChartsVisible" />
+                <VisualState x:Name="ChartsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Charts}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ChartsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="TopArtistsVisibilityGroup">
+                <VisualState x:Name="TopArtistsVisible" />
+                <VisualState x:Name="TopArtistsCollapsed">
+                    <VisualState.StateTriggers>
+                        <community:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.TopArtists}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="TopArtistsPanel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid Canvas.ZIndex="1" VerticalAlignment="Top">
+            <Border x:Name="HeaderFloatingBackBorder"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                    CornerRadius="8" Height="80" MaxWidth="936" Margin="32 16">
+            </Border>
+            <Border VerticalAlignment="Center">
+                <TextBlock x:Name="HeaderTextBlock" x:Uid="Views/BrowseView/Header"
+                           CharacterSpacing="-20" FontSize="24" FontWeight="Bold" MaxLines="2"
+                           TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+            </Border>
+        </Grid>
+        <ScrollViewer x:Name="RootScrollViewer" VerticalScrollMode="Enabled">
+            <StackPanel Canvas.ZIndex="0" Padding="16 104 16 84" Spacing="16">
+                <controls:CirculatedFlipView x:Name="BannersFlipView" ItemSpacing="8" MinimumEndPadding="60"
+                                             MaxHeight="250"
+                                             Background="Transparent"
+                                             ItemsSource="{x:Bind ViewModel.Banners, Mode=OneWay}">
+                    <controls:CirculatedFlipView.ItemTemplate>
+                        <DataTemplate x:DataType="publicModel:Banner">
+                            <Grid BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                                  CornerRadius="8">
+                                <Viewbox StretchDirection="DownOnly">
+                                    <Image Source="{x:Bind BannerImageUrl}" Stretch="Uniform" />
+                                </Viewbox>
+                                <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
+                                        CornerRadius="8" Margin="8">
+                                    <Border.Background>
+                                        <AcrylicBrush TintColor="{ThemeResource SystemAccentColor}"
+                                                      FallbackColor="{ThemeResource SystemAccentColor}"
+                                                      TintOpacity="0.8" />
+                                    </Border.Background>
+                                    <TextBlock Text="{x:Bind TypeTitle}" FontWeight="SemiLight" FontSize="12"
+                                               Margin="12 6" Foreground="{ThemeResource TextOnAccentFillColorDefault}" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </controls:CirculatedFlipView.ItemTemplate>
+                </controls:CirculatedFlipView>
+                <StackPanel x:Name="FeaturedPlaylistsPanel" Spacing="16">
+                    <TextBlock x:Uid="Views/BrowseView/FeaturedPlaylists/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.TrendingPlaylists}"
+                              SelectionMode="None" IsItemClickEnabled="False">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Vertical" MaximumRowsOrColumns="2" Margin="-8" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListViewItem">
+                                            <ContentPresenter />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="playlistModel:OnlinePlaylist">
+                                <controls:NavigatiableDisplayCard
+                                    Image="{x:Bind CoverImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                                    Title="{x:Bind Title}"
+                                    Subtitle="{x:Bind TrackCount, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/Playlist/Subtitle/Format}"
+                                    DataContext="{Binding Mode=OneWay}"
+                                    Width="200" Margin="8">
+                                    <Grid>
+                                        <Border VerticalAlignment="Top" HorizontalAlignment="Right" Padding="6 4"
+                                                Margin="4" CornerRadius="4"
+                                                Background="{ThemeResource AltColorAcrylicControlBackgroundBrush}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon Glyph="&#xE768;" FontSize="12" />
+                                                <TextBlock
+                                                    Text="{x:Bind Plays, Converter={StaticResource LargeNumberUnitConverter}}"
+                                                    FontSize="12" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </controls:NavigatiableDisplayCard>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="NewTracksPanel" Spacing="16">
+                    <TextBlock x:Uid="Views/BrowseView/NewTracks/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView Style="{StaticResource TrackListViewHorizontalStyle}"
+                              ItemsSource="{x:Bind ViewModel.NewTracks}"
+                              SelectionMode="None" Padding="-4 0">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Vertical" MaximumRowsOrColumns="5" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                                <controls:TrackListItem Style="{StaticResource LatestTrackListItemStyle}"
+                                                        DataContext="{x:Bind Track}" Width="400" Margin="4"
+                                                        PlayFromListCommand="{StaticResource PlayFromListCommand}"
+                                                        ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="NewAlbumsPanel" Spacing="16">
+                    <TextBlock x:Uid="Views/BrowseView/NewAlbums/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.NewAlbums}"
+                              SelectionMode="None">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsStackPanel Orientation="Horizontal" Margin="-8" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListViewItem">
+                                            <ContentPresenter />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="albumModel:OnlineAlbum">
+                                <controls:NavigatiableDisplayCard Title="{x:Bind Title}"
+                                                                  Subtitle="{x:Bind Artists, Converter={StaticResource MultipleEntityNamesConverter}}"
+                                                                  Image="{x:Bind ArtworkImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                                                                  DataContext="{Binding Mode=OneWay}"
+                                                                  Width="200" Margin="8" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="ChartsPanel" Spacing="16">
+                    <TextBlock x:Uid="Views/BrowseView/Charts/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.Charts}" Margin="0 -8"
+                              SelectionMode="None" IsItemClickEnabled="True">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Vertical" Height="204" Margin="-4 0" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <ContentPresenter />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="playlistModel:OnlinePlaylist">
+                                <controls:NavigatiableDisplayCard
+                                    Style="{StaticResource ChartNavigationDisplayCardStyle}" Margin="4" Height="60"
+                                    Width="240" CornerRadius="4"
+                                    Image="{x:Bind CoverImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=240}"
+                                    Title="{x:Bind Title}"
+                                    Subtitle="{x:Bind UpdateFrequency}"
+                                    DataContext="{Binding Mode=OneWay}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel x:Name="TopArtistsPanel" Spacing="16">
+                    <TextBlock x:Uid="Views/BrowseView/TopArtists/Header"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               VerticalAlignment="Center" />
+                    <ListView ItemsSource="{x:Bind ViewModel.TopArtists}"
+                              Margin="-4 0" Padding="0"
+                              SelectionMode="None" IsItemClickEnabled="True">
+                        <interactivity:Interaction.Behaviors>
+                            <behaviors:WheelEventRelayBehavior />
+                        </interactivity:Interaction.Behaviors>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsStackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <ContentPresenter Padding="4" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="artistModel:ArtistDetail">
+                                <controls:NavigatiableDisplayCard
+                                    Style="{StaticResource CircleNavigationDisplayCardStyle}" Width="128"
+                                    CornerRadius="60"
+                                    Image="{x:Bind AvatarImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=240}"
+                                    Title="{x:Bind Name}"
+                                    DataContext="{Binding Mode=OneWay}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</local:BrowseViewBase>

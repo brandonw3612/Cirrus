@@ -1,0 +1,135 @@
+<UserControl
+    x:Class="Cirrus.Controls.SidebarView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    mc:Ignorable="d">
+    <SplitView x:Name="RootSplitView"
+               Content="{x:Bind Child}"
+               DisplayMode="CompactOverlay" IsPaneOpen="False"
+               Background="Transparent" PaneBackground="Transparent"
+               CompactPaneLength="76" OpenPaneLength="364">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayModes">
+                <VisualState x:Name="CompactClosed">
+                    <VisualState.Setters>
+                        <Setter Target="RootSplitView.DisplayMode" Value="CompactOverlay" />
+                        <Setter Target="RootSplitView.IsPaneOpen" Value="False" />
+                        <Setter Target="DrawerGrid.Margin" Value="8" />
+                        <Setter Target="DrawerGrid.Background"
+                                Value="{ThemeResource AcrylicInAppFillColorDefaultBrush}" />
+                        <Setter Target="DrawerGrid.BorderThickness" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="CompactOpen">
+                    <VisualState.Setters>
+                        <Setter Target="RootSplitView.DisplayMode" Value="CompactOverlay" />
+                        <Setter Target="RootSplitView.IsPaneOpen" Value="True" />
+                        <Setter Target="DrawerGrid.Margin" Value="8" />
+                        <Setter Target="DrawerGrid.Background"
+                                Value="{ThemeResource AcrylicInAppFillColorDefaultBrush}" />
+                        <Setter Target="DrawerGrid.BorderThickness" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="FullSized">
+                    <VisualState.Setters>
+                        <Setter Target="RootSplitView.DisplayMode" Value="CompactInline" />
+                        <Setter Target="RootSplitView.IsPaneOpen" Value="True" />
+                        <Setter Target="DrawerGrid.Margin" Value="0 0 0 8" />
+                        <Setter Target="DrawerGrid.Background" Value="Transparent" />
+                        <Setter Target="DrawerGrid.BorderThickness" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <interactivity:Interaction.Behaviors>
+            <behaviors:PaneClosedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind PaneClosedCommand}" />
+            </behaviors:PaneClosedEventTriggerBehavior>
+            <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+            </behaviors:SizeChangedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
+        <SplitView.Pane>
+            <Grid x:Name="BarGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="76" />
+                    <ColumnDefinition Width="288" />
+                </Grid.ColumnDefinitions>
+                <Grid Padding="8" Background="Transparent">
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:PointerMovedEventTriggerBehavior>
+                            <interactivity:InvokeCommandAction Command="{x:Bind SidebarPanePointMovedCommand}" />
+                        </behaviors:PointerMovedEventTriggerBehavior>
+                        <behaviors:PointerExitedEventTriggerBehavior>
+                            <interactivity:InvokeCommandAction Command="{x:Bind SidebarPanePointExitedCommand}" />
+                        </behaviors:PointerExitedEventTriggerBehavior>
+                        <behaviors:TappedEventTriggerBehavior>
+                            <interactivity:InvokeCommandAction Command="{x:Bind SidebarPaneTappedCommand}" />
+                        </behaviors:TappedEventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="4">
+                        <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/Search"
+                                                 MenuIconSource="ms-appx:///Assets/MenuIcons/Search.svg" Width="60"
+                                                 Height="60"
+                                                 Command="{x:Bind SidebarNavigateCommand}" CommandParameter="Search"
+                                                 IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=Search}" />
+                        <!-- <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/ForYou" -->
+                        <!--                          MenuIconSource="ms-appx:///Assets/MenuIcons/ForYou.svg" Width="60" -->
+                        <!--                          Height="60" -->
+                        <!--                          Command="{x:Bind SidebarNavigateCommand}" -->
+                        <!--                          CommandParameter="PickedForYou" -->
+                        <!--                          IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=PickedForYou}" /> -->
+                        <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/Browse"
+                                                 MenuIconSource="ms-appx:///Assets/MenuIcons/Browse.svg" Width="60"
+                                                 Height="60"
+                                                 Command="{x:Bind SidebarNavigateCommand}" CommandParameter="Browse"
+                                                 IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=Browse}" />
+                        <!--<Border Height="10" />-->
+                        <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/Library"
+                                                 MenuIconSource="ms-appx:///Assets/MenuIcons/Library.svg" Width="60"
+                                                 Height="60"
+                                                 Command="{x:Bind SidebarNavigateCommand}" CommandParameter="Library"
+                                                 IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=Library}" />
+                        <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/CloudDrive"
+                                                 MenuIconSource="ms-appx:///Assets/MenuIcons/CloudDrive.svg" Width="60"
+                                                 Height="60"
+                                                 Command="{x:Bind SidebarNavigateCommand}"
+                                                 CommandParameter="CloudDrive"
+                                                 IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=CloudDrive}" />
+                        <!-- <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/PlaybackHistory" -->
+                        <!--                          MenuIconSource="ms-appx:///Assets/MenuIcons/History.svg" Width="60" -->
+                        <!--                          Height="60" -->
+                        <!--                          Command="{x:Bind SidebarNavigateCommand}" -->
+                        <!--                          CommandParameter="History" -->
+                        <!--                          IsSelected="{x:Bind ViewModel.CurrentFrameContentIdentifier, Mode=OneWay, Converter={StaticResource EqualityConverter}, ConverterParameter=History}" /> -->
+                    </StackPanel>
+                    <StackPanel Grid.Row="2">
+                        <local:SidebarMenuButton x:Uid="Controls/SidebarView/SidebarButtons/Station"
+                                                 MenuIconSource="ms-appx:///Assets/MenuIcons/Station.svg" Width="60"
+                                                 Height="60"
+                                                 Command="{x:Bind StartPersonalStationCommand}" />
+                    </StackPanel>
+                </Grid>
+                <Grid x:Name="DrawerGrid" Grid.Column="1" CornerRadius="8" BorderThickness="1"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <SystemBackdropElement>
+                        <SystemBackdropElement.SystemBackdrop>
+                            <MicaBackdrop Kind="BaseAlt" />
+                        </SystemBackdropElement.SystemBackdrop>
+                    </SystemBackdropElement>
+                    <local:QuickAccessView />
+                </Grid>
+            </Grid>
+        </SplitView.Pane>
+    </SplitView>
+</UserControl>

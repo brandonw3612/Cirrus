@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Cirrus (Package)": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": false
+    },
+    "Cirrus (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

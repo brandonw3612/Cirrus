@@ -1,0 +1,122 @@
+<local:ChartViewBase
+    x:Class="Cirrus.Views.ChartView"
+    x:Name="CurrentView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commanding="using:Cirrus.Commanding"
+    xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls="using:Cirrus.Controls"
+    xmlns:ctk="using:CommunityToolkit.WinUI"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:layout="using:Cirrus.Layout"
+    xmlns:liveModels="using:Cirrus.LiveModels"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commanding:ShowTrackContextFlyoutCommand x:Name="WeeklyTracksShowContextFlyoutCommand"
+                                                  x:Key="WeeklyTracksShowContextFlyoutCommand" />
+        <commanding:ShowTrackContextFlyoutCommand x:Name="AllTimeTracksShowContextFlyoutCommand"
+                                                  x:Key="AllTimeTracksShowContextFlyoutCommand" />
+        <commanding:PlayFromListCommand x:Name="WeeklyTracksPlayFromListCommand"
+                                        x:Key="WeeklyTracksPlayFromListCommand" />
+        <commanding:PlayFromListCommand x:Name="AllTimeTracksPlayFromListCommand"
+                                        x:Key="AllTimeTracksPlayFromListCommand" />
+    </Page.Resources>
+    <Grid>
+        <interactivity:Interaction.Behaviors>
+            <behaviors:LoadedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+            </behaviors:LoadedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <ctk:IsEqualStateTrigger Value="{x:Bind ViewModel.SelectedCategory, Mode=OneWay}"
+                                                 To="1" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="TrackListView.ItemTemplate">
+                            <Setter.Value>
+                                <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                                    <controls:TrackListItem Style="{StaticResource TopChartTrackListItemStyle}"
+                                                            Index="{x:Bind Index}"
+                                                            DataContext="{x:Bind Track}"
+                                                            Plays="{x:Bind Plays}"
+                                                            PlaysPercentage="{x:Bind Percentage}"
+                                                            PlayFromListCommand="{StaticResource AllTimeTracksPlayFromListCommand}"
+                                                            ShowContextFlyoutCommand="{StaticResource AllTimeTracksShowContextFlyoutCommand}" />
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
+                     Background="Transparent"
+                     IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+        <Border x:Name="FloatingHeader"
+                Canvas.ZIndex="1"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
+                Visibility="Collapsed"
+                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="4" Margin="32 16" Padding="24">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
+            </animations:Implicit.ShowAnimations>
+            <animations:Implicit.HideAnimations>
+                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
+            </animations:Implicit.HideAnimations>
+            <layout:Row
+                Spacing="16" HorizontalAlignment="Stretch">
+                <TextBlock
+                    Text="{x:Bind ViewModel.Nickname, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/ChartView/HeaderFormat}"
+                    CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                    VerticalAlignment="Center" />
+                <layout:Spacer layout:Row.ColumnWidth="*" />
+                <communityControls:Segmented
+                    SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/OneWeek" />
+                    <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/AllTime" />
+                </communityControls:Segmented>
+            </layout:Row>
+        </Border>
+        <ListView x:Name="TrackListView" Style="{StaticResource TrackListViewStyle}"
+                  Padding="16 16 16 80"
+                  ItemsSource="{x:Bind ViewModel.DisplayItems, Mode=OneWay}">
+            <ListView.Header>
+                <layout:Row x:Name="ViewHeader"
+                            Margin="32"
+                            Spacing="16">
+                    <TextBlock
+                        Text="{x:Bind ViewModel.Nickname, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/ChartView/HeaderFormat}"
+                        CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                        VerticalAlignment="Center" />
+                    <layout:Spacer layout:Row.ColumnWidth="*" />
+                    <communityControls:Segmented
+                        SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/OneWeek" />
+                        <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/AllTime" />
+                    </communityControls:Segmented>
+                </layout:Row>
+            </ListView.Header>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
+                    <controls:TrackListItem Style="{StaticResource TopChartTrackListItemStyle}"
+                                            Index="{x:Bind Index}"
+                                            DataContext="{x:Bind Track}"
+                                            Plays="{x:Bind Plays}"
+                                            PlaysPercentage="{x:Bind Percentage}"
+                                            PlayFromListCommand="{StaticResource WeeklyTracksPlayFromListCommand}"
+                                            ShowContextFlyoutCommand="{StaticResource WeeklyTracksShowContextFlyoutCommand}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</local:ChartViewBase>

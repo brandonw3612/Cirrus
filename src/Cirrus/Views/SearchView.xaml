@@ -1,0 +1,141 @@
+<local:SearchViewBase
+    x:Class="Cirrus.Views.SearchView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Cirrus.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:commandingPrimitives="using:Cirrus.Commanding.Primitives"
+    xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:communityUi="using:CommunityToolkit.WinUI"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:models="using:Cirrus.Models.Business.Search"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <commandingPrimitives:CommandWrapper x:Key="NavigateToSearchResultsCommandWrapper"
+                                             InnerCommand="{x:Bind ViewModel.NavigateToSearchResultsCommand}" />
+        <DataTemplate x:Key="TrendingSearchKeywordItemTemplate" x:DataType="models:TrendingSearchKeyword">
+            <Grid>
+                <Button Content="{x:Bind Keyword}" Style="{StaticResource AccentGlowButtonStyle}"
+                        FontSize="14" Height="32" MinWidth="40" CornerRadius="16" Padding="12 0"
+                        VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                        ToolTipService.ToolTip="{x:Bind ExtendedContent}" ToolTipService.Placement="Mouse"
+                        Command="{StaticResource NavigateToSearchResultsCommandWrapper}"
+                        CommandParameter="{x:Bind Keyword}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="SearchHistoryKeywordItemTemplate" x:DataType="x:String">
+            <Grid>
+                <Button Content="{x:Bind}" Style="{StaticResource AccentGlowButtonStyle}"
+                        FontSize="14" Height="32" MinWidth="40" CornerRadius="16" Padding="12 0"
+                        VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                        Command="{StaticResource NavigateToSearchResultsCommandWrapper}" CommandParameter="{x:Bind}" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+    <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WidthStates">
+                <VisualState x:Name="Compact" />
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <communityUi:CompareStateTrigger
+                            Value="{x:Bind SuggestGrid.(communityUi:FrameworkElementExtensions.ActualWidth)}"
+                            To="640" Comparison="GreaterThanOrEqual" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="TrendingTipItemsRepeater.(Grid.ColumnSpan)" Value="1" />
+                        <Setter Target="HistoryTipItemsRepeater.(Grid.Row)" Value="0" />
+                        <Setter Target="HistoryTipItemsRepeater.(Grid.Column)" Value="1" />
+                        <Setter Target="HistoryTipItemsRepeater.(Grid.ColumnSpan)" Value="1" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <StackPanel VerticalAlignment="Center" MaxWidth="800" Margin="32 0 32 90" Spacing="20">
+            <StackPanel.ChildrenTransitions>
+                <TransitionCollection>
+                    <AddDeleteThemeTransition />
+                    <RepositionThemeTransition />
+                </TransitionCollection>
+            </StackPanel.ChildrenTransitions>
+            <TextBlock Text="Cirrus" FontSize="40" HorizontalAlignment="Center" FontWeight="Bold"
+                       CharacterSpacing="-20" />
+            <AutoSuggestBox Text="{x:Bind ViewModel.SearchKeyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="16" HorizontalAlignment="Stretch"
+                            ItemsSource="{x:Bind ViewModel.SearchSuggestions, Mode=OneWay}">
+                <interactivity:Interaction.Behaviors>
+                    <behaviors:TextChangedEventTriggerBehavior>
+                        <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.InputKeywordChangedCommand}" />
+                    </behaviors:TextChangedEventTriggerBehavior>
+                    <behaviors:SuggestionChosenEventTriggerBehavior>
+                        <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.SearchSuggestionChosenCommand}" />
+                    </behaviors:SuggestionChosenEventTriggerBehavior>
+                    <behaviors:QuerySubmittedEventTriggerBehavior>
+                        <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.SearchQuerySubmittedCommand}" />
+                    </behaviors:QuerySubmittedEventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+                <AutoSuggestBox.QueryIcon>
+                    <FontIcon Glyph="{StaticResource FontIconGlyphSearch}"
+                              FontFamily="{StaticResource CirrusIconSetFontFamily}" />
+                </AutoSuggestBox.QueryIcon>
+            </AutoSuggestBox>
+            <Grid x:Name="SuggestGrid" Margin="-8 0"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Center" ColumnSpacing="10" RowSpacing="10"
+                  communityUi:FrameworkElementExtensions.EnableActualSizeBinding="True">
+                <Grid.ChildrenTransitions>
+                    <TransitionCollection>
+                        <AddDeleteThemeTransition />
+                        <RepositionThemeTransition />
+                    </TransitionCollection>
+                </Grid.ChildrenTransitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <communityControls:HeaderedContentControl x:Name="TrendingTipItemsRepeater"
+                                                          Grid.ColumnSpan="2"
+                                                          Visibility="{x:Bind ViewModel.TrendingSearchKeywords.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}">
+                    <communityControls:HeaderedContentControl.Header>
+                        <TextBlock x:Uid="Views/SearchView/TrendingKeywordsHeader" FontSize="20" CharacterSpacing="-20"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}" FontWeight="SemiBold"
+                                   Margin="8 0 0 10" />
+                    </communityControls:HeaderedContentControl.Header>
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.TrendingSearchKeywords}"
+                                   ItemTemplate="{StaticResource TrendingSearchKeywordItemTemplate}">
+                        <ItemsRepeater.Layout>
+                            <communityControls:WrapLayout HorizontalSpacing="5" VerticalSpacing="5" />
+                        </ItemsRepeater.Layout>
+                    </ItemsRepeater>
+                </communityControls:HeaderedContentControl>
+                <communityControls:HeaderedContentControl x:Name="HistoryTipItemsRepeater"
+                                                          Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                          Visibility="{x:Bind ViewModel.SearchHistoryKeywords.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}">
+                    <communityControls:HeaderedContentControl.Header>
+                        <Grid Margin="8 0 8 10">
+                            <TextBlock x:Uid="Views/SearchView/HistoryKeywordsHeader" FontSize="20"
+                                       CharacterSpacing="-20"
+                                       Foreground="{ThemeResource SystemBaseMediumColor}" FontWeight="SemiBold" />
+                            <Button x:Uid="Views/SearchView/ClearHistoryButton"
+                                    Style="{ThemeResource TextBlockButtonStyle}"
+                                    Command="{x:Bind ViewModel.ClearSearchHistoryCommand}" Padding="12 6"
+                                    CornerRadius="8"
+                                    HorizontalAlignment="Right" />
+                        </Grid>
+                    </communityControls:HeaderedContentControl.Header>
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.SearchHistoryKeywords}"
+                                   ItemTemplate="{StaticResource SearchHistoryKeywordItemTemplate}">
+                        <ItemsRepeater.Layout>
+                            <communityControls:WrapLayout HorizontalSpacing="5" VerticalSpacing="5" />
+                        </ItemsRepeater.Layout>
+                    </ItemsRepeater>
+                </communityControls:HeaderedContentControl>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</local:SearchViewBase>

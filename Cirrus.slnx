@@ -1,0 +1,32 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="ARM64" />
+  </Configurations>
+  <Project Path="src/Cirrus.Base/Cirrus.Base.csproj">
+    <Platform Solution="*|x64" Project="AnyCPU" />
+    <Platform Solution="*|ARM64" Project="AnyCPU" />
+  </Project>
+  <Project Path="src/Cirrus.Models/Cirrus.Models.csproj">
+    <Platform Solution="*|x64" Project="AnyCPU" />
+    <Platform Solution="*|ARM64" Project="AnyCPU" />
+  </Project>
+  <Project Path="src/Cirrus.Network/Cirrus.Network.csproj">
+    <Platform Solution="*|x64" Project="AnyCPU" />
+    <Platform Solution="*|ARM64" Project="AnyCPU" />
+  </Project>
+  <Project Path="src/Cirrus.Playback/Cirrus.Playback.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+  </Project>
+  <Project Path="src/Cirrus.SourceGenerators/Cirrus.SourceGenerators.csproj">
+    <Platform Solution="*|x64" Project="AnyCPU" />
+    <Platform Solution="*|ARM64" Project="AnyCPU" />
+  </Project>
+  <Project Path="src/Cirrus/Cirrus.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="*|ARM64" />
+  </Project>
+</Solution>
