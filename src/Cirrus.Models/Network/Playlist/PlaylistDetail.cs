@@ -155,7 +155,7 @@ public class PlaylistDetail : IPlaylist, IJsonOnDeserialized
     /// <summary>
     /// Shared creators of the playlist.
     /// </summary>
-    [JsonPropertyName("sharedUsers")] public List<UserProfile> SharedCreators { get; init; } = new();
+    [JsonPropertyName("sharedUsers")] public List<UserProfile>? SharedCreators { get; init; } = new();
 
     [JsonInclude] [JsonExtensionData] internal Dictionary<string, JsonElement> ExtensionData { get; set; } = new();
 
@@ -190,7 +190,7 @@ public class PlaylistDetail : IPlaylist, IJsonOnDeserialized
         IsSubscribed = IsSubscribed == true,
         PlaylistId = PlaylistId,
         Plays = Plays,
-        SharedCreators = SharedCreators,
+        SharedCreators = SharedCreators ?? [],
         SubscriberCount = SubscriberCount,
         Subscribers = Subscribers,
         Tags = Tags,
