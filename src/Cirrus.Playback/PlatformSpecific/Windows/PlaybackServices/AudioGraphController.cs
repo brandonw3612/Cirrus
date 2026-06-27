@@ -46,7 +46,6 @@ internal sealed partial class AudioGraphController : IDisposable
                 try
                 {
                     node.GraphNode.Stop();
-                    node.GraphNode.Seek(TimeSpan.Zero);
                     node.GraphNode.AddOutgoingConnection(_outputNode);
                     node.GraphNode.MediaSourceCompleted -= OnNodeCompleted;
                     node.GraphNode.MediaSourceCompleted += OnNodeCompleted;
