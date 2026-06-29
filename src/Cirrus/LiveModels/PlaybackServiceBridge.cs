@@ -1,12 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using Cirrus.Base.Services;
+﻿using Cirrus.Base.Services;
 using Cirrus.Models.Business.Playback;
+using Cirrus.Network.Api;
 using Cirrus.Playback.EventArgs;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
+using System.Collections.ObjectModel;
+using Windows.Storage.Streams;
 
 namespace Cirrus.LiveModels;
 
@@ -31,13 +33,16 @@ public partial class PlaybackServiceBridge : ObservableObject
     [ObservableProperty]
     public partial Uri AlbumArtworkUri { get; set; } = new("ms-appx:///Assets/Images/DefaultAlbumArtwork.png");
 
+    [ObservableProperty]
+    public partial IRandomAccessStreamReference? AlbumArtworkReference { get; set; }
+
     [ObservableProperty] public partial string TrackTitle { get; set; } = "Cirrus";
 
     [ObservableProperty] public partial bool IsExplicit { get; set; } = false;
 
     [ObservableProperty] public partial string Artists { get; set; } = "Dedicated to creators";
 
-    [ObservableProperty] public partial bool? IsPlaying { get; set; }
+    [ObservableProperty] public partial bool IsPlaying { get; set; } = false;
 
     [ObservableProperty] public partial string CurrentPlaybackMode { get; set; } = nameof(PlaybackMode.Sequential);
 
@@ -137,7 +142,7 @@ public partial class PlaybackServiceBridge : ObservableObject
                 }
                 case nameof(IPlaybackService<ulong>.IsPlaying):
                 {
-                    IsPlaying = _playbackService.IsPlaying;
+                    IsPlaying = _playbackService.IsPlaying ?? false;
                     break;
                 }
                 case nameof(IPlaybackService<ulong>.PlaybackPosition):
@@ -190,6 +195,11 @@ public partial class PlaybackServiceBridge : ObservableObject
         CurrentTrack = _playbackQueueProvider?.CurrentTrack;
         AlbumArtworkUri = _playbackQueueProvider?.CurrentTrack?.AlbumArtworkUri ??
                           new("ms-appx:///Assets/Images/DefaultAlbumArtwork.svg");
+        Uri imageUri = AlbumArtworkUri is not { } artworkUri ||
+                       !artworkUri.Scheme.StartsWith("http")
+            ? new("ms-appx:///Assets/Images/DefaultAlbumArtwork.png")
+            : new($"{artworkUri}?param=512y512");
+        AlbumArtworkReference = RandomAccessStreamReference.CreateFromUri(imageUri);
         TrackTitle = _playbackQueueProvider?.CurrentTrack?.Title ?? "Unknown Track";
         IsExplicit = _playbackQueueProvider?.CurrentTrack?.IsExplicit ?? false;
         Artists = _playbackQueueProvider?.CurrentTrack?.DisplayArtist ?? "Unknown Artists";
