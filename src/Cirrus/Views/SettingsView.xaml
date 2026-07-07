@@ -344,8 +344,6 @@
                                                          NavigateUri="https://github.com/Binaryify/NeteaseCloudMusicApi" />
                                         <HyperlinkButton Content="brandonw3612/Copycat"
                                                          NavigateUri="https://github.com/brandonw3612/Copycat" />
-                                        <HyperlinkButton Content="brandonw3612/Pulse.NET"
-                                                         NavigateUri="https://github.com/brandonw3612/Pulse.NET" />
                                         <HyperlinkButton Content="codebude/QRCoder"
                                                          NavigateUri="https://github.com/codebude/QRCoder" />
                                         <HyperlinkButton Content="CommunityToolkit/dotnet"
@@ -354,6 +352,8 @@
                                                          NavigateUri="https://github.com/CommunityToolkit/Windows" />
                                         <HyperlinkButton Content="dotMorten/WinUIEx"
                                                          NavigateUri="https://github.com/dotMorten/WinUIEx" />
+                                        <HyperlinkButton Content="dotnet/reactive"
+                                                         NavigateUri="https://github.com/dotnet/reactive" />
                                         <HyperlinkButton Content="dotnet/roslyn"
                                                          NavigateUri="https://github.com/dotnet/roslyn" />
                                         <HyperlinkButton Content="HavenDV/H.NotifyIcon"

@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.Json;
 using Windows.Storage;
+using Cirrus.Extensions;
 using Cirrus.Models.Business.Search;
 using Cirrus.Network;
 using Cirrus.Primitives;
@@ -8,9 +11,7 @@ using Cirrus.Serialization;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml.Controls;
-using Pulse.Debouncers;
 
 namespace Cirrus.ViewModels;
 
@@ -20,27 +21,27 @@ public sealed partial class SearchViewModel : ViewModel
 
     [ObservableProperty] public partial string SearchKeyword { get; set; } = string.Empty;
 
-    private string _userInputKeyword = string.Empty;
-
     public ObservableCollection<TrendingSearchKeyword> TrendingSearchKeywords { get; } = new();
     public ObservableCollection<string> SearchHistoryKeywords { get; } = new();
 
     [ObservableProperty] public partial List<string> SearchSuggestions { get; private set; } = [];
 
-    private readonly AsyncTaskDebouncer _suggestionQueryDebouncer;
+    private Subject<string>? _suggestionQueryInput;
+    private IDisposable? _suggestionQuerySubscription;
 
-    public SearchViewModel()
+    public override void AllocateDisposable()
     {
-        _suggestionQueryDebouncer = new()
-        {
-            TaskTimeout = TimeSpan.FromMicroseconds(500),
-            Task = () => DispatcherQueue!.EnqueueAsync(async () =>
+        _suggestionQueryInput = new();
+        _suggestionQuerySubscription = _suggestionQueryInput
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ObserveOn(DispatcherQueue!)
+            .Subscribe(async keyword =>
             {
-                if (_userInputKeyword is { Length: > 0 })
+                if (keyword is { Length: > 0 })
                 {
                     try
                     {
-                        var response = await Client.Search.SuggestKeywordsAsync(_userInputKeyword);
+                        var response = await Client.Search.SuggestKeywordsAsync(keyword);
                         SearchSuggestions = response.Keywords;
                     }
                     catch
@@ -52,8 +53,15 @@ public sealed partial class SearchViewModel : ViewModel
                 {
                     SearchSuggestions = [];
                 }
-            })
-        };
+            });
+    }
+
+    public override void RecycleDisposable()
+    {
+        _suggestionQuerySubscription?.Dispose();
+        _suggestionQuerySubscription = null;
+        _suggestionQueryInput?.Dispose();
+        _suggestionQueryInput = null;
     }
 
     public override async Task LoadDataAsync()
@@ -73,8 +81,7 @@ public sealed partial class SearchViewModel : ViewModel
     private void OnInputKeywordChanged(AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason is not AutoSuggestionBoxTextChangeReason.UserInput) return;
-        _userInputKeyword = SearchKeyword.Trim();
-        _suggestionQueryDebouncer.Invoke();
+        _suggestionQueryInput?.OnNext(SearchKeyword.Trim());
     }
 
     [RelayCommand]

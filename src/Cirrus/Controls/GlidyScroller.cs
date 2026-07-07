@@ -1,12 +1,14 @@
 ﻿using System.Numerics;
+using System.Reactive.Linq;
 using Windows.Foundation;
 using Cirrus.Behaviors;
+using Cirrus.Extensions;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
-using Pulse.Debouncers;
+
 
 namespace Cirrus.Controls;
 
@@ -82,8 +84,8 @@ public partial class GlidyScroller : Panel
     
     private readonly List<float> _childOffsets = [];
     private float _currentOffset;
-    
-    private readonly ActionDebouncer _interactionDebouncer;
+
+    private IDisposable? _pwcDebouncerSubscription;
     private bool _isInteracting;
 
     public event EventHandler? UserInteractionStarted;
@@ -91,21 +93,32 @@ public partial class GlidyScroller : Panel
 
     public GlidyScroller()
     {
-        _interactionDebouncer = new()
-        {
-            Action = () =>
-            {
-                _ = DispatcherQueue.TryEnqueue(() =>
-                {
-                    _isInteracting = false;
-                    UserInteractionEnded?.Invoke(this, EventArgs.Empty);
-                });
-            },
-            ActionTimeout = TimeSpan.FromMilliseconds(2000)
-        };
+        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, LoadedEventTriggerBehavior>(LoadedCommand);
+        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(UnloadedCommand);
         this.AttachEventTriggerBehaviorToCommand<UIElement, PointerWheelChangedEventTriggerBehavior>
             (PointerWheelChangedCommand);
         // TODO: Manipulation event handlers
+    }
+
+    [RelayCommand]
+    private void OnLoaded()
+    {
+        _pwcDebouncerSubscription = Observable.FromEventPattern<PointerEventHandler, PointerRoutedEventArgs>(
+            h => PointerWheelChanged += h,
+            h => PointerWheelChanged -= h
+        ).Throttle(TimeSpan.FromMilliseconds(2000))
+        .ObserveOn(DispatcherQueue)
+        .Subscribe(_ =>
+        {
+            _isInteracting = false;
+            UserInteractionEnded?.Invoke(this, EventArgs.Empty);
+        });
+    }
+
+    [RelayCommand]
+    private void OnUnloaded()
+    {
+        _pwcDebouncerSubscription?.Dispose();
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -261,8 +274,12 @@ public partial class GlidyScroller : Panel
     [RelayCommand]
     private void OnPointerWheelChanged(PointerRoutedEventArgs args)
     {
-        TriggerInteraction();
-
+        if (!_isInteracting)
+        {
+            _isInteracting = true;
+            UserInteractionStarted?.Invoke(this, EventArgs.Empty);
+        }
+        
         var actualOffset = _currentOffset - args.GetCurrentPoint(this).Properties.MouseWheelDelta;
         var controlBound = Orientation is Orientation.Vertical ? ActualHeight : ActualWidth;
 
@@ -282,15 +299,5 @@ public partial class GlidyScroller : Panel
         }
 
         _currentOffset = actualOffset;
-    }
-
-    private void TriggerInteraction()
-    {
-        if (!_isInteracting)
-        {
-            _isInteracting = true;
-            UserInteractionStarted?.Invoke(this, EventArgs.Empty);
-        }
-        _interactionDebouncer.Invoke();
     }
 }

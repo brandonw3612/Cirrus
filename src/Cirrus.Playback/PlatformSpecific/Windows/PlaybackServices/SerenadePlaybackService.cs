@@ -11,11 +11,10 @@ using Cirrus.Playback.Extensions;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
-using Pulse.Throttlers;
 
 namespace Cirrus.Playback.PlaybackServices;
 
-public partial class SerenadePlaybackService : ObservableObject, IPlaybackService<ulong>
+public partial class SerenadePlaybackService : ObservableObject, IPlaybackService<ulong>, IDisposable
 {
     #region Persistent fields
 
@@ -117,18 +116,11 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
     private bool _isInitialized;
     private AudioGraphController? _audioGraphController;
     private AudioNodeContainer? _audioNodeContainer;
-    private ActionThrottler<PlaybackPositionChangedEventArgs<ulong>> _positionMonitorThrottler;
     private bool _crossfadeSuppressed;
     
     public SerenadePlaybackService(UserPreferenceService userPreferenceService)
     {
         _userPreferenceService = userPreferenceService;
-        _positionMonitorThrottler = new()
-        {
-            IsInstantaneous = true,
-            ActionInterval = TimeSpan.FromMilliseconds(100),
-            Action = OnPositionUpdated
-        };
     }
 
     public void InitializeSystemMediaTransportControls(Window window)
@@ -165,7 +157,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
                 await GetDeviceInformationById(AudioOutputDeviceId));
         _audioGraphController!.SetVolume(Volume);
         _audioGraphController!.ApplyEqualizerEffects(EqualizerEffectKey, CustomEqualizerEffect);
-        _audioGraphController!.PlaybackPositionChanged += (_, args) => _positionMonitorThrottler.Invoke(args);
+        _audioGraphController!.PlaybackPositionChanged += (_, args) => OnPositionUpdated(args);
         _audioGraphController!.TrackEnded += OnTrackEnded;
         _audioNodeContainer = new(_audioGraphController!.AudioGraph, 5);
     }
@@ -432,5 +424,10 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         {
             return null;
         }
+    }
+
+    public void Dispose()
+    {
+        _audioGraphController?.Dispose();
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System.Collections;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Cirrus.Behaviors;
+using Cirrus.Extensions;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Pulse.Throttlers;
 using WinRT;
 
 namespace Cirrus.Controls;
@@ -62,23 +64,24 @@ public sealed partial class CirculatedFlipView : Control
         view.UpdateElements();
     }
 
-    private readonly ActionThrottler<bool> _translateThrottler;
+    private readonly IDisposable _translationSubscription;
+    private readonly Subject<bool> _translationSubject;
+    
     private readonly Timer _autoScrollingTimer;
 
     public CirculatedFlipView()
     {
         DefaultStyleKey = typeof(CirculatedFlipView);
-        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(new RelayCommand(() =>
-        {
-            _autoScrollingTimer?.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
-        }));
+        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(UnloadedCommand);
         ManipulationMode = ManipulationModes.TranslateX;
-        _translateThrottler = new()
-        {
-            ActionInterval = TimeSpan.FromMilliseconds(1000),
-            Action = (forward) => DispatcherQueue.TryEnqueue(() => _viewPanel?.Translate(forward)),
-            IsInstantaneous = true
-        };
+        _translationSubject = new();
+        _translationSubscription = _translationSubject
+            .GroupByUntil(
+                keySelector: _ => 1,
+                durationSelector: _ => Observable.Timer(TimeSpan.FromMilliseconds(1000))
+            ).SelectMany(g => g.Take(1))
+            .ObserveOn(DispatcherQueue)
+            .Subscribe(forward => _viewPanel?.Translate(forward));
         _autoScrollingTimer = new(_ =>
         {
             DispatcherQueue.TryEnqueue(() => _viewPanel?.Translate(true));
@@ -87,6 +90,14 @@ public sealed partial class CirculatedFlipView : Control
 
     private CirculatedFlipViewPanel? _viewPanel;
 
+    [RelayCommand]
+    private void OnUnloaded()
+    {
+        _autoScrollingTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _translationSubscription.Dispose();
+        _translationSubject.Dispose();
+    }
+    
     protected override void OnApplyTemplate()
     {
         _viewPanel = GetTemplateChild("ViewPanel") as CirculatedFlipViewPanel;
@@ -145,10 +156,10 @@ public sealed partial class CirculatedFlipView : Control
         switch (delta)
         {
             case >= 120:
-                _translateThrottler.Invoke(false);
+                _translationSubject.OnNext(false);
                 break;
             case <= -120:
-                _translateThrottler.Invoke(true);
+                _translationSubject.OnNext(true);
                 break;
         }
     }
@@ -160,17 +171,17 @@ public sealed partial class CirculatedFlipView : Control
         switch (delta)
         {
             case >= 20:
-                _translateThrottler.Invoke(false);
+                _translationSubject.OnNext(false);
                 break;
             case <= -20:
-                _translateThrottler.Invoke(true);
+                _translationSubject.OnNext(true);
                 break;
         }
     }
 
     public RelayCommand? ScrollBackwardCommand => field ??= new RelayCommand(ScrollBackward);
-    private void ScrollBackward() => _translateThrottler.Invoke(false);
+    private void ScrollBackward() => _translationSubject.OnNext(false);
 
     public RelayCommand? ScrollForwardCommand => field ??= new RelayCommand(ScrollForward);
-    private void ScrollForward() => _translateThrottler.Invoke(true);
+    private void ScrollForward() => _translationSubject.OnNext(true);
 }

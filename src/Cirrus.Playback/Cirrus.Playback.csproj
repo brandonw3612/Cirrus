@@ -43,7 +43,7 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-        <PackageReference Include="Pulse.NET" Version="0.0.4-alpha" />
+        <PackageReference Include="System.Reactive" Version="6.1.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.Contains(windows))'">
