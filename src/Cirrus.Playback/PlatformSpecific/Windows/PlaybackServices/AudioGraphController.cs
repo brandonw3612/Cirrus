@@ -1,4 +1,6 @@
-﻿using Windows.Devices.Enumeration;
+﻿using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Windows.Devices.Enumeration;
 using Windows.Media.Audio;
 using Windows.Media.Render;
 using Cirrus.Playback.EventArgs;
@@ -8,7 +10,8 @@ namespace Cirrus.Playback.PlaybackServices;
 internal sealed partial class AudioGraphController : IDisposable
 {
     private readonly AudioDeviceOutputNode _outputNode;
-    private readonly Timer _audioGraphMonitorTimer;
+    private readonly BehaviorSubject<bool> _isMonitoringSubject;
+    private readonly IDisposable _monitorSubscription;
     private bool _isCrossfading;
     private TimeSpan? _currentCrossfadeLength;
     
@@ -70,8 +73,14 @@ internal sealed partial class AudioGraphController : IDisposable
                     // Ignored.
                 }
             });
-        _audioGraphMonitorTimer =
-            new(OnGraphMonitorTimerElapsed, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _isMonitoringSubject = new(false);
+        _monitorSubscription = _isMonitoringSubject
+            .DistinctUntilChanged()
+            .Select(isMonitoring => isMonitoring
+                ? Observable.Interval(TimeSpan.FromMilliseconds(200))
+                : Observable.Empty<long>())
+            .Switch()
+            .Subscribe(_ => OnGraphMonitoring());
         audioGraph.Start();
     }
 
@@ -108,8 +117,7 @@ internal sealed partial class AudioGraphController : IDisposable
 
     public void SetMonitorStatus(bool isMonitoring)
     {
-        if (isMonitoring) _audioGraphMonitorTimer.Change(TimeSpan.Zero, TimeSpan.FromMilliseconds(50));
-        else _audioGraphMonitorTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        _isMonitoringSubject.OnNext(isMonitoring);
     }
 
     public void SetVolume(double volume)
@@ -119,11 +127,13 @@ internal sealed partial class AudioGraphController : IDisposable
 
     public void Dispose()
     {
+        _monitorSubscription.Dispose();
+        _isMonitoringSubject.Dispose();
         _outputNode.Dispose();
         AudioGraph.Dispose();
     }
 
-    private void OnGraphMonitorTimerElapsed(object? _)
+    private void OnGraphMonitoring()
     {
         var (current, next) = DualNodeFlow.Nodes;
         if (current is null)
