@@ -26,6 +26,7 @@ public sealed partial class App
         ServicesProvider.TryRegisterServices(static col =>
             col.AddSingleton<IPreferenceAccessService, PreferenceAccessService>()
                 .AddSingleton<ILocalizationService, LocalizationService>()
+                .AddSingleton<ISynchronizationContextService>(new SynchronizationContextService(SynchronizationContext.Current!))
                 .AddSingleton<IPlaybackService<ulong>, SerenadePlaybackService>()
                 .AddSingleton<IConfigurationService, ConfigurationService>()
                 // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
