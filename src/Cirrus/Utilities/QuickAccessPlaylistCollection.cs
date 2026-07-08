@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Text.Json;
 using Windows.Storage;
+using Cirrus.Base.Services;
+using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Network.Playlist;
 using Cirrus.Network;
@@ -9,36 +12,56 @@ using Cirrus.Serialization;
 using Cirrus.Utilities.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DynamicData;
 
 namespace Cirrus.Utilities;
 
-public partial class QuickAccessPlaylistCollection(ulong userId) : ObservableObject
+public partial class QuickAccessPlaylistCollection : ObservableObject
 {
-    public ObservableCollection<QuickAccessPlaylist> Playlists { get; } = new();
+    private readonly ulong _userId;
+    
+    private readonly SourceList<QuickAccessPlaylist> _playlistsSource;
+    private readonly ReadOnlyObservableCollection<QuickAccessPlaylist> _playlists;
+    public ReadOnlyObservableCollection<QuickAccessPlaylist> Playlists => _playlists;
 
     public QuickAccessPlaylist? FavList { get; private set; }
 
+    public QuickAccessPlaylistCollection(ulong userId)
+    {
+        _userId = userId;
+        
+        _playlistsSource = new();
+        var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
+        _playlistsSource
+            .Connect()
+            .ObserveOn(synchronizationContext)
+            .Bind(out _playlists)
+            .Subscribe();
+    }
+    
     public async Task UpdateAsync(IReadOnlyCollection<QuickAccessPlaylist> playlists)
     {
-        var playlistsToRemove = Playlists.Except(playlists, QuickAccessPlaylistEqualityComparer.Instance).ToList();
-        playlistsToRemove.ForEach(t => Playlists.Remove(t));
-        var intersection = playlists
-            .Intersect(Playlists, QuickAccessPlaylistEqualityComparer.Instance).ToList();
-        Playlists.RearrangeWith(intersection, QuickAccessPlaylistEqualityComparer.Instance);
-        int m = 0, n = 0;
-        while (m < playlists.Count)
+        _playlistsSource.Edit(inner =>
         {
-            if (n >= Playlists.Count ||
-                !QuickAccessPlaylistEqualityComparer.Instance.Equals(Playlists[n], playlists.ElementAt(m)))
-                Playlists.Insert(n, playlists.ElementAt(m));
-            m++;
-            n++;
-        }
+            var comparer = EqualityComparer<QuickAccessPlaylist>.Default;
+            var playlistsToRemove = inner.Except(playlists, comparer).ToList();
+            playlistsToRemove.ForEach(t => inner.Remove(t));
+            var intersection = playlists.Intersect(inner, comparer).ToList();
+            inner.RearrangeWith(intersection, comparer);
+            int m = 0, n = 0;
+            while (m < playlists.Count)
+            {
+                if (n >= inner.Count || !comparer.Equals(inner[n], playlists.ElementAt(m)))
+                    inner.Insert(n, playlists.ElementAt(m));
+                m++;
+                n++;
+            }
+        });
 
         for (var i = 0; i < playlists.Count; i++)
         {
-            Playlists[i].Title = playlists.ElementAt(i).Title;
-            Playlists[i].CoverImageUrl = playlists.ElementAt(i).CoverImageUrl;
+            _playlistsSource.Items[i].Title = playlists.ElementAt(i).Title;
+            _playlistsSource.Items[i].CoverImageUrl = playlists.ElementAt(i).CoverImageUrl;
         }
 
         await SaveAsync();
@@ -48,11 +71,11 @@ public partial class QuickAccessPlaylistCollection(ulong userId) : ObservableObj
     private async Task RefreshAsync()
     {
         List<QuickAccessPlaylist> playlists = new();
-        var playlistsGroup1 = await Client.User.GetPlaylistsAsync(userId, 0);
+        var playlistsGroup1 = await Client.User.GetPlaylistsAsync(_userId, 0);
         ProcessPlaylistGroup(playlistsGroup1.Playlists, playlists);
         if (playlistsGroup1.HasMore)
         {
-            var playlistsGroup2 = await Client.User.GetPlaylistsAsync(userId, 30);
+            var playlistsGroup2 = await Client.User.GetPlaylistsAsync(_userId, 30);
             ProcessPlaylistGroup(playlistsGroup2.Playlists, playlists);
         }
 
@@ -63,7 +86,7 @@ public partial class QuickAccessPlaylistCollection(ulong userId) : ObservableObj
     {
         foreach (var playlist in playlistsInResponse)
         {
-            if (playlist.Creator?.UserId == userId && playlist.PlaylistType == 5)
+            if (playlist.Creator?.UserId == _userId && playlist.PlaylistType == 5)
             {
                 FavList = playlist.ToBusinessModel().ToQuickAccess();
             }
@@ -93,10 +116,10 @@ public partial class QuickAccessPlaylistCollection(ulong userId) : ObservableObj
             };
             OnPropertyChanged(nameof(FavList));
             if (qa.Playlists is not { } playlists) return;
-            foreach (var playlist in playlists)
+            _playlistsSource.Edit(inner =>
             {
-                Playlists.Add(playlist);
-            }
+                inner.AddRange(playlists);
+            });
         }
         catch
         {

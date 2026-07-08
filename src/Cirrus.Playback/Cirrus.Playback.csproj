@@ -43,6 +43,7 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="DynamicData" Version="9.4.33" />
         <PackageReference Include="System.Reactive" Version="6.1.0" />
     </ItemGroup>
 

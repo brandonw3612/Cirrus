@@ -15,6 +15,11 @@
         <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
     <Frame x:Name="HostFrame">
+        <interactivity:Interaction.Behaviors>
+            <behaviors:LoadedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+            </behaviors:LoadedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
         <Grid x:Name="RootGrid">
             <controls:SidebarView x:Name="RootSidebarView" Margin="0 48 0 0">
                 <Grid BorderThickness="1 1 0 0" CornerRadius="8 0 0 0"
@@ -33,7 +38,7 @@
                     </Grid>
                 </Grid>
             </controls:SidebarView>
-            <TitleBar x:Name="TitleBar" VerticalAlignment="Top" Margin="1"
+            <TitleBar x:Name="TitleBar" VerticalAlignment="Top" Margin="0 0 144 0"
                       Title="{x:Bind ViewModel.ApplicationName}"
                       IsBackButtonVisible="{x:Bind NavigationStack.CanNavigateBack, Mode=OneWay}"
                       IsPaneToggleButtonVisible="True">

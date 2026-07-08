@@ -76,6 +76,7 @@
         <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
         <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
         <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
+        <PackageReference Include="DynamicData" Version="9.4.33" />
         <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
         <PackageReference Include="ImageEx.WinUI" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />

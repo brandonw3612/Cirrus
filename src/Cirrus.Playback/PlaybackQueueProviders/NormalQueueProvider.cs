@@ -1,10 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Linq;
 using Cirrus.Base.Services;
+using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Playback;
 using Cirrus.Playback.EventArgs;
 using Cirrus.Playback.Extensions;
 using Cirrus.Playback.Primitives;
+using DynamicData;
 
 namespace Cirrus.Playback.PlaybackQueueProviders;
 
@@ -13,7 +16,7 @@ namespace Cirrus.Playback.PlaybackQueueProviders;
 /// </summary>
 /// <typeparam name="TTrackIdentifier">Type of track identifier.</typeparam>
 /// <remarks>Often used by a normal playback source, such as a playlist or an album.</remarks>
-public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvider<TTrackIdentifier>
+public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvider<TTrackIdentifier>
     where TTrackIdentifier : notnull
 {
     #region Private states
@@ -41,8 +44,6 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
     ///     when in shuffle mode, this sequence is a random permutation of the indices of the tracks in the queue.
     /// </remarks>
     private List<int> _trackIndexSequence;
-
-    private readonly SynchronizationContext? _syncCtx;
 
     #endregion
 
@@ -76,8 +77,10 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
         }
     }
 
-    public override ObservableCollection<IAudioTrack<TTrackIdentifier>> UpcomingTracks { get; } = new();
-    
+    private readonly SourceList<IAudioTrack<TTrackIdentifier>> _upcomingTracksSource;
+    private readonly ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>> _upcomingTracks;
+    public override ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>> UpcomingTracks => _upcomingTracks;
+
     public override event EventHandler<CurrentTrackChangedEventArgs<TTrackIdentifier>>? CurrentTrackChanged;
 
     #endregion
@@ -85,7 +88,6 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
     /// <summary>
     /// Constructs a new <see cref="NormalQueueProvider{TTrackIdentifier}"/> instance.
     /// </summary>
-    /// <param name="syncCtx">Current synchronization context.</param>
     /// <param name="audioTracks">Tracks to be added to the queue initially.</param>
     /// <param name="startingTrackIndex">
     ///     Index of the track to be played first. Defaults to 0, indicating the first track.
@@ -93,11 +95,17 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
     /// <param name="playbackMode">
     ///     Playback mode of the queue. Defaults to null, indicating getting the settings from user preferences.
     /// </param>
-    public NormalQueueProvider(SynchronizationContext? syncCtx, IAudioTrack<TTrackIdentifier>[] audioTracks, int startingTrackIndex = -1,
+    public NormalQueueProvider(IAudioTrack<TTrackIdentifier>[] audioTracks, int startingTrackIndex = -1,
         PlaybackMode? playbackMode = null)
     {
-        _syncCtx = syncCtx;
         _queue = audioTracks.ToList();
+        _upcomingTracksSource = new();
+        var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
+        _upcomingTracksSource
+            .Connect()
+            .ObserveOn(synchronizationContext)
+            .Bind(out _upcomingTracks)
+            .Subscribe();
         _currentPlaybackMode = playbackMode ??
                                ServicesProvider.GetService<UserPreferenceService>()?.Playback.PlaybackMode ??
                                PlaybackMode.Sequential;
@@ -548,7 +556,7 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
         // Clear UpcomingTracks if queue is empty, or we are at the end of the queue.
         if (_queue.Count is 0 || totalUpcomingTracksCount is 0)
         {
-            _syncCtx?.Post(_ => UpcomingTracks.Clear(), null);
+            _upcomingTracksSource.Clear();
             return;
         }
         // Limit list size to the maximum count.
@@ -570,25 +578,24 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
         // Third, we rearrange UpcomingTracks with the intersection.
         //      The rearrangement is described in RearrangeWith method. For reference, you can check the docs there.
         // Last, we insert the tracks that are not in UpcomingTracks.
-        _syncCtx?.Post(_ =>
+        _upcomingTracksSource.Edit(inner =>
         {
-            var tracksToRemove =
-            UpcomingTracks.Except(updatedList, DefaultAudioTrackEqualityComparer<TTrackIdentifier>.Instance).ToList();
-            tracksToRemove.ForEach(t => UpcomingTracks.Remove(t));
-            var intersection = updatedList
-                .Intersect(UpcomingTracks, DefaultAudioTrackEqualityComparer<TTrackIdentifier>.Instance).ToList();
-            UpcomingTracks.RearrangeWith(intersection, DefaultAudioTrackEqualityComparer<TTrackIdentifier>.Instance);
+            var comparer = DefaultAudioTrackEqualityComparer<TTrackIdentifier>.Instance;
+            
+            var tracksToRemove = inner.Except(updatedList, comparer).ToList();
+            tracksToRemove.ForEach(t => inner.Remove(t));
+            
+            var intersection = updatedList.Intersect(inner, comparer).ToList();
+            inner.RearrangeWith(intersection, comparer);
             int m = 0, n = 0;
             while (m < updatedList.Length)
             {
-                if (n >= UpcomingTracks.Count ||
-                    !DefaultAudioTrackEqualityComparer<TTrackIdentifier>.Instance.Equals(UpcomingTracks[n],
-                        updatedList[m]))
-                    UpcomingTracks.Insert(n, updatedList[m]);
+                if (n >= inner.Count || !comparer.Equals(inner[n], updatedList[m]))
+                    inner.Insert(n, updatedList[m]);
                 m++;
                 n++;
             }
-        }, null);
+        });
         // After all these operations, UpcomingTracks is updated.
         // Here we do not need to notify the change since the collection is observable.
     }
@@ -616,4 +623,9 @@ public sealed partial class NormalQueueProvider<TTrackIdentifier> : PlaybackQueu
     }
     
     #endregion
+
+    public override void Dispose()
+    {
+        _upcomingTracksSource.Dispose();
+    }
 }

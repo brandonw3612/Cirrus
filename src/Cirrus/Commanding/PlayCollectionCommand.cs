@@ -32,9 +32,8 @@ public sealed partial class PlayCollectionCommand : CommandWrapper
                             var trackIds = playlistResponse.Playlist?.TrackIds.TakeAtMost(100).ToList();
                             if (trackIds is null) return;
                             var trackResponse = await Client.Track.GetDetailsAsync(trackIds);
-                            var syncCtx = SynchronizationContext.Current;
+                            playbackService.QueueProvider?.Dispose();
                             playbackService.QueueProvider = new NormalQueueProvider<ulong>(
-                                syncCtx,
                                 trackResponse
                                     .Tracks
                                     .Select(static t => t.ToBusinessModel())
@@ -46,9 +45,8 @@ public sealed partial class PlayCollectionCommand : CommandWrapper
                     case ITopChart playbackRecord:
                         {
                             var recordResponse = await Client.User.GetPlaybackRecordAsync(playbackRecord.UserId);
-                            var syncCtx = SynchronizationContext.Current;
+                            playbackService.QueueProvider?.Dispose();
                             playbackService.QueueProvider = new NormalQueueProvider<ulong>(
-                                syncCtx,
                                 recordResponse
                                     .WeeklyTracks
                                     .Select(r => r.Track?.ToBusinessModel())
@@ -60,9 +58,8 @@ public sealed partial class PlayCollectionCommand : CommandWrapper
                     case IAlbum album:
                         {
                             var albumResponse = await Client.Album.GetDetailsAsync(album.AlbumId);
-                            var syncCtx = SynchronizationContext.Current;
+                            playbackService.QueueProvider?.Dispose();
                             playbackService.QueueProvider = new NormalQueueProvider<ulong>(
-                                syncCtx,
                                 albumResponse
                                     .Tracks
                                     .Select(static t => t.ToBusinessModel())

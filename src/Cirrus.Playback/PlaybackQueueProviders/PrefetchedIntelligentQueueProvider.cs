@@ -22,19 +22,19 @@ public sealed partial class PrefetchedIntelligentQueueProvider<TTrackIdentifier>
     /// <summary>
     /// Initializes a new instance of the <see cref="PrefetchedIntelligentQueueProvider{TTrackIdentifier}"/> class.
     /// </summary>
-    /// <param name="syncCtx">Current synchronization context.</param>
     /// <param name="audioTracks">Tracks to be added to the queue initially.</param>
-    public PrefetchedIntelligentQueueProvider(SynchronizationContext? syncCtx, IAudioTrack<TTrackIdentifier>[] audioTracks)
+    public PrefetchedIntelligentQueueProvider(IAudioTrack<TTrackIdentifier>[] audioTracks)
     {
-        _normalQueueProvider = new(syncCtx, audioTracks, 0, PlaybackMode.RepeatAll);
+        _normalQueueProvider = new(audioTracks, 0, PlaybackMode.RepeatAll);
         _normalQueueProvider.CurrentTrackChanged += OnCurrentTrackChanged;
         _normalQueueProvider.PropertyChanged += OnInnerPropertyChanged;
     }
     
-    public void Dispose()
+    public override void Dispose()
     {
         _normalQueueProvider.CurrentTrackChanged -= OnCurrentTrackChanged;
         _normalQueueProvider.PropertyChanged -= OnInnerPropertyChanged;
+        _normalQueueProvider.Dispose();
     }
 
     private void OnInnerPropertyChanged(object? _, PropertyChangedEventArgs args)
@@ -87,7 +87,7 @@ public sealed partial class PrefetchedIntelligentQueueProvider<TTrackIdentifier>
 
     public override IAudioTrack<TTrackIdentifier>? CurrentTrack => _normalQueueProvider.CurrentTrack;
 
-    public override ObservableCollection<IAudioTrack<TTrackIdentifier>> UpcomingTracks =>
+    public override ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>> UpcomingTracks =>
         _normalQueueProvider.UpcomingTracks;
 
     public override event EventHandler<CurrentTrackChangedEventArgs<TTrackIdentifier>>? CurrentTrackChanged;

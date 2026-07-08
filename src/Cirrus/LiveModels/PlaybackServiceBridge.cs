@@ -16,7 +16,8 @@ public partial class PlaybackServiceBridge : ObservableObject
     private readonly IPlaybackService<ulong> _playbackService;
     private PlaybackQueueProvider<ulong>? _playbackQueueProvider;
 
-    [ObservableProperty] public partial ObservableCollection<IAudioTrack<ulong>> UpcomingTracks { get; set; } = [];
+    [ObservableProperty] public partial ReadOnlyObservableCollection<IAudioTrack<ulong>> UpcomingTracks { get; set; }
+        = ReadOnlyObservableCollection<IAudioTrack<ulong>>.Empty;
 
     [ObservableProperty] public partial bool IsControlAvailable { get; set; }
 
@@ -123,8 +124,8 @@ public partial class PlaybackServiceBridge : ObservableObject
                         _playbackQueueProvider.CurrentTrackChanged -= OnCurrentTrackChanged;
                         _playbackQueueProvider.CurrentTrackChanged += OnCurrentTrackChanged;
                         UpcomingTracks = _playbackQueueProvider.IsPeekSupported
-                            ? _playbackQueueProvider.UpcomingTracks ?? []
-                            : [];
+                            ? _playbackQueueProvider.UpcomingTracks ?? ReadOnlyObservableCollection<IAudioTrack<ulong>>.Empty
+                            : ReadOnlyObservableCollection<IAudioTrack<ulong>>.Empty;
                         IsPreviousAvailable = _playbackQueueProvider.IsPreviousSupported;
                         IsNextAvailable = _playbackQueueProvider.IsNextSupported;
                         CurrentPlaybackMode = (_playbackQueueProvider.CurrentPlaybackMode ?? PlaybackMode.Sequential)
