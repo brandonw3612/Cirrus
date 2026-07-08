@@ -10,7 +10,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Cirrus.Utilities;
 
-public partial class NeteaseAccount : ObservableObject
+public partial class NeteaseAccount : ObservableObject, IDisposable
 {
     [ObservableProperty] public partial bool IsLoggedIn { get; private set; }    
     [ObservableProperty] public partial UserProfile? UserProfile { get; private set; }
@@ -94,8 +94,14 @@ public partial class NeteaseAccount : ObservableObject
         if (loginStatus.IsLoggedIn)
         {
             MembershipStatus = await Client.User.GetMembershipStatusAsync(loginStatus.Account!.UserId);
-            QuickAccessPlaylists= new(loginStatus.Account.UserId);
+            QuickAccessPlaylists?.Dispose();
+            QuickAccessPlaylists = new(loginStatus.Account.UserId);
             await QuickAccessPlaylists.LoadAsync();
+        }
+        else
+        {
+            QuickAccessPlaylists?.Dispose();
+            QuickAccessPlaylists = null;
         }
     }
     
@@ -118,5 +124,10 @@ public partial class NeteaseAccount : ObservableObject
         var exception = _exceptionService.CreateLocalized("Exceptions/Authentication/LoginFailedExceptionFormat",
             response.ResponseMessage);
         return AuthenticationResult.CreateFailure(exception);
+    }
+
+    public void Dispose()
+    {
+        QuickAccessPlaylists?.Dispose();
     }
 }

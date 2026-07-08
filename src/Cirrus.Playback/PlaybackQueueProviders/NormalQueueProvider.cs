@@ -78,6 +78,7 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
     }
 
     private readonly SourceList<IAudioTrack<TTrackIdentifier>> _upcomingTracksSource;
+    private readonly IDisposable _upcomingTracksSubscription;
     private readonly ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>> _upcomingTracks;
     public override ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>> UpcomingTracks => _upcomingTracks;
 
@@ -101,7 +102,7 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
         _queue = audioTracks.ToList();
         _upcomingTracksSource = new();
         var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
-        _upcomingTracksSource
+        _upcomingTracksSubscription = _upcomingTracksSource
             .Connect()
             .ObserveOn(synchronizationContext)
             .Bind(out _upcomingTracks)
@@ -626,6 +627,7 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
 
     public override void Dispose()
     {
+        _upcomingTracksSubscription.Dispose();
         _upcomingTracksSource.Dispose();
     }
 }
