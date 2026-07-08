@@ -22,9 +22,8 @@ public sealed partial class AppendTrackCommand : CommandWrapper
             if (track is null || ServicesProvider.Current.GetService<IPlaybackService<ulong>>() is not
                     { } playbackService || MainWindow.Current is not { } window) return;
             if (playbackService.QueueProvider is null)
-            {
-                var syncCtx = SynchronizationContext.Current;
-                playbackService.QueueProvider = new NormalQueueProvider<ulong>(syncCtx, [track]);
+            {;
+                playbackService.QueueProvider = new NormalQueueProvider<ulong>([track]);
             }
             else if (playbackService.QueueProvider.IsPendSupported)
             {

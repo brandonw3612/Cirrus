@@ -372,6 +372,8 @@
                                                          NavigateUri="https://github.com/microsoft/windowsappsdk" />
                                         <HyperlinkButton Content="Microsoft/XamlBehaviors"
                                                          NavigateUri="https://github.com/Microsoft/XamlBehaviors" />
+                                        <HyperlinkButton Content="reactivemarbles/DynamicData"
+                                                         NavigateUri="https://github.com/reactivemarbles/DynamicData" />
                                         <HyperlinkButton Content="4OTbIPE/imageex"
                                                          NavigateUri="https://github.com/4OTbIPE/imageex" />
                                     </StackPanel>

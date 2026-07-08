@@ -77,7 +77,7 @@ internal sealed partial class AudioGraphController : IDisposable
         _monitorSubscription = _isMonitoringSubject
             .DistinctUntilChanged()
             .Select(isMonitoring => isMonitoring
-                ? Observable.Interval(TimeSpan.FromMilliseconds(200))
+                ? Observable.Interval(TimeSpan.FromMilliseconds(100))
                 : Observable.Empty<long>())
             .Switch()
             .Subscribe(_ => OnGraphMonitoring());

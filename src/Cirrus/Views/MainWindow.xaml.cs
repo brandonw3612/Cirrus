@@ -4,6 +4,7 @@ using Cirrus.Enums;
 using Cirrus.Models.Business.Appearance;
 using Cirrus.Utilities;
 using Cirrus.ViewModels;
+using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -30,13 +31,13 @@ public sealed partial class MainWindow
         Current = this;
         InitializeComponent();
         DialogController = new(this);
-        ApplyTitleBarStyle();
         Closed += OnClosed;
-        InitializeAsync();
     }
 
-    private async void InitializeAsync()
+    [RelayCommand]
+    private async Task OnLoaded()
     {
+        ApplyTitleBarStyle();
         AppWindow.SetIcon("Assets/ApplicationIcon.ico");
         AppWindow.SetTaskbarIcon("Assets/ApplicationIcon.ico");
         AppWindow.SetTitleBarIcon("Assets/ApplicationIcon.ico");
