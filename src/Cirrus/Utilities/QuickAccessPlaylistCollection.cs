@@ -16,11 +16,12 @@ using DynamicData;
 
 namespace Cirrus.Utilities;
 
-public partial class QuickAccessPlaylistCollection : ObservableObject
+public partial class QuickAccessPlaylistCollection : ObservableObject, IDisposable
 {
     private readonly ulong _userId;
     
     private readonly SourceList<QuickAccessPlaylist> _playlistsSource;
+    private readonly IDisposable _playlistsSubscription;
     private readonly ReadOnlyObservableCollection<QuickAccessPlaylist> _playlists;
     public ReadOnlyObservableCollection<QuickAccessPlaylist> Playlists => _playlists;
 
@@ -32,7 +33,7 @@ public partial class QuickAccessPlaylistCollection : ObservableObject
         
         _playlistsSource = new();
         var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
-        _playlistsSource
+        _playlistsSubscription = _playlistsSource
             .Connect()
             .ObserveOn(synchronizationContext)
             .Bind(out _playlists)
@@ -139,5 +140,11 @@ public partial class QuickAccessPlaylistCollection : ObservableObject
         };
         var json = JsonSerializer.Serialize(qa, AppSerializationContext.Default.QuickAccess);
         await File.WriteAllTextAsync(filePath, json);
+    }
+
+    public void Dispose()
+    {
+        _playlistsSubscription.Dispose();
+        _playlistsSource.Dispose();
     }
 }
