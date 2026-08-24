@@ -7,7 +7,8 @@ namespace Cirrus.Playback.Primitives;
 /// Playback service interface.
 /// </summary>
 /// <typeparam name="TTrackIdentifier">Non-nullable type of the identifier of the audio track.</typeparam>
-public interface IPlaybackService<TTrackIdentifier> : INotifyPropertyChanged where TTrackIdentifier : notnull
+public interface IPlaybackService<TTrackIdentifier> : INotifyPropertyChanged
+    where TTrackIdentifier : notnull
 {
     #region Persistent properties
 

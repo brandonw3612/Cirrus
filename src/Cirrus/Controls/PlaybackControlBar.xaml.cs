@@ -53,7 +53,7 @@ public sealed partial class PlaybackControlBar
         var current = args.OriginalSource as DependencyObject;
         while (current != null && current != this)
         {
-            if (current is Button) return;
+            if (current is Button or GlidySlider) return;
             current = VisualTreeHelper.GetParent(current);
         }
         window.TogglePlaybackDrawer(true);

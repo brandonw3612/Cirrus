@@ -140,7 +140,12 @@ public sealed partial class StationQueueProvider<TTrackIdentifier> : PlaybackQue
             _queueSemaphore.Release();
         }
     }
-    
+
+    public override void Dispose()
+    {
+        _queueSemaphore.Dispose();
+    }
+
     /// <summary>
     /// Private constructor, for we need asynchronous initialization.
     /// </summary>

@@ -14,7 +14,7 @@ namespace Cirrus.Playback.Primitives;
 ///     A provider only exposes the actions it supports and bindable stateful properties.
 ///     All internal operations and special logics should be encapsulated.
 /// </remarks>
-public abstract class PlaybackQueueProvider<TTrackIdentifier> : ObservableObject where TTrackIdentifier : notnull
+public abstract class PlaybackQueueProvider<TTrackIdentifier> : ObservableObject, IDisposable where TTrackIdentifier : notnull
 {
     /// <summary>
     /// Actions supported by the provider.
@@ -228,7 +228,7 @@ public abstract class PlaybackQueueProvider<TTrackIdentifier> : ObservableObject
     /// Upcoming tracks in the playback queue.
     /// </summary>
     /// <remarks>Null if <see cref="PlaybackQueueActions.Peek"/> is not supported.</remarks>
-    public virtual ObservableCollection<IAudioTrack<TTrackIdentifier>>? UpcomingTracks => null;
+    public virtual ReadOnlyObservableCollection<IAudioTrack<TTrackIdentifier>>? UpcomingTracks => null;
 
     #endregion
 
@@ -255,4 +255,6 @@ public abstract class PlaybackQueueProvider<TTrackIdentifier> : ObservableObject
     ///         to support preloading-related features.
     /// </remarks>
     internal abstract Task<IAudioTrack<TTrackIdentifier>?> InternalPeekAsync();
+
+    public abstract void Dispose();
 }

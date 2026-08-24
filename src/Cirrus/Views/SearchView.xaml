@@ -20,7 +20,8 @@
                 <Button Content="{x:Bind Keyword}" Style="{StaticResource AccentGlowButtonStyle}"
                         FontSize="14" Height="32" MinWidth="40" CornerRadius="16" Padding="12 0"
                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                        ToolTipService.ToolTip="{x:Bind ExtendedContent}" ToolTipService.Placement="Mouse"
+                        ToolTipService.ToolTip="{x:Bind ExtendedContent}"
+                        ToolTipService.Placement="Mouse"
                         Command="{StaticResource NavigateToSearchResultsCommandWrapper}"
                         CommandParameter="{x:Bind Keyword}" />
             </Grid>

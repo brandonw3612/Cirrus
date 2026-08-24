@@ -28,8 +28,8 @@ public sealed partial class PlayFromListCommand : CommandWrapper
                 ? null
                 : Tracks.FirstOrDefault(t => t.TrackId == track.TrackId);
             var startIndex = match is null ? -1 : Tracks.IndexOf(match);
-            var syncCtx = SynchronizationContext.Current;
-            playbackService.QueueProvider = new NormalQueueProvider<ulong>(syncCtx, Tracks.ToArray(), startIndex);
+            playbackService.QueueProvider?.Dispose();
+            playbackService.QueueProvider = new NormalQueueProvider<ulong>(Tracks.ToArray(), startIndex);
         }, _ => Tracks is not null && playbackService is not null);
     }
 }

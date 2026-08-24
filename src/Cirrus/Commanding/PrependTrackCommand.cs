@@ -23,8 +23,7 @@ public sealed partial class PrependTrackCommand : CommandWrapper
                     { } playbackService || MainWindow.Current is not { } window) return;
             if (playbackService.QueueProvider is null)
             {
-                var syncCtx = SynchronizationContext.Current;
-                playbackService.QueueProvider = new NormalQueueProvider<ulong>(syncCtx, [track]);
+                playbackService.QueueProvider = new NormalQueueProvider<ulong>([track]);
             }
             else if (playbackService.QueueProvider.IsPendSupported)
             {

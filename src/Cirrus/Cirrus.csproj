@@ -78,6 +78,7 @@
         <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
         <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
         <PackageReference Include="ComputeSharp.D2D1.WinUI" Version="3.2.0" />
+        <PackageReference Include="DynamicData" Version="9.4.33" />
         <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
         <PackageReference Include="ImageEx.WinUI" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />
@@ -92,9 +93,9 @@
         <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.1.0" />
         <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
         <PackageReference Include="ProjectCirrus.Copycat" Version="0.1.0" />
-        <PackageReference Include="Pulse.NET" Version="0.0.4-alpha" />
         <PackageReference Include="QRCoder" Version="1.8.0" />
         <PackageReference Include="System.Formats.Nrbf" Version="10.0.8" />
+        <PackageReference Include="System.Reactive" Version="6.1.0" />
         <PackageReference Include="WinUIEx" Version="2.9.1" />
     </ItemGroup>
 

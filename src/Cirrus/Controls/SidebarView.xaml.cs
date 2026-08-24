@@ -1,4 +1,8 @@
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Cirrus.Base.Services;
+using Cirrus.Behaviors;
+using Cirrus.Extensions;
 using Cirrus.Models.Business.Playback;
 using Cirrus.Network;
 using Cirrus.Playback.PlaybackQueueProviders;
@@ -7,7 +11,6 @@ using Cirrus.Utilities;
 using Cirrus.ViewModels;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
@@ -20,7 +23,8 @@ public sealed partial class SidebarView
 {
     public SidebarViewModel ViewModel { get; }
     
-    private readonly Sentinel<double> _pointerSentinel;
+    private readonly Subject<double> _pointerSnapSubject;
+    private readonly IDisposable _pointerSnapSubscription;
 
     public UIElement? Child
     {
@@ -39,19 +43,40 @@ public sealed partial class SidebarView
         {
             VisualStateManager.GoToState(this, value ? "FullSized" : "CompactClosed", true);
         });
-        _pointerSentinel = new()
-        {
-            Window = TimeSpan.FromMilliseconds(300),
-            StatusValidator = static x => x is >= 0d and <= 8d,
-            NegativeReporter = static _ => Task.CompletedTask,
-            PositiveReporter = _ => DispatcherQueue.EnqueueAsync(() =>
-                VisualStateManager.GoToState(this, "CompactOpen", true)
+        _pointerSnapSubject = new();
+        _pointerSnapSubscription = _pointerSnapSubject
+            .Select(x => new
+            {
+                X = x,
+                IsOpen = x is >= 0d and <= 8d
+            })
+            .Publish(shared => shared
+                .DistinctUntilChanged(s => s.IsOpen)
+                .Select(state => state.IsOpen
+                    ? Observable
+                        .Timer(TimeSpan.FromMilliseconds(300))
+                        .WithLatestFrom(shared.StartWith(state), (_, latest) => latest.X)
+                    : Observable.Empty<double>()
+                )
+                .Switch()
             )
-        };
+            .ObserveOn(DispatcherQueue)
+            .Subscribe(_ =>
+            {
+                VisualStateManager.GoToState(this, "CompactOpen", true);
+            });
+        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(UnloadedCommand);
     }
-
+    
     public void SetCurrentViewIdentifier(string viewIdentifier) => ViewModel.CurrentFrameContentIdentifier = viewIdentifier;
 
+    [RelayCommand]
+    private void OnUnloaded()
+    {
+        _pointerSnapSubscription.Dispose();
+        _pointerSnapSubject.Dispose();
+    }
+    
     [RelayCommand]
     private void OnSizeChanged(SizeChangedEventArgs args)
     {
@@ -68,7 +93,7 @@ public sealed partial class SidebarView
     {
         if (ViewModel is { IsFullSizeAvailable: true, IsFullSizeToggled: true } ||
             args.Pointer.PointerDeviceType is PointerDeviceType.Touch) return;
-        _pointerSentinel.Invoke(args.GetCurrentPoint(this).Position.X);
+        _pointerSnapSubject.OnNext(args.GetCurrentPoint(this).Position.X);
     }
     
     [RelayCommand]
@@ -76,7 +101,7 @@ public sealed partial class SidebarView
     {
         if (ViewModel is { IsFullSizeAvailable: true, IsFullSizeToggled: true } ||
             args.Pointer.PointerDeviceType is PointerDeviceType.Touch) return;
-        _pointerSentinel.Invoke(-1d);
+        _pointerSnapSubject.OnNext(-1d);
     }
 
     [RelayCommand]

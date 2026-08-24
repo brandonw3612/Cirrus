@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using DynamicData;
 
 namespace Cirrus.Playback.Extensions;
 
@@ -32,7 +33,7 @@ public static class CollectionExtensions
     /// <param name="equalityComparer">Equality comparer of the elements.</param>
     /// <typeparam name="T">Type of elements in the collection.</typeparam>
     /// <returns>The longest common subsequence between the two collections.</returns>
-    public static IReadOnlyCollection<T> LongestCommonSubsequenceWith<T>(this IReadOnlyCollection<T> a,
+    public static IReadOnlyCollection<T> LongestCommonSubsequenceWith<T>(this IExtendedList<T> a,
         IReadOnlyCollection<T> b, IEqualityComparer<T> equalityComparer)
     {
         // Reference: https://en.wikipedia.org/wiki/Longest_common_subsequence_problem#Computing_the_length_of_the_LCS
@@ -73,7 +74,7 @@ public static class CollectionExtensions
     /// <param name="targetCollection">The target collection to match.</param>
     /// <param name="equalityComparer">Equality comparer of the elements.</param>
     /// <typeparam name="T">Type of elements in the collection.</typeparam>
-    public static void RearrangeWith<T>(this ObservableCollection<T> collection,
+    public static void RearrangeWith<T>(this IExtendedList<T> collection,
         IReadOnlyCollection<T> targetCollection, IEqualityComparer<T> equalityComparer)
     {
         // First, we compute the longest common sequence of the collections.
@@ -96,7 +97,8 @@ public static class CollectionExtensions
             {
                 // Current element is not in the LCS.
                 // We search for current element in the observable collection.
-                var targetIndex = collection.IndexOf(e => equalityComparer.Equals(e, target));
+                var targetInCollection = collection.FirstOrDefault(e => equalityComparer.Equals(e, target));
+                var targetIndex = targetInCollection is not null ? collection.IndexOf(targetInCollection) : -1;
                 // (1) If the target element is right on the position we do not have to move the element.
                 //      However, this could not happen because 'pl' indicates the position of the last LCS element.
                 //  // if (targetIndex == pl) continue;

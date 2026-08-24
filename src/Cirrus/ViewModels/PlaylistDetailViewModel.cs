@@ -113,10 +113,11 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
         var intelligentListResponse =
             await Client.Playlist.GetIntelligentListAsync(startingTrackId, Playlist!.PlaylistId);
         if (ServicesProvider.Current.GetService<IPlaybackService<ulong>>() is not { } playbackService) return;
-        var syncCtx = SynchronizationContext.Current;
+        playbackService.QueueProvider?.Dispose();
         playbackService.QueueProvider = new PrefetchedIntelligentQueueProvider<ulong>(
-            syncCtx,
-            intelligentListResponse.Tracks.Select(static t => t.ToBusinessModel()).OfType<IAudioTrack<ulong>>()
+            intelligentListResponse.Tracks
+                .Select(static t => t.ToBusinessModel())
+                .OfType<IAudioTrack<ulong>>()
                 .ToArray());
     }
 
