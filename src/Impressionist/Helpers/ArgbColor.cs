@@ -31,10 +31,6 @@ public struct ArgbColor : IEquatable<ArgbColor>
         _value = (alpha << 24) | (red << 16) | (green << 8) | blue;
     }
 
-    public ArgbColor(Vector3 v) : this(255, (byte)v.X, (byte)v.Y, (byte)v.Z)
-    {
-    }
-
     public ArgbColor(Vector4 v) : this((byte)v.X, (byte)v.Y, (byte)v.Z, (byte)v.W)
     {
     }
