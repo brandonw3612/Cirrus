@@ -432,6 +432,12 @@
                                                 <TextBlock x:Uid="Views/SettingsView/About/SpecSubmodule/AppUpdate" />
                                             </StackPanel>
                                         </Button>
+                                        <Button Command="{x:Bind ViewModel.GoToGcTestCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE9D9;" FontSize="14" />
+                                                <TextBlock x:Uid="Views/SettingsView/About/SpecSubmodule/GcTest" />
+                                            </StackPanel>
+                                        </Button>
                                         <Button Command="{x:Bind ViewModel.ViewOnGitHubCommand}">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <FontIcon Glyph="{StaticResource FontIconGlyphGitHub}"

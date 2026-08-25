@@ -1003,4 +1003,25 @@
   <data name="Views.ChartView.Categories.AllTime.Content" xml:space="preserve">
     <value>所有时间</value>
   </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.GcTest.Text" xml:space="preserve">
+    <value>GC 测试</value>
+  </data>
+  <data name="Views.GcTestView.Header.Text" xml:space="preserve">
+    <value>GC 测试</value>
+  </data>
+  <data name="Views.GcTestView.Warning.Title" xml:space="preserve">
+    <value>调试工具</value>
+  </data>
+  <data name="Views.GcTestView.Warning.Message" xml:space="preserve">
+    <value>此页面仅用于调试。内存泄漏测试会临时创建并依次导航应用页面。</value>
+  </data>
+  <data name="Views.GcTestView.ForceGcButton.Content" xml:space="preserve">
+    <value>强制执行 GC</value>
+  </data>
+  <data name="Views.GcTestView.TestLeaksButton.Content" xml:space="preserve">
+    <value>测试页面内存泄漏</value>
+  </data>
+  <data name="Views.GcTestView.ResultDialog.Title" xml:space="preserve">
+    <value>GC 内存泄漏检查结果</value>
+  </data>
 </root>

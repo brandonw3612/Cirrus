@@ -331,6 +331,13 @@ public partial class SettingsViewModel : ViewModel
     }
 
     [RelayCommand]
+    private void GoToGcTest()
+    {
+        if (MainWindow.Current is not { } window) return;
+        window.Navigate(typeof(GcTestView));
+    }
+
+    [RelayCommand]
     private async Task ViewOnGitHub()
     {
         await Launcher.LaunchUriAsync(new("https://github.com/brandonw3612/Cirrus"));
