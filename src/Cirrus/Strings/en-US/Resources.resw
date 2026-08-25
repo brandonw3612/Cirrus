@@ -1035,4 +1035,25 @@ When you're ready, click "Verify" on the right and we'll verify your login statu
     <value>All time</value>
     <comment>听歌排行页 - 分类 - 所有时间 - 标题</comment>
   </data>
+  <data name="Views.SettingsView.About.SpecSubmodule.GcTest.Text" xml:space="preserve">
+    <value>GC test</value>
+  </data>
+  <data name="Views.GcTestView.Header.Text" xml:space="preserve">
+    <value>GC test</value>
+  </data>
+  <data name="Views.GcTestView.Warning.Title" xml:space="preserve">
+    <value>Debug tool</value>
+  </data>
+  <data name="Views.GcTestView.Warning.Message" xml:space="preserve">
+    <value>This page is intended for debugging only. The leak test temporarily creates and navigates through application pages.</value>
+  </data>
+  <data name="Views.GcTestView.ForceGcButton.Content" xml:space="preserve">
+    <value>Force garbage collection</value>
+  </data>
+  <data name="Views.GcTestView.TestLeaksButton.Content" xml:space="preserve">
+    <value>Test page memory leaks</value>
+  </data>
+  <data name="Views.GcTestView.ResultDialog.Title" xml:space="preserve">
+    <value>GC leak check result</value>
+  </data>
 </root>

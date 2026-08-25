@@ -12,8 +12,8 @@ namespace Cirrus.ViewModels;
 public partial class PlaybackControlBarViewModel : ObservableObject
 {
     private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>()!;
-    public PlaybackServiceBridge PlaybackServiceBridge { get; } = new();
-    
+    public PlaybackServiceBridge PlaybackServiceBridge { get; } = ServicesProvider.Current.GetService<PlaybackServiceBridge>()!;
+
     [RelayCommand]
     private Task Previous() => _playbackService.TryPreviousAsync();
 

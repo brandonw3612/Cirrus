@@ -40,6 +40,7 @@ public interface IAudioTrack<out TTrackIdentifier> where TTrackIdentifier : notn
     /// URI of the album artwork.
     /// </summary>
     Uri? AlbumArtworkUri { get; }
+
 }
 
 /// <summary>

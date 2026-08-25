@@ -25,6 +25,7 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
     {
         ViewModel = new();
         NavigationCacheMode = NavigationCacheMode.Disabled;
+        Unloaded += View_OnUnloaded;
     }
 
     protected virtual Task LoadVisualContentAsync()
@@ -118,10 +119,10 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
         base.OnNavigatedTo(e);
     }
 
-    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    private void View_OnUnloaded(object sender, RoutedEventArgs e)
     {
         ViewModel.RecycleDisposable();
-        base.OnNavigatedFrom(e);
+        Unloaded -= View_OnUnloaded;
     }
 
     public async Task RefreshViewAsync()
