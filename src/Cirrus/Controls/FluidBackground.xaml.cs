@@ -7,9 +7,7 @@ using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System.Numerics;
-using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 
 namespace Cirrus.Controls;
@@ -47,7 +45,6 @@ public sealed partial class FluidBackground
         {
             BackgroundPresenter.RemoveFromVisualTree();
             shaderEffect.Dispose();
-
         }));
         this.AttachEventTriggerBehaviorToCommand<FrameworkElement, SizeChangedEventTriggerBehavior>(new RelayCommand<SizeChangedEventArgs>(args =>
         {

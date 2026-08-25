@@ -2,17 +2,23 @@
     x:Class="Cirrus.Controls.Drawer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:behaviors="using:Cirrus.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    mc:Ignorable="d"
-    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    mc:Ignorable="d">
     <interactivity:Interaction.Behaviors>
         <behaviors:SizeChangedEventTriggerBehavior>
             <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
         </behaviors:SizeChangedEventTriggerBehavior>
     </interactivity:Interaction.Behaviors>
-    <Frame x:Name="ContentFrame" Background="Transparent"
-           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+    <ContentControl
+        x:Name="ContentControl"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        HorizontalContentAlignment="Stretch"
+        VerticalContentAlignment="Stretch"
+        Background="Transparent" />
 </UserControl>

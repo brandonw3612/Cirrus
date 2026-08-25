@@ -1,5 +1,6 @@
 ﻿using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
+using Cirrus.LiveModels;
 using Cirrus.Network;
 using Cirrus.Playback.PlaybackServices;
 using Cirrus.Playback.Primitives;
@@ -29,8 +30,9 @@ public sealed partial class App
                 .AddSingleton<ISynchronizationContextService>(new SynchronizationContextService(SynchronizationContext.Current!))
                 .AddSingleton<IPlaybackService<ulong>, SerenadePlaybackService>()
                 .AddSingleton<IConfigurationService, ConfigurationService>()
-                // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
-                // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
+                .AddSingleton<PlaybackServiceBridge>()
+        // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
+        // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );
         if (ServicesProvider.GetService<UserPreferenceService>() is not { } userPreferenceService) return;
         Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
