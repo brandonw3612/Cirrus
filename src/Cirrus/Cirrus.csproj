@@ -63,38 +63,34 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.MarkdownTextBlock" Version="0.1.260529-build.2632" />
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.MarkdownTextBlock" Version="0.1.260915-build.2673" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-        <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Controls.HeaderedControls" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
-        <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
-        <PackageReference Include="DynamicData" Version="9.4.33" />
-        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
+        <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.HeaderedControls" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.3.260402-preview2" />
+        <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
+        <PackageReference Include="DynamicData" Version="9.5.0" />
+        <PackageReference Include="H.NotifyIcon.WinUI" Version="2.5.0-dev.2" />
         <PackageReference Include="ImageEx.WinUI" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.13" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
-        <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.0-prerelease.251115.2" />
-        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002">
-            <ExcludeAssets>all</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.1.3" />
-        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.1.0" />
+        <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+        <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
         <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
         <PackageReference Include="ProjectCirrus.Copycat" Version="0.1.0" />
-        <PackageReference Include="QRCoder" Version="1.8.0" />
-        <PackageReference Include="System.Formats.Nrbf" Version="10.0.8" />
-        <PackageReference Include="System.Reactive" Version="6.1.0" />
-        <PackageReference Include="WinUIEx" Version="2.9.1" />
+        <PackageReference Include="QRCoder" Version="1.8.1" />
+        <PackageReference Include="System.Reactive" Version="7.0.0" />
+        <PackageReference Include="WinUIEx" Version="2.9.3" />
     </ItemGroup>
 
     <!-- 

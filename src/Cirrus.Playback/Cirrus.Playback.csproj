@@ -43,13 +43,13 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-        <PackageReference Include="DynamicData" Version="9.4.33" />
-        <PackageReference Include="System.Reactive" Version="6.1.0" />
+        <PackageReference Include="DynamicData" Version="9.5.0" />
+        <PackageReference Include="System.Reactive" Version="7.0.0" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework.Contains(windows))'">
-        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
-        <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.1.0" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'">
+      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
     </ItemGroup>
     
 </Project>
