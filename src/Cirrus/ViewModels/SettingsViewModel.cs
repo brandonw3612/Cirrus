@@ -9,6 +9,7 @@ using Cirrus.Models.Shared.Track;
 using Cirrus.Models.Shared.User;
 using Cirrus.Playback.Primitives;
 using Cirrus.Primitives;
+using Cirrus.Services;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +20,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using AppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
+using Cirrus.Base.Services.Abstract;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Cirrus.ViewModels;
 
@@ -28,6 +31,11 @@ public partial class SettingsViewModel : ViewModel
 
     private UserPreferenceService? _userPreferenceService;
     private IPlaybackService<ulong>? _playbackService;
+    private LastFmService? _lastFmService;
+
+    [ObservableProperty] public partial bool IsLastFmAuthenticated { get; set; }
+
+    [ObservableProperty] public partial string LastFmAccountName { get; set; } = string.Empty;
 
     public List<LocalizedText<DisplayTheme>> AvailableThemes { get; } =
     [
@@ -223,6 +231,10 @@ public partial class SettingsViewModel : ViewModel
         }
 
         _playbackService = playbackService;
+        _lastFmService = ServicesProvider.Current.GetServices<IScrobbleService>()
+            .OfType<LastFmService>()
+            .SingleOrDefault();
+        UpdateLastFmStatus();
 
         var systemFonts = Microsoft.Graphics.Canvas.Text.CanvasTextFormat.GetSystemFontFamilies()
             .Where(static f => f is { Length: > 0 }).Distinct().OrderBy(static f => f).ToArray();
@@ -260,10 +272,33 @@ public partial class SettingsViewModel : ViewModel
         }
     }
 
+    private void UpdateLastFmStatus()
+    {
+        IsLastFmAuthenticated = _lastFmService is { IsAuthenticated: true };
+        LastFmAccountName = _lastFmService?.Session?.Name ?? string.Empty;
+    }
+
     private static RelayCommandEx<FrameworkElement, RoutedEventArgs>? _showAttachedFlyoutCommand;
 
     public RelayCommandEx<FrameworkElement, RoutedEventArgs> ShowAttachedFlyoutCommand => _showAttachedFlyoutCommand ??=
         new((sender, _) => { FlyoutBase.GetAttachedFlyout(sender).ShowAt(sender); });
+
+    [RelayCommand]
+    private async Task ConnectLastFmAsync()
+    {
+        if (MainWindow.Current is not { } window || _lastFmService is null) return;
+        WebLoginWindow loginWindow = new();
+        await loginWindow.ShowAtAsync(window);
+        UpdateLastFmStatus();
+    }
+
+    [RelayCommand]
+    private void DisconnectLastFm()
+    {
+        if (_lastFmService is null) return;
+        _lastFmService.LogOut();
+        UpdateLastFmStatus();
+    }
 
     [RelayCommand]
     private async Task ShowKeyboardShortcutsCustomizationDialog()

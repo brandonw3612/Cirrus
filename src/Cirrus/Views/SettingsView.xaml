@@ -33,35 +33,62 @@
             <Border HorizontalAlignment="Stretch">
                 <StackPanel Margin="16 112 16 92" Spacing="32" MaxWidth="1000">
                     <!--Account-->
-                    <!-- <StackPanel Spacing="4"> -->
-                    <!--     <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Account" -->
-                    <!--                FontSize="16" FontWeight="Medium" Margin="4" /> -->
-                    <!--     <communityControls:SettingsCard Header="Link to Last.fm"> -->
-                    <!--         <communityControls:SettingsCard.HeaderIcon> -->
-                    <!--             <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}" -->
-                    <!--                       Glyph="{StaticResource FontIconGlyphLastFm}" -->
-                    <!--                       Foreground="#ffba0000" /> -->
-                    <!--         </communityControls:SettingsCard.HeaderIcon> -->
-                    <!--         <communityControls:SettingsCard.Description> -->
-                    <!--             <HyperlinkButton x:Uid="Views/SettingsView/AboutThisOptionHyperlinkButton" -->
-                    <!--                              Margin="-6 0" Padding="4 1"> -->
-                    <!--                 <interactivity:Interaction.Behaviors> -->
-                    <!--                     <behaviors:ClickEventTriggerBehavior> -->
-                    <!--                         <primitives:InvokeCommandActionEx -->
-                    <!--                             Command="{x:Bind ViewModel.ShowAttachedFlyoutCommand}" /> -->
-                    <!--                     </behaviors:ClickEventTriggerBehavior> -->
-                    <!--                 </interactivity:Interaction.Behaviors> -->
-                    <!--                 <FlyoutBase.AttachedFlyout> -->
-                    <!--                     <Flyout LightDismissOverlayMode="Off" Placement="BottomEdgeAlignedLeft"> -->
-                    <!--                         <TextBlock FontFamily="{StaticResource ContentControlThemeFontFamily}" -->
-                    <!--                                    Foreground="CornflowerBlue" TextWrapping="Wrap" Width="400" -->
-                    <!--                                    Text="Helper goes here." /> -->
-                    <!--                     </Flyout> -->
-                    <!--                 </FlyoutBase.AttachedFlyout> -->
-                    <!--             </HyperlinkButton> -->
-                    <!--         </communityControls:SettingsCard.Description> -->
-                    <!--     </communityControls:SettingsCard> -->
-                    <!-- </StackPanel> -->
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Account"
+                                   FontSize="16" FontWeight="Medium" Margin="4" />
+                        <communityControls:SettingsCard x:Uid="Views/SettingsView/Account/LastFm">
+                            <communityControls:SettingsCard.HeaderIcon>
+                                <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                          Glyph="{StaticResource FontIconGlyphLastFm}"
+                                          Foreground="#ffba0000" />
+                            </communityControls:SettingsCard.HeaderIcon>
+                            <communityControls:SettingsCard.Description>
+                                <HyperlinkButton x:Uid="Views/SettingsView/AboutThisOptionHyperlinkButton"
+                                                 Margin="-6 0" Padding="4 1">
+                                    <interactivity:Interaction.Behaviors>
+                                        <behaviors:ClickEventTriggerBehavior>
+                                            <behaviors:InvokeCommandActionEx
+                                                Command="{x:Bind ViewModel.ShowAttachedFlyoutCommand}" />
+                                        </behaviors:ClickEventTriggerBehavior>
+                                    </interactivity:Interaction.Behaviors>
+                                    <FlyoutBase.AttachedFlyout>
+                                        <Flyout LightDismissOverlayMode="Off" Placement="BottomEdgeAlignedLeft">
+                                            <TextBlock
+                                                x:Uid="Views/SettingsView/Account/LastFmSubmodule/Description"
+                                                FontFamily="{StaticResource ContentControlThemeFontFamily}"
+                                                Foreground="{ThemeResource AccentTextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" Width="400" />
+                                        </Flyout>
+                                    </FlyoutBase.AttachedFlyout>
+                                </HyperlinkButton>
+                            </communityControls:SettingsCard.Description>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Command="{x:Bind ViewModel.ConnectLastFmCommand}"
+                                        Visibility="{x:Bind ViewModel.IsLastFmAuthenticated, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE71B;"
+                                                  FontSize="14" />
+                                        <TextBlock x:Uid="Views/SettingsView/Account/LastFmSubmodule/ConnectButtonText" />
+                                    </StackPanel>
+                                </Button>
+                                <StackPanel Orientation="Horizontal" Spacing="12"
+                                            Visibility="{x:Bind ViewModel.IsLastFmAuthenticated, Mode=OneWay}">
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{ThemeResource SystemBaseMediumColor}"
+                                               Text="{x:Bind ViewModel.LastFmAccountName, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/SettingsView/Account/LastFmSubmodule/ConnectedUser/Format}" />
+                                    <Button Command="{x:Bind ViewModel.DisconnectLastFmCommand}">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                      Glyph="&#xE711;"
+                                                      FontSize="14" />
+                                            <TextBlock
+                                                x:Uid="Views/SettingsView/Account/LastFmSubmodule/DisconnectButtonText" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </communityControls:SettingsCard>
+                    </StackPanel>
                     <!--Appearance-->
                     <StackPanel Spacing="4">
                         <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Appearance"

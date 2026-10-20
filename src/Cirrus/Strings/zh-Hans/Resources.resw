@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -855,12 +855,11 @@
     <comment>软件更新页 - 检查时间 - Format</comment>
   </data>
   <data name="Views.WebLoginWindow.TitleTextBlock.Text" xml:space="preserve">
-    <value>网页登录</value>
+    <value>连接 Last.fm 账户</value>
     <comment>网页登录对话框 - 标题 - Text</comment>
   </data>
   <data name="Views.WebLoginView.InstructionTextBlock.Text" xml:space="preserve">
-    <value>在上方网页中登录你的云音乐账号。
-完成后点击右侧"验证"按钮，我们将验证登录状态。</value>
+    <value>请在上方网页中登录并授权你的 Last.fm 账号，授权完成后窗口将自动关闭。</value>
     <comment>网页登录对话框 - 操作说明 - Text</comment>
   </data>
   <data name="Views.WebLoginView.VerifyButton.Content" xml:space="preserve">
@@ -1002,5 +1001,20 @@
   </data>
   <data name="Views.ChartView.Categories.AllTime.Content" xml:space="preserve">
     <value>所有时间</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFm.Header" xml:space="preserve">
+    <value>使用 Last.fm 记录听歌历史</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.Description.Text" xml:space="preserve">
+    <value>连接至你的 Last.fm 账户后，Cirrus 将在播放音乐时自动同步“正在播放”状态并记录听歌历史。</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectButtonText.Text" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.DisconnectButtonText.Text" xml:space="preserve">
+    <value>解除关联</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectedUser.Format" xml:space="preserve">
+    <value>已连接至：{0}</value>
   </data>
 </root>

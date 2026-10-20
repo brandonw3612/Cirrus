@@ -4,7 +4,9 @@ using Windows.Media;
 using Windows.Media.Devices;
 using Windows.Storage.Streams;
 using Cirrus.Base.Services;
+using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Playback;
+using Cirrus.Models.Network.Track;
 using Cirrus.Models.Shared.Track;
 using Cirrus.Playback.EventArgs;
 using Cirrus.Playback.Extensions;
@@ -111,16 +113,26 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
     [ObservableProperty] public partial object? PlaybackSource { get; set; }
 
     private readonly UserPreferenceService _userPreferenceService;
+    private readonly IScrobbleService[] _scrobbleServices;
     private SystemMediaTransportControls? _systemMediaTransportControls;
 
     private bool _isInitialized;
     private AudioGraphController? _audioGraphController;
     private AudioNodeContainer? _audioNodeContainer;
     private bool _crossfadeSuppressed;
+
+    private IAudioTrack<ulong>? _scrobbleTrack;
+    private DateTimeOffset _scrobbleTrackStartedAt;
+    private TimeSpan _accumulatedPlayedTime;
+    private TimeSpan? _lastRecordedPosition;
+    private bool _hasRefreshedNowPlaying;
+    private bool _hasScrobbled;
     
-    public SerenadePlaybackService(UserPreferenceService userPreferenceService)
+    public SerenadePlaybackService(UserPreferenceService userPreferenceService,
+        IEnumerable<IScrobbleService> scrobbleServices)
     {
         _userPreferenceService = userPreferenceService;
+        _scrobbleServices = scrobbleServices.ToArray();
     }
 
     public void InitializeSystemMediaTransportControls(Window window)
@@ -186,6 +198,12 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         {
             current.GraphNode.Start();
             IsPlaying = true;
+            if (_scrobbleTrack is not null && !_hasRefreshedNowPlaying)
+            {
+                _hasRefreshedNowPlaying = true;
+                _scrobbleTrackStartedAt = DateTimeOffset.UtcNow;
+                _ = NotifyNowPlayingAsync(CreateTrackBrief(_scrobbleTrack, current.GraphNode.Duration));
+            }
         }
         _audioGraphController.SetMonitorStatus(IsPlaying!.Value);
     }
@@ -203,6 +221,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             if (targetPosition > next!.GraphNode.Duration) return;
             current!.GraphNode.Stop();
             next.GraphNode.Seek(targetPosition);
+            _lastRecordedPosition = targetPosition;
             await _audioGraphController.DualNodeFlow.FlowAsync();
             _audioGraphController.IsCrossfading = false;
             return;
@@ -210,6 +229,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         if (current is null) return;
         if (targetPosition > current.GraphNode.Duration) return;
         current.GraphNode.Seek(targetPosition);
+        _lastRecordedPosition = targetPosition;
         _crossfadeSuppressed = (current.GraphNode.Duration - targetPosition).TotalSeconds < 20;
         if (IsPlaying is not true)
         {
@@ -227,7 +247,11 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             IsPlaying = false;
         }
         ApplyTransportControlsFunctioning(newValue);
-        if (newValue is null) return;
+        if (newValue is null)
+        {
+            BeginTrackSession(null, false);
+            return;
+        }
         newValue.CurrentTrackChanged -= OnCurrentTrackChanged;
         newValue.CurrentTrackChanged += OnCurrentTrackChanged;
         newValue.PropertyChanged -= OnQueueProviderPropertyChanged;
@@ -304,6 +328,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             current?.GraphNode.Stop();
             await _audioGraphController.DualNodeFlow.ResetAsync();
             IsPlaying = null;
+            BeginTrackSession(null, false);
             return;
         }
         _crossfadeSuppressed = false;
@@ -319,12 +344,17 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
                 IsPlaying = true;
                 _audioGraphController!.SetMonitorStatus(true);
             }
+            BeginTrackSession(e.CurrentTrack, start, next.GraphNode.Duration);
             return;
         }
         await _audioGraphController!.DualNodeFlow.ResetAsync();
         await PrepareNextTrackAsync(e.CurrentTrack);
         // Failed to create node.
-        if (_audioGraphController!.DualNodeFlow.Nodes.Current is not { } node) return;
+        if (_audioGraphController!.DualNodeFlow.Nodes.Current is not { } node)
+        {
+            BeginTrackSession(null, false);
+            return;
+        }
         PlaybackPosition = (TimeSpan.Zero, node.GraphNode.Duration);
         if (start)
         {
@@ -332,16 +362,17 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             IsPlaying = true;
             _audioGraphController!.SetMonitorStatus(true);
         }
+        BeginTrackSession(e.CurrentTrack, start, node.GraphNode.Duration);
     }
     
     private async void OnPositionUpdated(PlaybackPositionChangedEventArgs<ulong> args)
     {
         PlaybackPosition = args.NewPosition;        
         var (current, next) = args.Nodes;
-        if (current is null) return;
+        if (current is null || args.NewPosition is not { } position) return;
+        UpdateScrobbleProgress(position);
         // Next track does not exist.
         if (await QueueProvider!.InternalPeekAsync() is not { } nextTrack) return;
-        var position = args.NewPosition!.Value;
         var timeLeft = position.Total - position.Current;
         if (_audioGraphController!.IsCrossfading) return;
         // Prepare next track.
@@ -362,6 +393,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             next.GraphNode.Start();
             _audioGraphController!.IsCrossfading = true;
             await QueueProvider!.StepForwardAsync();
+            BeginTrackSession(nextTrack, true, next.GraphNode.Duration);
         }
     }
 
@@ -377,6 +409,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         {
             currentNode.GraphNode.Start();
             await QueueProvider.StepForwardAsync();
+            BeginTrackSession(nextTrack, true, currentNode.GraphNode.Duration);
             return;
         }
         await PrepareNextTrackAsync(nextTrack);
@@ -384,6 +417,7 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             nextTrack.TrackId != newNode.Track.TrackId) return;
         newNode.GraphNode.Start();
         await QueueProvider.StepForwardAsync();
+        BeginTrackSession(nextTrack, true, newNode.GraphNode.Duration);
     }
 
     public async Task ResetAsync()
@@ -391,6 +425,84 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         if (QueueProvider is null) return;
         IsPlaying = false;
         await QueueProvider.ResetAsync();
+    }
+
+    private void BeginTrackSession(IAudioTrack<ulong>? track, bool isPlaying, TimeSpan? actualDuration = null)
+    {
+        _scrobbleTrack = track;
+        _scrobbleTrackStartedAt = DateTimeOffset.UtcNow;
+        _accumulatedPlayedTime = TimeSpan.Zero;
+        _lastRecordedPosition = TimeSpan.Zero;
+        _hasRefreshedNowPlaying = false;
+        _hasScrobbled = false;
+
+        if (track is null || !isPlaying) return;
+        _hasRefreshedNowPlaying = true;
+        _ = NotifyNowPlayingAsync(CreateTrackBrief(track, actualDuration));
+    }
+
+    private void UpdateScrobbleProgress((TimeSpan Current, TimeSpan Total) position)
+    {
+        if (_scrobbleTrack is null || _hasScrobbled) return;
+
+        if (_lastRecordedPosition is { } lastPos)
+        {
+            var delta = position.Current - lastPos;
+            if (delta > TimeSpan.Zero && delta <= TimeSpan.FromSeconds(2))
+            {
+                _accumulatedPlayedTime += delta;
+            }
+        }
+        _lastRecordedPosition = position.Current;
+
+        var totalDuration = position.Total > TimeSpan.Zero ? position.Total : _scrobbleTrack.Duration;
+        if (totalDuration.TotalSeconds <= 30d) return;
+
+        var thresholdSeconds = Math.Min(totalDuration.TotalSeconds / 2d, 240d);
+        if (_accumulatedPlayedTime.TotalSeconds < thresholdSeconds) return;
+
+        _hasScrobbled = true;
+        _ = NotifyScrobbleAsync(CreateTrackBrief(_scrobbleTrack, totalDuration), _scrobbleTrackStartedAt);
+    }
+
+    private async Task NotifyNowPlayingAsync(TrackBrief track)
+    {
+        if (_scrobbleServices.Length is 0) return;
+        await Task.WhenAll(_scrobbleServices.Select(async service =>
+        {
+            try
+            {
+                await service.RefreshStatusAsync(track);
+            }
+            catch
+            {
+                // Ignored.
+            }
+        }));
+    }
+
+    private async Task NotifyScrobbleAsync(TrackBrief track, DateTimeOffset startedAt)
+    {
+        if (_scrobbleServices.Length is 0) return;
+        await Task.WhenAll(_scrobbleServices.Select(async service =>
+        {
+            try
+            {
+                await service.ScrobbleAsync(track, startedAt);
+            }
+            catch
+            {
+                // Ignored.
+            }
+        }));
+    }
+
+    private static TrackBrief CreateTrackBrief(IAudioTrack<ulong> track, TimeSpan? actualDuration = null)
+    {
+        var duration = track.Duration > TimeSpan.Zero
+            ? track.Duration
+            : actualDuration ?? TimeSpan.Zero;
+        return new(track.Title, track.DisplayArtist, track.DisplayAlbum, duration);
     }
 
     private int _preparingTrack;

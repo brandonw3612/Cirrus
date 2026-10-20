@@ -5,16 +5,24 @@ namespace Cirrus.Services;
 
 public class ConfigurationService : IConfigurationService
 {
-    private readonly IConfiguration _configurationRoot = new ConfigurationBuilder()
-        .SetBasePath(AppContext.BaseDirectory)
-        .AddJsonFile(ConfigFileName, optional: false, reloadOnChange: true)
-        .Build();
+    private readonly IConfiguration _configurationRoot = BuildConfiguration();
 
     public IConfiguration GetConfiguration() => _configurationRoot;
 
+    private static IConfiguration BuildConfiguration()
+    {
+        var builder = new ConfigurationBuilder();
+        using var stream = typeof(ConfigurationService).Assembly.GetManifestResourceStream(ConfigResourceName);
+        if (stream is not null)
+        {
+            builder.AddJsonStream(stream);
+        }
+        return builder.Build();
+    }
+
 #if PRODUCTION
-    private static readonly string ConfigFileName = "app.config.json";
+    private const string ConfigResourceName = "Cirrus.app.config.json";
 #else
-    private static readonly string ConfigFileName = "app.dev.config.json";
+    private const string ConfigResourceName = "Cirrus.app.dev.config.json";
 #endif
 }

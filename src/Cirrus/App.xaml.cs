@@ -29,6 +29,7 @@ public sealed partial class App
                 .AddSingleton<ISynchronizationContextService>(new SynchronizationContextService(SynchronizationContext.Current!))
                 .AddSingleton<IPlaybackService<ulong>, SerenadePlaybackService>()
                 .AddSingleton<IConfigurationService, ConfigurationService>()
+                .AddSingleton<IScrobbleService, LastFmService>()
                 // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
                 // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );

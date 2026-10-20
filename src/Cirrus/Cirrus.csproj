@@ -13,6 +13,7 @@
         <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
         <OutputPath>../../build/Cirrus/$(Configuration)</OutputPath>
         <Configurations>Debug;Release;Production</Configurations>
+        <DefineConstants Condition="'$(Configuration)' == 'Production'">$(DefineConstants);PRODUCTION</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -53,6 +54,8 @@
 		<Content Include="Assets\MultiColorIcons\*" />
 		<Content Include="Assets\Fonts\*" />
 		<Content Include="Assets\Images\*" />
+		<EmbeddedResource Include="app.config.json" LogicalName="Cirrus.app.config.json" Condition="'$(Configuration)' == 'Production' AND Exists('app.config.json')" />
+		<EmbeddedResource Include="app.dev.config.json" LogicalName="Cirrus.app.dev.config.json" Condition="'$(Configuration)' != 'Production' AND Exists('app.dev.config.json')" />
 	</ItemGroup>
 
     <ItemGroup>
@@ -79,6 +82,7 @@
         <PackageReference Include="DynamicData" Version="9.5.0" />
         <PackageReference Include="H.NotifyIcon.WinUI" Version="2.5.0-dev.2" />
         <PackageReference Include="ImageEx.WinUI" Version="5.0.0" />
+        <PackageReference Include="LiteFM" Version="1.0.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.13" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
@@ -89,6 +93,7 @@
         <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
         <PackageReference Include="ProjectCirrus.Copycat" Version="0.1.0" />
         <PackageReference Include="QRCoder" Version="1.8.1" />
+        <PackageReference Include="System.Formats.Nrbf" Version="10.0.13" />
         <PackageReference Include="System.Reactive" Version="7.0.0" />
         <PackageReference Include="WinUIEx" Version="2.9.3" />
     </ItemGroup>

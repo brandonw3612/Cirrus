@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -855,12 +855,11 @@
     <comment>软件更新页 - 检查时间 - Format</comment>
   </data>
   <data name="Views.WebLoginWindow.TitleTextBlock.Text" xml:space="preserve">
-    <value>Login via web</value>
+    <value>Connect with Last.fm</value>
     <comment>网页登录对话框 - 标题 - Text</comment>
   </data>
   <data name="Views.WebLoginView.InstructionTextBlock.Text" xml:space="preserve">
-    <value>Log into your NetEase Music account in the above web page.
-When you're ready, click "Verify" on the right and we'll verify your login status.</value>
+    <value>Log in and authorize your Last.fm account in the web page above. This window will close automatically once authorized.</value>
     <comment>网页登录对话框 - 操作说明 - Text</comment>
   </data>
   <data name="Views.WebLoginView.VerifyButton.Content" xml:space="preserve">
@@ -1034,5 +1033,20 @@ When you're ready, click "Verify" on the right and we'll verify your login statu
   <data name="Views.ChartView.Categories.AllTime.Content" xml:space="preserve">
     <value>All time</value>
     <comment>听歌排行页 - 分类 - 所有时间 - 标题</comment>
+  </data>
+  <data name="Views.SettingsView.Account.LastFm.Header" xml:space="preserve">
+    <value>Scrobble with Last.fm</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.Description.Text" xml:space="preserve">
+    <value>Once connected to your Last.fm account, Cirrus will automatically update your "Now Playing" status and scrobble tracks as you listen.</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectButtonText.Text" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.DisconnectButtonText.Text" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectedUser.Format" xml:space="preserve">
+    <value>Connected to: {0}</value>
   </data>
 </root>
