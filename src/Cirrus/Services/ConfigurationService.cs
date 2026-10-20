@@ -5,6 +5,8 @@ namespace Cirrus.Services;
 
 public class ConfigurationService : IConfigurationService
 {
+    private const string ConfigResourceName = "Cirrus.app.config.json";
+    
     private readonly IConfiguration _configurationRoot = BuildConfiguration();
 
     public IConfiguration GetConfiguration() => _configurationRoot;
@@ -19,10 +21,4 @@ public class ConfigurationService : IConfigurationService
         }
         return builder.Build();
     }
-
-#if PRODUCTION
-    private const string ConfigResourceName = "Cirrus.app.config.json";
-#else
-    private const string ConfigResourceName = "Cirrus.app.dev.config.json";
-#endif
 }

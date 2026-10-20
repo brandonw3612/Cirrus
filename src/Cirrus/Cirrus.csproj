@@ -12,8 +12,7 @@
         <Platforms>x64;ARM64</Platforms>
         <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
         <OutputPath>../../build/Cirrus/$(Configuration)</OutputPath>
-        <Configurations>Debug;Release;Production</Configurations>
-        <DefineConstants Condition="'$(Configuration)' == 'Production'">$(DefineConstants);PRODUCTION</DefineConstants>
+        <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -54,8 +53,7 @@
 		<Content Include="Assets\MultiColorIcons\*" />
 		<Content Include="Assets\Fonts\*" />
 		<Content Include="Assets\Images\*" />
-		<EmbeddedResource Include="app.config.json" LogicalName="Cirrus.app.config.json" Condition="'$(Configuration)' == 'Production' AND Exists('app.config.json')" />
-		<EmbeddedResource Include="app.dev.config.json" LogicalName="Cirrus.app.dev.config.json" Condition="'$(Configuration)' != 'Production' AND Exists('app.dev.config.json')" />
+		<EmbeddedResource Include="app.config.json" LogicalName="Cirrus.app.config.json" Condition="Exists('app.config.json')" />
 	</ItemGroup>
 
     <ItemGroup>

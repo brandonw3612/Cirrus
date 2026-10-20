@@ -16,7 +16,7 @@
     
     <PropertyGroup>
         <OutputPath>../../build/Cirrus.SourceGenerators/$(Configuration)</OutputPath>
-        <Configurations>Debug;Release;Production</Configurations>
+        <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
     <ItemGroup>

@@ -2,7 +2,6 @@
   <Configurations>
     <BuildType Name="Debug" />
     <BuildType Name="Release" />
-    <BuildType Name="Production" />
     <Platform Name="x64" />
     <Platform Name="ARM64" />
   </Configurations>

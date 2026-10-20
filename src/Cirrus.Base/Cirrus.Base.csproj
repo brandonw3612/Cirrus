@@ -11,7 +11,7 @@
     <PropertyGroup>
         <IsAotCompatible>true</IsAotCompatible>
         <OutputPath>../../build/Cirrus.Base/$(Configuration)</OutputPath>
-        <Configurations>Debug;Release;Production</Configurations>
+        <Configurations>Debug;Release</Configurations>
     </PropertyGroup>
 
     <ItemGroup>
