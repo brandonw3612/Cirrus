@@ -57,6 +57,7 @@
 	</ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Cirrus.Data\Cirrus.Data.csproj" />
         <ProjectReference Include="..\Cirrus.Models\Cirrus.Models.csproj" />
         <ProjectReference Include="..\Cirrus.Network\Cirrus.Network.csproj" />
         <ProjectReference Include="..\Cirrus.Playback\Cirrus.Playback.csproj" />

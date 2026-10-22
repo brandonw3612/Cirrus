@@ -1,5 +1,7 @@
-﻿using Cirrus.Base.Services;
+﻿using Windows.Storage;
+using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
+using Cirrus.Data;
 using Cirrus.Network;
 using Cirrus.Playback.PlaybackServices;
 using Cirrus.Playback.Primitives;
@@ -30,12 +32,15 @@ public sealed partial class App
                 .AddSingleton<IPlaybackService<ulong>, SerenadePlaybackService>()
                 .AddSingleton<IConfigurationService, ConfigurationService>()
                 .AddSingleton<IScrobbleService, LastFmService>()
+                .AddSingleton<ICacheService>(new SqliteCacheService(ApplicationData.Current.LocalCacheFolder.Path))
                 // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
                 // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );
-        if (ServicesProvider.GetService<UserPreferenceService>() is not { } userPreferenceService) return;
-        Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
-            LanguageUtility.GetSupportedSystemLanguage(userPreferenceService.General.DisplayLanguage);
+        if (ServicesProvider.GetService<UserPreferenceService>() is { } userPreferenceService)
+            Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
+                LanguageUtility.GetSupportedSystemLanguage(userPreferenceService.General.DisplayLanguage);
+        if (ServicesProvider.GetService<ICacheService>() is { } cacheService)
+            Task.Run(async () => await cacheService.InitializeAsync());
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
