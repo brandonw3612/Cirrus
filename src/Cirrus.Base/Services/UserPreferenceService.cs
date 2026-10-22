@@ -359,7 +359,7 @@ public class UserPreferenceService
         private readonly UserPreferenceEntry<bool> _isSidebarOpenPreferenceEntry = new()
         {
             PreferencePath = $"{nameof(Appearance)}/{nameof(IsSidebarOpen)}",
-            DefaultValue = false
+            DefaultValue = true
         };
 
         #endregion
