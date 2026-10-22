@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Cirrus.Base.Services.Abstract;
+using Cirrus.Models.Business.Lyrics;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Serialization;
 using Microsoft.Data.Sqlite;
@@ -41,10 +42,11 @@ public class SqliteCacheService : ICacheService
         StringBuilder sb = new();
         sb.AppendLine(SQL.Meta.GlobalConfig);
         sb.AppendLine(SQL.Meta.TracksCache);
+        sb.AppendLine(SQL.Meta.LyricsCache);
         return sb.ToString();
     }
     
-    public async Task<Dictionary<ulong, OnlineTrack>> GetOnlineTracksAsync(IReadOnlyList<long> trackIds, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<ulong, OnlineTrack>> GetOnlineTracksAsync(IReadOnlyList<ulong> trackIds, CancellationToken cancellationToken = default)
     {
         var result = new Dictionary<ulong, OnlineTrack>(trackIds.Count);
         if (trackIds.Count == 0) return result;
@@ -103,6 +105,49 @@ public class SqliteCacheService : ICacheService
             }
             
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task<TrackLyrics?> GetLyricsAsync(ulong trackId, CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = SQL.Lyrics.Get;
+        cmd.Parameters.AddWithValue("$id", unchecked((long)trackId));
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Lyrics).ToUnixTimeSeconds();
+        cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
+        var payloadBytes = (byte[])reader["Payload"];
+        return JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.TrackLyrics);
+    }
+
+    public async Task SaveLyricsAsync(ulong trackId, TrackLyrics lyrics, CancellationToken cancellationToken = default)
+    {
+        var payloadBytes = JsonSerializer.SerializeToUtf8Bytes(lyrics, NativeModelSerializationContext.Default.TrackLyrics);
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+            await using var cmd = connection.CreateCommand();
+            cmd.CommandText = SQL.Lyrics.Upsert;
+            cmd.Parameters.AddWithValue("$id", unchecked((long)trackId));
+            cmd.Parameters.AddWithValue("$payload", payloadBytes);
+            cmd.Parameters.AddWithValue("$updatedAt", now);
+            cmd.Parameters.AddWithValue("$version", Version.LyricsCache);
+
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
