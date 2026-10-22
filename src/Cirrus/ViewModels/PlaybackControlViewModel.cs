@@ -1,4 +1,5 @@
 ﻿using Cirrus.Base.Services;
+using Cirrus.Base.Services.Abstract;
 using Cirrus.Extensions;
 using Cirrus.LiveModels;
 using Cirrus.Models.Business.Lyrics;
@@ -9,6 +10,7 @@ using Cirrus.Playback.Primitives;
 using Cirrus.Primitives;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 using WinRT;
 
 namespace Cirrus.ViewModels;
@@ -23,6 +25,7 @@ public partial class PlaybackControlViewModel : ViewModel
     
     private readonly UserPreferenceService _preference = ServicesProvider.Current.GetService<UserPreferenceService>()!;
     private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>()!;
+    private readonly ICacheService? _cacheService = ServicesProvider.GetService<ICacheService>();
     public PlaybackServiceBridge PlaybackServiceBridge { get; } = new();
 
     public TrackLyrics? CurrentTrackLyrics { get; private set; }
@@ -103,13 +106,29 @@ public partial class PlaybackControlViewModel : ViewModel
             });
             return;
         }
+        if (_cacheService is not null && await _cacheService.GetLyricsAsync(track.TrackId) is { } cachedLyrics)
+        {
+            Debug.WriteLine($"Cache Hit! Lyrics: {track.Title} ({track.TrackId})");
+            DispatcherQueue!.TryEnqueue(() =>
+            {
+                RenderLyrics?.Invoke(cachedLyrics);
+                CurrentTrackLyrics = cachedLyrics;
+            });
+            return;
+        }
+        Debug.WriteLine($"Cache Miss... Lyrics: {track.Title} ({track.TrackId})");
         var resp = await Network.Client.Track.GetLyricsAsync(track.TrackId);
+        var lyrics = resp.ToLocal(track.Duration);
         DispatcherQueue!.TryEnqueue(() =>
         {
-            var lyrics = resp.ToLocal(track.Duration);
             RenderLyrics?.Invoke(lyrics);
             CurrentTrackLyrics = lyrics;
         });
+        Debug.WriteLine($"Caching... Lyrics: {track.Title} ({track.TrackId})");
+        if (ServicesProvider.GetService<ICacheService>() is { } cacheService)
+        {
+            await cacheService.SaveLyricsAsync(track.TrackId, lyrics);
+        }
     }
     
     public Action<TrackLyrics?>? RenderLyrics { get; set; }
