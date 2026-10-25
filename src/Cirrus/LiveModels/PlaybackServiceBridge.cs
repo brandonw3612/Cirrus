@@ -104,10 +104,10 @@ public partial class PlaybackServiceBridge : ObservableObject
         await _playbackService.SeekAsync(TimeSpan.FromMilliseconds(timestamp));
     }
 
-    private async void OnPlaybackServicePropertyChanged(object? sender,
+    private void OnPlaybackServicePropertyChanged(object? sender,
         System.ComponentModel.PropertyChangedEventArgs e)
     {
-        await _dispatcherQueue.EnqueueAsync(() =>
+        _dispatcherQueue.TryEnqueue(() =>
         {
             switch (e.PropertyName)
             {
@@ -165,9 +165,9 @@ public partial class PlaybackServiceBridge : ObservableObject
     private void OnCurrentTrackChanged(object? sender, CurrentTrackChangedEventArgs<ulong> e) =>
         CurrentTrackChanged?.Invoke(this, e);
 
-    private async void OnQueueProviderPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnQueueProviderPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        await _dispatcherQueue.EnqueueAsync(() =>
+        _dispatcherQueue.TryEnqueue(() =>
         {
             switch (e.PropertyName)
             {
