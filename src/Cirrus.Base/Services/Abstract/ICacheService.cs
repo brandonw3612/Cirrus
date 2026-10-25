@@ -1,4 +1,5 @@
 using Cirrus.Models.Business.Lyrics;
+using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
 
 namespace Cirrus.Base.Services.Abstract;
@@ -25,6 +26,16 @@ public interface ICacheService
     Task SaveLyricsAsync(
         ulong trackId,
         TrackLyrics lyrics,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task<Dictionary<ulong, OnlinePlaylist>> GetPlaylistsAsync(
+        IReadOnlyList<ulong> playlistIds,
+        CancellationToken cancellationToken = default
+    );
+
+    Task SavePlaylistsAsync(
+        IReadOnlyList<OnlinePlaylist> playlists,
         CancellationToken cancellationToken = default
     );
 }

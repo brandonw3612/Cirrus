@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Lyrics;
+using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Serialization;
 using Microsoft.Data.Sqlite;
@@ -43,6 +44,7 @@ public class SqliteCacheService : ICacheService
         sb.AppendLine(SQL.Meta.GlobalConfig);
         sb.AppendLine(SQL.Meta.TracksCache);
         sb.AppendLine(SQL.Meta.LyricsCache);
+        sb.AppendLine(SQL.Meta.PlaylistsCache);
         return sb.ToString();
     }
     
@@ -148,6 +150,72 @@ public class SqliteCacheService : ICacheService
             cmd.Parameters.AddWithValue("$version", Version.LyricsCache);
 
             await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task<Dictionary<ulong, OnlinePlaylist>> GetPlaylistsAsync(IReadOnlyList<ulong> playlistIds, CancellationToken cancellationToken = default)
+    {
+        var result = new Dictionary<ulong, OnlinePlaylist>(playlistIds.Count);
+        if (playlistIds.Count == 0) return result;
+        
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = SQL.Playlist.Get;
+        var idsJson = JsonSerializer.Serialize(playlistIds.ToArray(), NativeModelSerializationContext.Default.UInt64Array);
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Playlist).ToUnixTimeSeconds();
+        cmd.Parameters.AddWithValue("$idsJson", idsJson);
+        cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)reader.GetInt64(0));
+            var payloadBytes = (byte[])reader["Payload"];
+            var track = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.OnlinePlaylist);
+            if (track is not null) result[id] = track;
+        }
+        return result;
+    }
+
+    public async Task SavePlaylistsAsync(IReadOnlyList<OnlinePlaylist> playlists, CancellationToken cancellationToken = default)
+    {
+        if (playlists.Count == 0) return;
+
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            await using var cmd = connection.CreateCommand();
+            cmd.Transaction = (SqliteTransaction)transaction;
+            cmd.CommandText = SQL.Playlist.Upsert;
+
+            var pId = cmd.Parameters.Add("$id", SqliteType.Integer);
+            var pPayload = cmd.Parameters.Add("$payload", SqliteType.Blob);
+            var pUpdatedAt = cmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var pVersion = cmd.Parameters.Add("$version", SqliteType.Integer);
+            
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            foreach (var playlist in playlists)
+            {
+                pId.Value = unchecked((long)playlist.PlaylistId);
+                pPayload.Value = JsonSerializer.SerializeToUtf8Bytes(playlist, NativeModelSerializationContext.Default.OnlinePlaylist);
+                pUpdatedAt.Value = now;
+                pVersion.Value = Version.PlaylistCache;
+                
+                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
