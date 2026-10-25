@@ -42,7 +42,7 @@ public sealed partial class MainWindow
         AppWindow.SetTaskbarIcon("Assets/ApplicationIcon.ico");
         AppWindow.SetTitleBarIcon("Assets/ApplicationIcon.ico");
         ApplyKeyboardHandler(await KeyboardActionHandler.CreateAsync());
-        if (ServicesProvider.GetService<UserPreferenceService>() is not { } userPreferenceService) return;
+        if (UserPreferenceService.GetService() is not { } userPreferenceService) return;
         UpdateTheme(userPreferenceService.Appearance.DisplayTheme);
         if (userPreferenceService.Appearance.DisplayFont is { } fontName)
         {
@@ -141,7 +141,7 @@ public sealed partial class MainWindow
 
     private void OnClosed(object sender, WindowEventArgs args)
     {
-        if (ServicesProvider.GetService<UserPreferenceService>() is not { General.RunsInBackground: true }) return;
+        if (UserPreferenceService.GetService() is not { General.RunsInBackground: true }) return;
         this.Hide();
         args.Handled = true;
     }

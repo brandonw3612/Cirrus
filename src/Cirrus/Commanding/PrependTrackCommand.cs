@@ -6,7 +6,6 @@ using Cirrus.Playback.Primitives;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Cirrus.Commanding;
@@ -19,7 +18,7 @@ public sealed partial class PrependTrackCommand : CommandWrapper
     public PrependTrackCommand()
     {
         InnerCommand = new AsyncRelayCommand<IAudioTrack<ulong>>(static async track => {
-            if (track is null || ServicesProvider.Current.GetService<IPlaybackService<ulong>>() is not
+            if (track is null || ServicesProvider.GetService<IPlaybackService<ulong>>() is not
                     { } playbackService || MainWindow.Current is not { } window) return;
             if (playbackService.QueueProvider is null)
             {

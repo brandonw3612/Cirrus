@@ -31,7 +31,7 @@ public partial class NeteaseAccount : ObservableObject, IDisposable
         UserAccount = userAccount;
         MembershipStatus = membershipStatus;
         QuickAccessPlaylists = quickAccessPlaylists;
-        _exceptionService = ServicesProvider.GetService<LocalizedExceptionService>()!;
+        _exceptionService = LocalizedExceptionService.GetService()!;
     }
 
     public static async Task<NeteaseAccount> LoadAsync()

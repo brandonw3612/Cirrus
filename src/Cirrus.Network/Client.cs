@@ -67,7 +67,7 @@ public partial class Client
     {
         // Hidden constructor method.
         DeserializationCoverageService = ServicesProvider.GetService<IDeserializationCoverageService>();
-        _userPreferenceService = ServicesProvider.GetService<UserPreferenceService>();
+        _userPreferenceService = UserPreferenceService.GetService();
         _cookies = _userPreferenceService?.Account.UserCookies ?? new();
         _userCredentials = _userPreferenceService?.Account.UserCredentials ?? new();
         _ipFix = _userPreferenceService?.Network.IpFix;

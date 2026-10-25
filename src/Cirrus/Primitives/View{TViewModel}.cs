@@ -72,7 +72,7 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
             {
                 case ILoggableException loggableException:
                 {
-                    if (ServicesProvider.GetService<UserPreferenceService>() is { General.SendDiagnosticsData: true } &&
+                    if (UserPreferenceService.GetService() is { General.SendDiagnosticsData: true } &&
                         IEventLogService.GetService() is { } eventLogService)
                     {
                         var log = loggableException.GenerateLog();

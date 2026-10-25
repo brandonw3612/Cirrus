@@ -16,33 +16,30 @@ public partial class KeyboardShortcut : ObservableObject
     {
         ["PlayPause"] = async () =>
         {
-            if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-                playbackService) return;
+            if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService) return;
             await playbackService.PlayPauseAsync();
         },
         ["Next"] = async () =>
         {
-            if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-                playbackService) return;
+            if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService) return;
             await playbackService.TryNextAsync();
         },
         ["Previous"] = async () =>
         {
-            if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-                playbackService) return;
+            if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService) return;
             await playbackService.TryPreviousAsync();
         },
         ["IncreaseVolume"] = () =>
         {
-            if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-                playbackService) return Task.CompletedTask;
+            if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService)
+                return Task.CompletedTask;
             playbackService.Volume = Math.Clamp(playbackService.Volume + 0.1d, 0d, 1d);
             return Task.CompletedTask;
         },
         ["DecreaseVolume"] = () =>
         {
-            if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-                playbackService) return Task.CompletedTask;
+            if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService)
+                return Task.CompletedTask;
             playbackService.Volume = Math.Clamp(playbackService.Volume - 0.1d, 0d, 1d);
             return Task.CompletedTask;
         }

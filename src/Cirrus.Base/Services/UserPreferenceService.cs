@@ -16,6 +16,8 @@ namespace Cirrus.Base.Services;
 [RegisterSingleton]
 public class UserPreferenceService
 {
+    public static UserPreferenceService? GetService() => ServicesProvider.GetService<UserPreferenceService>();
+    
     /// <summary>
     /// Constructs the service from the IoC container.
     /// </summary>

@@ -138,7 +138,7 @@
                 <DataTemplate x:DataType="liveModels:IndexedOnlineAlbumTrack">
                     <controls:TrackListItem Style="{StaticResource AlbumTrackListItemStyle}"
                                             DataContext="{x:Bind Track}"
-                                            Index="{x:Bind Index, Mode=OneWay}"
+                                            Index="{x:Bind Index}"
                                             AreArtistsShown="{x:Bind AreArtistsShown}"
                                             PlayFromListCommand="{StaticResource PlayFromListCommand}"
                                             ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />

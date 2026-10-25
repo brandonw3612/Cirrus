@@ -6,6 +6,8 @@ namespace Cirrus.Base.Services.Abstract;
 
 public interface ICacheService
 {
+    static ICacheService? GetService() => ServicesProvider.GetService<ICacheService>();
+    
     ValueTask InitializeAsync(CancellationToken cancellationToken = default);
     
     Task<Dictionary<ulong, OnlineTrack>> GetOnlineTracksAsync(

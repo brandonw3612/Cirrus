@@ -42,7 +42,7 @@ public partial class SoftwareUpdateViewModel : ViewModel
     
     public override async Task LoadDataAsync()
     {
-        _userPreferenceService = ServicesProvider.GetService<UserPreferenceService>();
+        _userPreferenceService = UserPreferenceService.GetService();
         if (_userPreferenceService is null) throw new Exception("Internal fatal error: Could not load preference service.");
         _softwareUpdateService = ISoftwareUpdateService.GetService();
         if (_softwareUpdateService is null) throw new Exception("Internal fatal error: Could not load software update service.");

@@ -5,6 +5,8 @@ namespace Cirrus.Base.Services;
 [RegisterSingleton]
 public class LocalizedExceptionService(ILocalizationService localizationService)
 {
+    public static LocalizedExceptionService? GetService() => ServicesProvider.GetService<LocalizedExceptionService>();
+    
     public Exception CreateLocalized(string exceptionMessageKey) =>
         new(localizationService.Localize(exceptionMessageKey));
 

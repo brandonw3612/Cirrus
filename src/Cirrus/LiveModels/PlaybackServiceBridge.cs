@@ -4,8 +4,6 @@ using Cirrus.Models.Business.Playback;
 using Cirrus.Playback.EventArgs;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 
 namespace Cirrus.LiveModels;
@@ -82,7 +80,7 @@ public partial class PlaybackServiceBridge : ObservableObject
     public PlaybackServiceBridge()
     {
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-        _playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>()!;
+        _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
         Volume = _playbackService.Volume;
         _playbackService.PropertyChanged -= OnPlaybackServicePropertyChanged;
         _playbackService.PropertyChanged += OnPlaybackServicePropertyChanged;

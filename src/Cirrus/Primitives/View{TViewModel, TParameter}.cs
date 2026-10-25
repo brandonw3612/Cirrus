@@ -76,7 +76,7 @@ public abstract class View<TViewModel, TParameter> : Page
             {
                 case ILoggableException loggableException:
                 {
-                    if (ServicesProvider.GetService<UserPreferenceService>() is { General.SendDiagnosticsData: true } &&
+                    if (UserPreferenceService.GetService() is { General.SendDiagnosticsData: true } &&
                         IEventLogService.GetService() is { } eventLogService)
                     {
                         var log = loggableException.GenerateLog();

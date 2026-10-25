@@ -36,16 +36,16 @@ public sealed partial class App
                 // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
                 // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );
-        if (ServicesProvider.GetService<UserPreferenceService>() is { } userPreferenceService)
+        if (UserPreferenceService.GetService() is { } userPreferenceService)
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
                 LanguageUtility.GetSupportedSystemLanguage(userPreferenceService.General.DisplayLanguage);
-        if (ServicesProvider.GetService<ICacheService>() is { } cacheService)
+        if (ICacheService.GetService() is { } cacheService)
             Task.Run(async () => await cacheService.InitializeAsync());
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        if (ServicesProvider.GetService<UserPreferenceService>() is not { } userPreferenceService) return;
+        if (UserPreferenceService.GetService() is not { } userPreferenceService) return;
         if (userPreferenceService.Appearance.DisplayFont is { } fontName)
         {
             FontFamily font = new(fontName);
@@ -83,7 +83,7 @@ public sealed partial class App
         CurrentAccount = await NeteaseAccount.LoadAsync();
         MainWindow = new MainWindow();
         MainWindow.Activate();
-        if (ServicesProvider.Current.GetService<IPlaybackService<ulong>>() is SerenadePlaybackService playbackService)
+        if (ServicesProvider.GetService<IPlaybackService<ulong>>() is SerenadePlaybackService playbackService)
         {
             playbackService.InitializeSystemMediaTransportControls(MainWindow);
             await playbackService.InitializeAsync();

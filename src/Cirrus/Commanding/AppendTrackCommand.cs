@@ -6,7 +6,6 @@ using Cirrus.Playback.Primitives;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Cirrus.Commanding;
@@ -19,8 +18,9 @@ public sealed partial class AppendTrackCommand : CommandWrapper
     public AppendTrackCommand()
     {
         InnerCommand = new AsyncRelayCommand<IAudioTrack<ulong>>(static async track => {
-            if (track is null || ServicesProvider.Current.GetService<IPlaybackService<ulong>>() is not
-                    { } playbackService || MainWindow.Current is not { } window) return;
+            if (track is null ||
+                ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService ||
+                MainWindow.Current is not { } window) return;
             if (playbackService.QueueProvider is null)
             {;
                 playbackService.QueueProvider = new NormalQueueProvider<ulong>([track]);

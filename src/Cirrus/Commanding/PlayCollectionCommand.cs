@@ -32,7 +32,7 @@ public sealed partial class PlayCollectionCommand : CommandWrapper
                 {
                     case IPlaylist playlist:
                         {
-                            var cacheService = ServicesProvider.GetService<ICacheService>();
+                            var cacheService = ICacheService.GetService();
                             List<ulong> trackIds = [];
                             bool playlistCacheHit = false;
                             if (cacheService is not null)
@@ -103,9 +103,9 @@ public sealed partial class PlayCollectionCommand : CommandWrapper
                             }
                             playbackService.QueueProvider = new NormalQueueProvider<ulong>(queue.ToArray());
                             if (tracksToCache.Count > 0 &&
-                                ServicesProvider.GetService<ICacheService>() is { } cs)
+                                cacheService is not null)
                             {
-                                await cs.SaveOnlineTracksAsync(tracksToCache);
+                                await cacheService.SaveOnlineTracksAsync(tracksToCache);
                             }
                             break;
                         }

@@ -13,7 +13,7 @@ public class ServicesProvider : IServiceProvider
     /// <summary>
     /// Global singleton of <see cref="ServicesProvider"/> object.
     /// </summary>
-    public static ServicesProvider Current => _current ??= new();
+    private static ServicesProvider Current => _current ??= new();
 
     private readonly IServiceCollection _collection;
     private ServiceProvider? _serviceProvider;
@@ -65,4 +65,6 @@ public class ServicesProvider : IServiceProvider
     }
     
     public static T? GetService<T>() where T : class => Current.GetService<T>();
+    
+    public static IEnumerable<T> GetServices<T>() where T : class => Current.GetServices<T>();
 }

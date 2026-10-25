@@ -32,7 +32,7 @@ public partial class QuickAccessPlaylistCollection : ObservableObject, IDisposab
         _userId = userId;
         
         _playlistsSource = new();
-        var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
+        var synchronizationContext = ISynchronizationContextService.GetService()!.Get();
         _playlistsSubscription = _playlistsSource
             .Connect()
             .ObserveOn(synchronizationContext)

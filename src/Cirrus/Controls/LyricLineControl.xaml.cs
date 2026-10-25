@@ -4,7 +4,6 @@ using Cirrus.Behaviors;
 using Cirrus.LiveModels;
 using Cirrus.Models.Business.Lyrics;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI.Composition;
@@ -106,7 +105,7 @@ public sealed partial class LyricLineControl
     private readonly List<LyricFragmentMapping> _fragmentMappings;
     private readonly List<LineMapping> _lineMappings;
     
-    private readonly UserPreferenceService _preference = ServicesProvider.Current.GetService<UserPreferenceService>()!;
+    private readonly UserPreferenceService _preference = UserPreferenceService.GetService()!;
     private readonly PlaybackServiceBridge _playbackServiceBridge;
     
     private readonly Visual _backgroundVisual;

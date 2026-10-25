@@ -5,7 +5,6 @@ using Cirrus.Playback.PlaybackQueueProviders;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cirrus.Commanding;
 
@@ -20,7 +19,7 @@ public sealed partial class PlayFromListCommand : CommandWrapper
 
     public PlayFromListCommand()
     {
-        var playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>();
+        var playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>();
         InnerCommand = new RelayCommand<IAudioTrack<ulong>>(track =>
         {
             if (Tracks is null || playbackService is null) return;

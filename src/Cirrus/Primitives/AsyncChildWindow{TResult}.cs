@@ -32,7 +32,7 @@ public abstract class AsyncChildWindow<TResult> : WindowEx
         AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
         AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-        if (ServicesProvider.GetService<UserPreferenceService>() is { } userPreferenceService)
+        if (UserPreferenceService.GetService() is { } userPreferenceService)
         {
             var theme = userPreferenceService.Appearance.DisplayTheme;
             if (Content is FrameworkElement content)

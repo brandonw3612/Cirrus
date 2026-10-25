@@ -9,7 +9,6 @@ using Cirrus.Playback.Extensions;
 using Cirrus.Playback.Primitives;
 using Cirrus.Primitives;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using WinRT;
 
@@ -23,9 +22,9 @@ public partial class PlaybackControlViewModel : ViewModel
 {
     public override string ViewIdentifier => string.Empty;
     
-    private readonly UserPreferenceService _preference = ServicesProvider.Current.GetService<UserPreferenceService>()!;
-    private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>()!;
-    private readonly ICacheService? _cacheService = ServicesProvider.GetService<ICacheService>();
+    private readonly UserPreferenceService _preference = UserPreferenceService.GetService()!;
+    private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
+    private readonly ICacheService? _cacheService = ICacheService.GetService();
     public PlaybackServiceBridge PlaybackServiceBridge { get; } = new();
 
     public TrackLyrics? CurrentTrackLyrics { get; private set; }
@@ -125,9 +124,9 @@ public partial class PlaybackControlViewModel : ViewModel
             CurrentTrackLyrics = lyrics;
         });
         Debug.WriteLine($"Caching... Lyrics: {track.Title} ({track.TrackId})");
-        if (ServicesProvider.GetService<ICacheService>() is { } cacheService)
+        if (_cacheService is not null)
         {
-            await cacheService.SaveLyricsAsync(track.TrackId, lyrics);
+            await _cacheService.SaveLyricsAsync(track.TrackId, lyrics);
         }
     }
     

@@ -71,7 +71,7 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
             if (value is null || value.Value == _currentPlaybackMode) return;
             OnPlaybackModeChanged(_currentPlaybackMode, value.Value);
             _currentPlaybackMode = value.Value;
-            if (ServicesProvider.GetService<UserPreferenceService>() is { } userPreferenceService)
+            if (UserPreferenceService.GetService() is { } userPreferenceService)
                 userPreferenceService.Playback.PlaybackMode = value.Value;
             OnPropertyChanged();
         }
@@ -101,14 +101,14 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
     {
         _queue = audioTracks.ToList();
         _upcomingTracksSource = new();
-        var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()!.Get();
+        var synchronizationContext = ISynchronizationContextService.GetService()!.Get();
         _upcomingTracksSubscription = _upcomingTracksSource
             .Connect()
             .ObserveOn(synchronizationContext)
             .Bind(out _upcomingTracks)
             .Subscribe();
         _currentPlaybackMode = playbackMode ??
-                               ServicesProvider.GetService<UserPreferenceService>()?.Playback.PlaybackMode ??
+                               UserPreferenceService.GetService()?.Playback.PlaybackMode ??
                                PlaybackMode.Sequential;
         if (_queue.Count is 0)
         {

@@ -21,7 +21,6 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using AppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 using Cirrus.Base.Services.Abstract;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cirrus.ViewModels;
 
@@ -218,20 +217,19 @@ public partial class SettingsViewModel : ViewModel
 
     public override async Task LoadDataAsync()
     {
-        if (ServicesProvider.Current.GetService(typeof(UserPreferenceService)) is not UserPreferenceService service)
+        if (UserPreferenceService.GetService() is not { } service)
         {
             throw new Exception("Internal fatal error: Could not load preference service.");
         }
 
         _userPreferenceService = service;
-        if (ServicesProvider.Current.GetService(typeof(IPlaybackService<ulong>)) is not IPlaybackService<ulong>
-            playbackService)
+        if (ServicesProvider.GetService<IPlaybackService<ulong>>() is not { } playbackService)
         {
             throw new Exception("Internal fatal error: Could not load playback service.");
         }
 
         _playbackService = playbackService;
-        _lastFmService = ServicesProvider.Current.GetServices<IScrobbleService>()
+        _lastFmService = ServicesProvider.GetServices<IScrobbleService>()
             .OfType<LastFmService>()
             .SingleOrDefault();
         UpdateLastFmStatus();

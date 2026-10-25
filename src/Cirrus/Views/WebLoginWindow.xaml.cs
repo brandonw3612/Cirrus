@@ -2,7 +2,6 @@
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Primitives;
 using Cirrus.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.Web.WebView2.Core;
 
@@ -19,7 +18,7 @@ public sealed partial class WebLoginWindow
 
     public WebLoginWindow()
     {
-        _lastFmService = ServicesProvider.Current.GetServices<IScrobbleService>()
+        _lastFmService = ServicesProvider.GetServices<IScrobbleService>()
             .OfType<LastFmService>()
             .SingleOrDefault();
         InitializeComponent();

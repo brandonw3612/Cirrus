@@ -5,13 +5,12 @@ using Cirrus.Playback.Extensions;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cirrus.ViewModels;
 
 public partial class PlaybackControlBarViewModel : ObservableObject
 {
-    private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.Current.GetService<IPlaybackService<ulong>>()!;
+    private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
     public PlaybackServiceBridge PlaybackServiceBridge { get; } = new();
     
     [RelayCommand]

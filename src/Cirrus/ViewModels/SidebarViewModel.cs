@@ -8,14 +8,14 @@ public partial class SidebarViewModel(Action<bool> onIsFullSizeToggledChangedCal
     [ObservableProperty] public partial bool IsFullSizeAvailable { get; set; }
 
     [ObservableProperty] public partial bool IsFullSizeToggled { get; set; } =
-        ServicesProvider.GetService<UserPreferenceService>()?.Appearance.IsSidebarOpen ?? false;
+        UserPreferenceService.GetService()?.Appearance.IsSidebarOpen ?? false;
 
     [ObservableProperty] public partial string CurrentFrameContentIdentifier { get; set; } = string.Empty;
         
     partial void OnIsFullSizeToggledChanged(bool value)
     {
         onIsFullSizeToggledChangedCallback(value);
-        if (ServicesProvider.GetService<UserPreferenceService>() is { } service)
+        if (UserPreferenceService.GetService() is { } service)
         {
             service.Appearance.IsSidebarOpen = value;
         }

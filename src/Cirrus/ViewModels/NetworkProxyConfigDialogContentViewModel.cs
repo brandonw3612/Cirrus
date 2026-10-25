@@ -23,7 +23,7 @@ public partial class NetworkProxyConfigDialogContentViewModel : ObservableObject
             new("Dialogs/NetworkProxyConfigDialogContent/ProxyModes/Custom")
                 { Attachment = ProxyMode.CustomProxy }
         ];
-        if (ServicesProvider.GetService<UserPreferenceService>() is { } service)
+        if (UserPreferenceService.GetService() is { } service)
         {
             PreferredProxyMode = AvailableProxyModes.Find(m => m.Attachment == service.Network.ProxyMode) ??
                                  AvailableProxyModes[0];
@@ -57,7 +57,7 @@ public partial class NetworkProxyConfigDialogContentViewModel : ObservableObject
 
     public void UpdateSettings()
     {
-        if (ServicesProvider.GetService<UserPreferenceService>() is not { } service) return;
+        if (UserPreferenceService.GetService() is not { } service) return;
         int portNumber = 80;
         if (PreferredProxyMode.Attachment == ProxyMode.CustomProxy)
         {

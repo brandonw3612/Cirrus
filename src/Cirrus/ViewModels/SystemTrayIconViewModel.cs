@@ -7,7 +7,6 @@ using Cirrus.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cirrus.ViewModels;
 
@@ -26,13 +25,13 @@ internal partial class SystemTrayIconViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private Task? PreviousTrack() => ServicesProvider.Current.GetService<IPlaybackService<ulong>>()?.TryPreviousAsync();
+    private Task? PreviousTrack() => ServicesProvider.GetService<IPlaybackService<ulong>>()?.TryPreviousAsync();
     
     [RelayCommand]
-    private Task? PlayPause() => ServicesProvider.Current.GetService<IPlaybackService<ulong>>()?.PlayPauseAsync();
+    private Task? PlayPause() => ServicesProvider.GetService<IPlaybackService<ulong>>()?.PlayPauseAsync();
     
     [RelayCommand]
-    private Task? NextTrack() => ServicesProvider.Current.GetService<IPlaybackService<ulong>>()?.TryNextAsync();
+    private Task? NextTrack() => ServicesProvider.GetService<IPlaybackService<ulong>>()?.TryNextAsync();
 
     [RelayCommand]
     private void ExitApplication()

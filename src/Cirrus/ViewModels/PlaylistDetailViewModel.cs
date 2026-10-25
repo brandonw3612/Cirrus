@@ -50,7 +50,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
 
     public PlaylistDetailViewModel()
     {
-        var synchronizationContext = ServicesProvider.GetService<ISynchronizationContextService>()?.Get()
+        var synchronizationContext = ISynchronizationContextService.GetService()?.Get()
             ?? SynchronizationContext.Current
             ?? new SynchronizationContext();
         _tracksSubscription = _tracksSource
@@ -76,7 +76,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
         PlayableTracks.Clear();
         Artists.Clear();
 
-        var cacheService = ServicesProvider.GetService<ICacheService>();
+        var cacheService = ICacheService.GetService();
         var currentUserId = (Application.Current as App)?.CurrentAccount?.UserProfile?.UserId;
         var cachedPlaylists = cacheService is null
             ? new Dictionary<ulong, OnlinePlaylist>()
