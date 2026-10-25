@@ -76,7 +76,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
                     <controls:TrackListItem DataContext="{x:Bind Track}"
-                                            Index="{x:Bind Index, Mode=OneWay}"
+                                            Index="{x:Bind Index}"
                                             PlayFromListCommand="{StaticResource PlayFromListCommand}"
                                             ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
                 </DataTemplate>

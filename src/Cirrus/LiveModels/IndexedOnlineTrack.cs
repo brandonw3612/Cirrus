@@ -1,17 +1,16 @@
 ﻿using Cirrus.Models.Business.Track;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Cirrus.LiveModels;
 
-public partial class IndexedOnlineTrack : ObservableObject
+public partial record IndexedOnlineTrack
 {
     public required OnlineTrack Track { get; init; }
-    [ObservableProperty] public partial string Index { get; set; } = string.Empty;
-    public double Percentage { get; set; } = 0d;
-    public string Plays { get; set; } = string.Empty;
+    public string Index { get; init; } = string.Empty;
+    public double Percentage { get; init; } = 0d;
+    public string Plays { get; init; } = string.Empty;
 }
 
-public partial class IndexedOnlineAlbumTrack : IndexedOnlineTrack
+public partial record IndexedOnlineAlbumTrack : IndexedOnlineTrack
 {
     public required bool AreArtistsShown { get; init; }
 }

@@ -15,10 +15,11 @@ public class TrackDetailsApiResponse : MusicApiResponse, IJsonOnDeserialized
     [JsonPropertyName("songs")] public List<TrackDetail> Tracks { get; init; } = new();
 
     [JsonInclude] [JsonPropertyName("privileges")]
-    internal List<TrackPermission> TrackPermissions { get; init; } = new();
+    internal List<TrackPermission>? TrackPermissions { get; init; } = new();
 
     void IJsonOnDeserialized.OnDeserialized()
     {
+        if (TrackPermissions is null) return;
         for (var i = 0; i < TrackPermissions.Count && i < Tracks.Count; i++)
         {
             Tracks[i].Permission = TrackPermissions[i];

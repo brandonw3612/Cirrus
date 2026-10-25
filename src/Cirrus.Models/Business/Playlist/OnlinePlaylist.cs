@@ -21,7 +21,7 @@ public class OnlinePlaylist : IPlaylist
     public required int SubscriberCount { get; init; }
     public required List<UserProfile> Subscribers { get; init; }
     public required List<string> Tags { get; init; }
-    public required string Title { get; init; }
+    public required string Title { get; set; }
     public required string? TitleImageUrl { get; init; }
     public required int TrackCount { get; init; }
     public required List<ulong> TrackIds { get; init; }

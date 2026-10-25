@@ -6,8 +6,7 @@ using Cirrus.Models.Business.Track;
 namespace Cirrus.Models.Serialization;
 
 [JsonSourceGenerationOptions(
-    GenerationMode = JsonSourceGenerationMode.Default,
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    GenerationMode = JsonSourceGenerationMode.Default
 )]
 [JsonSerializable(typeof(ulong[]))]
 [JsonSerializable(typeof(OnlineTrack))]
