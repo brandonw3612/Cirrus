@@ -1017,4 +1017,10 @@
   <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectedUser.Format" xml:space="preserve">
     <value>已連接至：{0}</value>
   </data>
+  <data name="Views.PlaybackControlView.ShowTranslationTextBlock.Text" xml:space="preserve">
+    <value>顯示中文翻譯</value>
+  </data>
+  <data name="Views.PlaybackControlView.AdjustFontSize.Text" xml:space="preserve">
+    <value>調節字體大小</value>
+  </data>
 </root>

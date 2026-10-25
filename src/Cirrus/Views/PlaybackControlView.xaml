@@ -280,10 +280,11 @@
                                 <Flyout Placement="TopEdgeAlignedRight"
                                         FlyoutPresenterStyle="{ThemeResource CompactFlyoutPresenterStyle}">
                                     <StackPanel>
-                                        <ToggleMenuFlyoutItem Text="Show Translation"
+                                        <ToggleMenuFlyoutItem x:Uid="Views/PlaybackControlView/ShowTranslationTextBlock"
                                                               IsChecked="{x:Bind ViewModel.IsLyricsTranslationEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         <layout:Row Margin="12 6" Spacing="4">
-                                            <TextBlock Text="Adjust font size" VerticalAlignment="Center" />
+                                            <TextBlock x:Uid="Views/PlaybackControlView/AdjustFontSize"
+                                                       VerticalAlignment="Center" />
                                             <layout:Spacer layout:Row.ColumnWidth="20" />
                                             <Button Content="&#xE70E;"
                                                     FontFamily="{ThemeResource SymbolThemeFontFamily}"

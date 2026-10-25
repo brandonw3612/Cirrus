@@ -1049,4 +1049,12 @@
   <data name="Views.SettingsView.Account.LastFmSubmodule.ConnectedUser.Format" xml:space="preserve">
     <value>Connected to: {0}</value>
   </data>
+  <data name="Views.PlaybackControlView.ShowTranslationTextBlock.Text" xml:space="preserve">
+    <value>Show translation to Chinese</value>
+    <comment>播放控制页 - 显示翻译</comment>
+  </data>
+  <data name="Views.PlaybackControlView.AdjustFontSize.Text" xml:space="preserve">
+    <value>Adjust font size</value>
+    <comment>播放控制页 - 调节字体大小</comment>
+  </data>
 </root>
