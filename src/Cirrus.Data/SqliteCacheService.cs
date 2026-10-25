@@ -62,6 +62,7 @@ public class SqliteCacheService : ICacheService
         var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Track).ToUnixTimeSeconds();
         cmd.Parameters.AddWithValue("$idsJson", idsJson);
         cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        cmd.Parameters.AddWithValue("$version", Version.TrackCache);
         
         await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
@@ -124,6 +125,7 @@ public class SqliteCacheService : ICacheService
         cmd.Parameters.AddWithValue("$id", unchecked((long)trackId));
         var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Lyrics).ToUnixTimeSeconds();
         cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        cmd.Parameters.AddWithValue("$version", Version.LyricsCache);
         
         await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
         if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
@@ -171,6 +173,7 @@ public class SqliteCacheService : ICacheService
         var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Playlist).ToUnixTimeSeconds();
         cmd.Parameters.AddWithValue("$idsJson", idsJson);
         cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        cmd.Parameters.AddWithValue("$version", Version.PlaylistCache);
         
         await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
