@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using Cirrus.Base.Extensions;
 using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Constants;
@@ -21,6 +22,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI;
 using DynamicData;
+using DynamicData.Binding;
 using Microsoft.UI.Xaml;
 
 namespace Cirrus.ViewModels;
@@ -56,7 +58,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
         _tracksSubscription = _tracksSource
             .Connect()
             .ObserveOn(synchronizationContext)
-            .Bind(out var tracks)
+            .Bind(out var tracks, BindingOptions.NeverFireReset())
             .Subscribe();
         Tracks = tracks;
     }
@@ -236,16 +238,31 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
 
     private void UpdateTracks(IReadOnlyList<ulong> trackIds, IReadOnlyDictionary<ulong, OnlineTrack> tracks)
     {
-        var visibleTracks = trackIds
-            .Select((id, index) => tracks.TryGetValue(id, out var track)
-                ? new IndexedOnlineTrack { Track = track, Index = (index + 1).ToString() }
-                : null)
-            .OfType<IndexedOnlineTrack>()
-            .ToList();
-        _tracksSource.Edit(list =>
+        var visibleTracks = new List<IndexedOnlineTrack>();
+        for (var index = 0; index < trackIds.Count; index++)
         {
-            list.Clear();
-            list.AddRange(visibleTracks);
+            if (!tracks.TryGetValue(trackIds[index], out var track)) break;
+            visibleTracks.Add(new IndexedOnlineTrack
+            {
+                Track = track,
+                Index = (index + 1).ToString()
+            });
+        }
+        _tracksSource.Edit(inner =>
+        {
+            var comparer = EqualityComparer<IndexedOnlineTrack>.Default;
+            var tracksToRemove = inner.Except(visibleTracks, comparer).ToList();
+            tracksToRemove.ForEach(t => inner.Remove(t));
+            var intersection = visibleTracks.Intersect(inner, comparer).ToList();
+            inner.RearrangeWith(intersection, comparer);
+            int m = 0, n = 0;
+            while (m < visibleTracks.Count)
+            {
+                if (n >= inner.Count || !comparer.Equals(inner[n], visibleTracks.ElementAt(m)))
+                    inner.Insert(n, visibleTracks.ElementAt(m));
+                m++;
+                n++;
+            }
         });
         PlayableTracks.Clear();
         PlayableTracks.AddRange(visibleTracks.Select(static t => (IAudioTrack<ulong>)t.Track));

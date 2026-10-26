@@ -2,7 +2,7 @@
 
 namespace Cirrus.LiveModels;
 
-public partial record IndexedOnlineTrack
+public record IndexedOnlineTrack
 {
     public required OnlineTrack Track { get; init; }
     public string Index { get; init; } = string.Empty;
