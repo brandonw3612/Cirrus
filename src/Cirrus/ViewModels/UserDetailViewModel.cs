@@ -2,7 +2,7 @@
 using Cirrus.LiveModels;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.User;
-using Cirrus.Models.Network.User;
+using Cirrus.Models.Shared.User;
 using Cirrus.Network;
 using Cirrus.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;

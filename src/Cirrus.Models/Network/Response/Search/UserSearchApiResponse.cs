@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using Cirrus.Models.Network.User;
 using Cirrus.Models.Shared.Search;
+using Cirrus.Models.Shared.User;
 
 namespace Cirrus.Models.Network.Response.Search;
 

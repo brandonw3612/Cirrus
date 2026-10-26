@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Cirrus.Models.Abstract;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Network.Track;
-using Cirrus.Models.Network.User;
+using Cirrus.Models.Shared.User;
 
 namespace Cirrus.Models.Network.Playlist;
 

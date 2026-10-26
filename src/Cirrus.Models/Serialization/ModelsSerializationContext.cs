@@ -108,7 +108,7 @@ namespace Cirrus.Models.Serialization;
 [JsonSerializable(typeof(Network.User.LyricsContributor))]
 [JsonSerializable(typeof(Network.User.MembershipStatus))]
 [JsonSerializable(typeof(Network.User.PlaybackRecordItem))]
-[JsonSerializable(typeof(Network.User.UserProfile))]
 [JsonSerializable(typeof(Shared.Album.TrackAlbum))]
 [JsonSerializable(typeof(Shared.Artist.TrackArtist))]
+[JsonSerializable(typeof(Shared.User.UserProfile))]
 public partial class ModelsSerializationContext : JsonSerializerContext;

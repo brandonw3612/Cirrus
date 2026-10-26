@@ -3,7 +3,7 @@ using Cirrus.Base.Services;
 using Cirrus.Models.Network.Account;
 using Cirrus.Models.Network.Response.Authentication;
 using Cirrus.Models.Network.Response.User;
-using Cirrus.Models.Network.User;
+using Cirrus.Models.Shared.User;
 using Cirrus.Network;
 using Cirrus.Utilities.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;

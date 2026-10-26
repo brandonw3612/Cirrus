@@ -4,7 +4,7 @@ using Cirrus.Models.Network.Album;
 using Cirrus.Models.Network.Artist;
 using Cirrus.Models.Network.Playlist;
 using Cirrus.Models.Network.Response.Search.GeneralSearchModules;
-using Cirrus.Models.Network.User;
+using Cirrus.Models.Shared.User;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

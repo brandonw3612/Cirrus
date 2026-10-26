@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Cirrus.Models.Abstract;
 
-namespace Cirrus.Models.Network.User;
+namespace Cirrus.Models.Shared.User;
 
 /// <summary>
 /// Profile of a user.

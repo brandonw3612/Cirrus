@@ -1,5 +1,5 @@
 ﻿using Cirrus.Models.Abstract;
-using Cirrus.Models.Network.User;
+using Cirrus.Models.Shared.User;
 
 namespace Cirrus.Models.Business.Playlist;
 

@@ -20,7 +20,7 @@
     xmlns:mArtist="using:Cirrus.Models.Network.Artist"
     xmlns:mPlaylist="using:Cirrus.Models.Network.Playlist"
     xmlns:mTrack="using:Cirrus.Models.Business.Track"
-    xmlns:mUser="using:Cirrus.Models.Network.User"
+    xmlns:mUser="using:Cirrus.Models.Shared.User"
     xmlns:system="using:System"
     xmlns:themes="using:Cirrus.Themes"
     mc:Ignorable="d">
