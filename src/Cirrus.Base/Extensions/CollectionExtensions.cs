@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using DynamicData;
 
-namespace Cirrus.Playback.Extensions;
+namespace Cirrus.Base.Extensions;
 
 /// <summary>
 /// Extensions for generic collections.

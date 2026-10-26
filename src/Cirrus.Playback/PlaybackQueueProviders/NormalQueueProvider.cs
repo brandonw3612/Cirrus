@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
+using Cirrus.Base.Extensions;
 using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Playback;
 using Cirrus.Playback.EventArgs;
-using Cirrus.Playback.Extensions;
 using Cirrus.Playback.Primitives;
 using DynamicData;
 

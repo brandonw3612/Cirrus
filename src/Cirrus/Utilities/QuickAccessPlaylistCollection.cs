@@ -2,12 +2,11 @@
 using System.Reactive.Linq;
 using System.Text.Json;
 using Windows.Storage;
-using Cirrus.Base.Services;
+using Cirrus.Base.Extensions;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Network.Playlist;
 using Cirrus.Network;
-using Cirrus.Playback.Extensions;
 using Cirrus.Serialization;
 using Cirrus.Utilities.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
