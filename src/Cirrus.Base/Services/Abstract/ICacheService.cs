@@ -1,6 +1,7 @@
 using Cirrus.Models.Business.Lyrics;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
+using Cirrus.Models.Shared.User;
 
 namespace Cirrus.Base.Services.Abstract;
 
@@ -37,6 +38,24 @@ public interface ICacheService
     );
 
     Task SavePlaylistsAsync(
+        IReadOnlyList<OnlinePlaylist> playlists,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task<UserProfile?> GetPersonalProfileAsync(
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SavePersonalProfileAsync(
+        UserProfile profile,
+        CancellationToken cancellationToken = default
+    );
+    
+    IAsyncEnumerable<OnlinePlaylist> GetPersonalPlaylistsAsync(
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SavePersonalPlaylistsAsync(
         IReadOnlyList<OnlinePlaylist> playlists,
         CancellationToken cancellationToken = default
     );

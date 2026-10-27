@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Cirrus.Base.Services.Abstract;
@@ -5,6 +6,7 @@ using Cirrus.Models.Business.Lyrics;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Serialization;
+using Cirrus.Models.Shared.User;
 using Microsoft.Data.Sqlite;
 
 namespace Cirrus.Data;
@@ -45,6 +47,7 @@ public class SqliteCacheService : ICacheService
         sb.AppendLine(SQL.Meta.TracksCache);
         sb.AppendLine(SQL.Meta.LyricsCache);
         sb.AppendLine(SQL.Meta.PlaylistsCache);
+        sb.AppendLine(SQL.Meta.PersonalCache);
         return sb.ToString();
     }
     
@@ -216,6 +219,144 @@ public class SqliteCacheService : ICacheService
                 pVersion.Value = Version.PlaylistCache;
                 
                 await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    private const string UserProfileKey = "Profile";
+    
+    public async Task<UserProfile?> GetPersonalProfileAsync(CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = SQL.Personal.Get;
+        cmd.Parameters.AddWithValue("$id", UserProfileKey);
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Personal.Profile).ToUnixTimeSeconds();
+        cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        cmd.Parameters.AddWithValue("$version", Version.Personal.ProfileCache);
+        
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
+        var payloadBytes = (byte[])reader["Payload"];
+        return JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UserProfile);
+    }
+
+    public async Task SavePersonalProfileAsync(UserProfile profile, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            await using var cmd = connection.CreateCommand();
+            cmd.CommandText = SQL.Personal.Upsert;
+            cmd.Parameters.AddWithValue("$id", UserProfileKey);
+            cmd.Parameters.AddWithValue("$payload", JsonSerializer.SerializeToUtf8Bytes(profile, NativeModelSerializationContext.Default.UserProfile));
+            cmd.Parameters.AddWithValue("$updatedAt", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            cmd.Parameters.AddWithValue("$version", Version.Personal.ProfileCache);
+            
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    private const string PersonalPlaylistKey = "Playlists";
+    
+    public async IAsyncEnumerable<OnlinePlaylist> GetPersonalPlaylistsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var idCmd = connection.CreateCommand();
+        idCmd.CommandText = SQL.Personal.Get;
+        idCmd.Parameters.AddWithValue("$id", PersonalPlaylistKey);
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Personal.Playlists).ToUnixTimeSeconds();
+        idCmd.Parameters.AddWithValue("$minTime", minValidTime);
+        idCmd.Parameters.AddWithValue("$version", Version.Personal.PlaylistsCache);
+        
+        await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) yield break;
+        var payloadBytes = (byte[])idReader["Payload"];
+        var ids = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UInt64Array);
+        if (ids is null || ids.Length == 0) yield break;
+        
+        await using var plCmd = connection.CreateCommand();
+        plCmd.CommandText = SQL.Playlist.GetBrief;
+        var idsJson = JsonSerializer.Serialize(ids, NativeModelSerializationContext.Default.UInt64Array);
+        plCmd.Parameters.AddWithValue("$idsJson", idsJson);
+        minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Playlist).ToUnixTimeSeconds();
+        plCmd.Parameters.AddWithValue("$minTime", minValidTime);
+        plCmd.Parameters.AddWithValue("$version", Version.PlaylistCache);
+        
+        var map = new Dictionary<ulong, OnlinePlaylist>(ids.Length);
+        await using var plReader = await plCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await plReader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)plReader.GetInt64(0));
+            var plPayloadBytes = (byte[])plReader["Payload"];
+            var playlist = JsonSerializer.Deserialize(plPayloadBytes, NativeModelSerializationContext.Default.OnlinePlaylist);
+            if (playlist is not null) map[id] = playlist;
+        }
+        
+        foreach (var id in ids)
+        {
+            if (map.TryGetValue(id, out var playlist)) yield return playlist;
+            else yield break;
+        }
+    }
+
+    public async Task SavePersonalPlaylistsAsync(IReadOnlyList<OnlinePlaylist> playlists, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            await using var idCmd = connection.CreateCommand();
+            idCmd.Transaction = (SqliteTransaction)transaction;
+            idCmd.CommandText = SQL.Personal.Upsert;
+
+            idCmd.Parameters.AddWithValue("$id", PersonalPlaylistKey);
+            var ids = playlists.Select(p => p.PlaylistId).ToArray();
+            var idsJson = JsonSerializer.SerializeToUtf8Bytes(ids, NativeModelSerializationContext.Default.UInt64Array);
+            idCmd.Parameters.AddWithValue("$payload", idsJson);
+            idCmd.Parameters.AddWithValue("$updatedAt", now);
+            idCmd.Parameters.AddWithValue("$version", Version.Personal.PlaylistsCache);
+            
+            await idCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            
+            var plCmd = connection.CreateCommand();
+            plCmd.Transaction = (SqliteTransaction)transaction;
+            plCmd.CommandText = SQL.Playlist.UpsertBrief;
+            var pId = plCmd.Parameters.Add("$id", SqliteType.Integer);
+            var pPayload = plCmd.Parameters.Add("$payload", SqliteType.Blob);
+            var pUpdatedAt = plCmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var pVersion = plCmd.Parameters.Add("$version", SqliteType.Integer);
+            
+            foreach (var playlist in playlists)
+            {
+                pId.Value = unchecked((long)playlist.PlaylistId);
+                pPayload.Value = JsonSerializer.SerializeToUtf8Bytes(playlist, NativeModelSerializationContext.Default.OnlinePlaylist);
+                pUpdatedAt.Value = now;
+                pVersion.Value = Version.PlaylistCache;
+
+                await plCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
             
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
