@@ -96,6 +96,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
 
             var onlinePlaylist = await GetOnlinePlaylistAsync(cancellationToken);
             if (onlinePlaylist is null || !IsCurrent(generation, cancellationToken)) return;
+            ApplyPlaylist(onlinePlaylist, currentUserId);
             if ((onlinePlaylist.CreatorId == currentUserId || onlinePlaylist.IsSubscribed) &&
                 cacheService is not null)
                 await cacheService.SavePlaylistsAsync(new List<OnlinePlaylist> { onlinePlaylist }, cancellationToken);
@@ -117,7 +118,6 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
                 generation = _loadGeneration;
                 _tracksSource.Clear();
                 PlayableTracks.Clear();
-                ApplyPlaylist(onlinePlaylist, currentUserId);
                 await LoadPlaylistTracksAsync(
                     onlinePlaylist,
                     currentUserId,
@@ -212,7 +212,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
             try
             {
                 var tracksResponse = await Client.Track.GetDetailsAsync(groupIds.ToList());
-                fetchedTracks = tracksResponse.Tracks ?? [];
+                fetchedTracks = tracksResponse.Tracks;
             }
             catch (UnsuccessfulResponseException ex) when (ex.StatusCode is 404)
             {
