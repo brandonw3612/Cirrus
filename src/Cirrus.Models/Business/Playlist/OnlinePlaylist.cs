@@ -37,3 +37,20 @@ public class OnlinePlaylist : IPlaylist
         CoverImageUrl = CoverImageUrl
     };
 }
+
+public sealed class OnlinePlaylistIdComparer : IEqualityComparer<OnlinePlaylist>
+{
+    public static OnlinePlaylistIdComparer Default => field ??= new();
+
+    public bool Equals(OnlinePlaylist? x, OnlinePlaylist? y)
+    {
+        if (ReferenceEquals(x, y)) return true;
+        if (x is null || y is null) return false;
+        return x.PlaylistId == y.PlaylistId;
+    }
+
+    public int GetHashCode(OnlinePlaylist obj)
+    {
+        return obj.PlaylistId.GetHashCode();
+    }
+}

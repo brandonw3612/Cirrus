@@ -6,7 +6,7 @@ namespace Cirrus.Models.Network.Response.User;
 /// <summary>
 /// Response for API user/details.
 /// </summary>
-public class UserDetailsApiResponse : MusicApiResponse
+public class UserDetailsApiResponse : MusicApiResponse, IJsonOnDeserialized
 {
     /// <summary>
     /// Level of the user.
@@ -37,4 +37,9 @@ public class UserDetailsApiResponse : MusicApiResponse
     /// Number of days the user has been using the account.
     /// </summary>
     [JsonPropertyName("createDays")] public long RegisteredDays { get; init; }
+    
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        Profile?.TrackCount = (int)TrackCount;
+    }
 }

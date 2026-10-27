@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
+using DynamicData.Binding;
 using Cirrus.Models.Abstract.Primitives;
 
 namespace Cirrus.LiveModels;
 
-public partial class NavigatiableGroup(IEnumerable<INavigatiable> source) : ObservableCollection<INavigatiable>(source)
+public partial class NavigatiableGroup(IEnumerable<INavigatiable> source) : ObservableCollectionExtended<INavigatiable>(source)
 {
     public string GroupHeader
     {

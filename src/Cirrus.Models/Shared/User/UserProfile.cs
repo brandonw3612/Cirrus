@@ -111,4 +111,9 @@ public class UserProfile : IUser
     /// Membership type of the user, presented in an integer, defined by NetEase.
     /// </summary>
     [JsonPropertyName("vipType")] public int MembershipType { get; init; }
+    
+    /// <summary>
+    /// Total count of tracks that have been played by the user.
+    /// </summary>
+    public int TrackCount { get; set; }
 }
