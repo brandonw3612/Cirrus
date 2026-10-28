@@ -86,6 +86,17 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
 
     #endregion
 
+    internal List<IAudioTrack<TTrackIdentifier>> Queue
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _queue;
+            }
+        }
+    }
+
     /// <summary>
     /// Constructs a new <see cref="NormalQueueProvider{TTrackIdentifier}"/> instance.
     /// </summary>

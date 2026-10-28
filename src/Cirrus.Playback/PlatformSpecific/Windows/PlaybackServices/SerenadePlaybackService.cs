@@ -10,6 +10,7 @@ using Cirrus.Models.Network.Track;
 using Cirrus.Models.Shared.Track;
 using Cirrus.Playback.EventArgs;
 using Cirrus.Playback.Extensions;
+using Cirrus.Playback.PlaybackQueueProviders;
 using Cirrus.Playback.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
@@ -114,12 +115,14 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
 
     private readonly UserPreferenceService _userPreferenceService;
     private readonly IScrobbleService[] _scrobbleServices;
+    private readonly ICacheService? _cacheService;
     private SystemMediaTransportControls? _systemMediaTransportControls;
 
     private bool _isInitialized;
     private AudioGraphController? _audioGraphController;
     private AudioNodeContainer? _audioNodeContainer;
     private bool _crossfadeSuppressed;
+    private bool _queueCacheSuppressed;
 
     private IAudioTrack<ulong>? _scrobbleTrack;
     private DateTimeOffset _scrobbleTrackStartedAt;
@@ -129,10 +132,11 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
     private bool _hasScrobbled;
     
     public SerenadePlaybackService(UserPreferenceService userPreferenceService,
-        IEnumerable<IScrobbleService> scrobbleServices)
+        IEnumerable<IScrobbleService> scrobbleServices, ICacheService? cacheService)
     {
         _userPreferenceService = userPreferenceService;
         _scrobbleServices = scrobbleServices.ToArray();
+        _cacheService = cacheService;
     }
 
     public void InitializeSystemMediaTransportControls(Window window)
@@ -172,6 +176,13 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         _audioGraphController!.PlaybackPositionChanged += (_, args) => OnPositionUpdated(args);
         _audioGraphController!.TrackEnded += OnTrackEnded;
         _audioNodeContainer = new(_audioGraphController!.AudioGraph, 5);
+
+        if (_cacheService is not null &&
+            await _cacheService.GetPlaybackQueueAsync() is { } cq)
+        {
+            _queueCacheSuppressed = true;
+            QueueProvider = new NormalQueueProvider<ulong>(cq.Queue, cq.Index);
+        }
     }
 
     public async Task PlayPauseAsync()
@@ -256,8 +267,39 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         newValue.CurrentTrackChanged += OnCurrentTrackChanged;
         newValue.PropertyChanged -= OnQueueProviderPropertyChanged;
         newValue.PropertyChanged += OnQueueProviderPropertyChanged;
-        IsPlaying = true;
+        if (!_queueCacheSuppressed)
+        {
+            IsPlaying = true;
+        }
         newValue.InitiateState();
+
+        if (!_queueCacheSuppressed && _cacheService is not null)
+        {
+            CacheQueue(_cacheService, newValue);
+        }
+
+        _queueCacheSuppressed = false;
+        return;
+        
+        async void CacheQueue(ICacheService c, PlaybackQueueProvider<ulong> q)
+        {
+            try
+            {
+                if (q is NormalQueueProvider<ulong> qq)
+                {
+                    await c.SavePlaybackQueueAsync(qq.Queue);
+                    await c.SavePlaybackQueueIndexAsync(q.CurrentTrack is { } t ? qq.Queue.IndexOf(t) : 0);
+                }
+                else
+                {
+                    await c.ClearPlaybackQueueAsync();
+                }
+            }
+            catch
+            {
+                // Ignored.
+            }
+        }
     }
 
     partial void OnIsPlayingChanged(bool? value)
@@ -329,10 +371,14 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             await _audioGraphController.DualNodeFlow.ResetAsync();
             IsPlaying = null;
             BeginTrackSession(null, false);
+            if (_cacheService is not null)
+            {
+                await _cacheService.ClearPlaybackQueueAsync();
+            }
             return;
         }
         _crossfadeSuppressed = false;
-        var start = IsDirectSwitchEnabled || IsPlaying is true;
+        var start = !_queueCacheSuppressed && (IsDirectSwitchEnabled || IsPlaying is true);
         if (e.CurrentTrack.TrackId == next?.Track.TrackId)
         {
             await _audioGraphController.DualNodeFlow.FlowAsync();
@@ -341,9 +387,9 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
             if (start)
             {
                 next.GraphNode.Start();
-                IsPlaying = true;
-                _audioGraphController!.SetMonitorStatus(true);
             }
+            IsPlaying = start;
+            _audioGraphController!.SetMonitorStatus(start);
             BeginTrackSession(e.CurrentTrack, start, next.GraphNode.Duration);
             return;
         }
@@ -359,10 +405,14 @@ public partial class SerenadePlaybackService : ObservableObject, IPlaybackServic
         if (start)
         {
             node.GraphNode.Start();
-            IsPlaying = true;
-            _audioGraphController!.SetMonitorStatus(true);
         }
+        IsPlaying = start;
+        _audioGraphController!.SetMonitorStatus(start);
         BeginTrackSession(e.CurrentTrack, start, node.GraphNode.Duration);
+        if (_cacheService is not null && QueueProvider is NormalQueueProvider<ulong> nqp)
+        {
+            await _cacheService.SavePlaybackQueueIndexAsync(Math.Max(nqp.Queue.IndexOf(e.CurrentTrack), 0));
+        }
     }
     
     private async void OnPositionUpdated(PlaybackPositionChangedEventArgs<ulong> args)
