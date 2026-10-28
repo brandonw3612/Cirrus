@@ -1,13 +1,15 @@
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Models.Business.Lyrics;
+using Cirrus.Models.Business.Playback;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Serialization;
 using Cirrus.Models.Shared.User;
 using Microsoft.Data.Sqlite;
+using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
 
 namespace Cirrus.Data;
 
@@ -88,17 +90,16 @@ public class SqliteCacheService : ICacheService
             await using var connection = new SqliteConnection(_conStr);
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
             await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
             await using var cmd = connection.CreateCommand();
             cmd.Transaction = (SqliteTransaction)transaction;
             cmd.CommandText = SQL.Track.Upsert;
-
             var pId = cmd.Parameters.Add("$id", SqliteType.Integer);
             var pPayload = cmd.Parameters.Add("$payload", SqliteType.Blob);
             var pUpdatedAt = cmd.Parameters.Add("$updatedAt", SqliteType.Integer);
             var pVersion = cmd.Parameters.Add("$version", SqliteType.Integer);
-            
-            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             
             foreach (var track in tracks)
             {
@@ -153,7 +154,6 @@ public class SqliteCacheService : ICacheService
             cmd.Parameters.AddWithValue("$payload", payloadBytes);
             cmd.Parameters.AddWithValue("$updatedAt", now);
             cmd.Parameters.AddWithValue("$version", Version.LyricsCache);
-
             await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
@@ -200,10 +200,10 @@ public class SqliteCacheService : ICacheService
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             
             await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            
             await using var cmd = connection.CreateCommand();
             cmd.Transaction = (SqliteTransaction)transaction;
             cmd.CommandText = SQL.Playlist.Upsert;
-
             var pId = cmd.Parameters.Add("$id", SqliteType.Integer);
             var pPayload = cmd.Parameters.Add("$payload", SqliteType.Blob);
             var pUpdatedAt = cmd.Parameters.Add("$updatedAt", SqliteType.Integer);
@@ -278,12 +278,14 @@ public class SqliteCacheService : ICacheService
     {
         await using var connection = new SqliteConnection(_conStr);
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var now = DateTimeOffset.UtcNow;
         
         await using var idCmd = connection.CreateCommand();
         idCmd.CommandText = SQL.Personal.Get;
         idCmd.Parameters.AddWithValue("$id", PersonalPlaylistKey);
-        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Personal.Playlists).ToUnixTimeSeconds();
-        idCmd.Parameters.AddWithValue("$minTime", minValidTime);
+        var idMvt = now.Subtract(TTL.Personal.Playlists).ToUnixTimeSeconds();
+        idCmd.Parameters.AddWithValue("$minTime", idMvt);
         idCmd.Parameters.AddWithValue("$version", Version.Personal.PlaylistsCache);
         
         await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
@@ -296,8 +298,8 @@ public class SqliteCacheService : ICacheService
         plCmd.CommandText = SQL.Playlist.GetBrief;
         var idsJson = JsonSerializer.Serialize(ids, NativeModelSerializationContext.Default.UInt64Array);
         plCmd.Parameters.AddWithValue("$idsJson", idsJson);
-        minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Playlist).ToUnixTimeSeconds();
-        plCmd.Parameters.AddWithValue("$minTime", minValidTime);
+        var plMvt = now.Subtract(TTL.Playlist).ToUnixTimeSeconds();
+        plCmd.Parameters.AddWithValue("$minTime", plMvt);
         plCmd.Parameters.AddWithValue("$version", Version.PlaylistCache);
         
         var map = new Dictionary<ulong, OnlinePlaylist>(ids.Length);
@@ -358,6 +360,171 @@ public class SqliteCacheService : ICacheService
 
                 await plCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    private const string PlaybackQueueKey = "PlaybackQueue";
+    private const string PlaybackQueueIndexKey = "PlaybackQueueIndex";
+    
+    public async Task<(IAudioTrack<ulong>[] Queue, int Index)?> GetPlaybackQueueAsync(CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var idCmd = connection.CreateCommand();
+        idCmd.CommandText = SQL.Personal.Get;
+        idCmd.Parameters.AddWithValue("$id", PlaybackQueueKey);
+        idCmd.Parameters.AddWithValue("$minTime", 0);
+        idCmd.Parameters.AddWithValue("$version", 1);
+        
+        await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
+        var payloadBytes = (byte[])idReader["Payload"];
+        var ids = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UInt64Array);
+        if (ids is null || ids.Length == 0) return null;
+        
+        await using var qCmd = connection.CreateCommand();
+        qCmd.CommandText = SQL.Track.Get;
+        var idsJson = JsonSerializer.Serialize(ids, NativeModelSerializationContext.Default.UInt64Array);
+        qCmd.Parameters.AddWithValue("$idsJson", idsJson);
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Track).ToUnixTimeSeconds();
+        qCmd.Parameters.AddWithValue("$minTime", minValidTime);
+        qCmd.Parameters.AddWithValue("$version", Version.TrackCache);
+        
+        var map = new Dictionary<ulong, IAudioTrack<ulong>>(ids.Length);
+        await using var qReader = await qCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await qReader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)qReader.GetInt64(0));
+            var tPayload = (byte[])qReader["Payload"];
+            var track = JsonSerializer.Deserialize(tPayload, NativeModelSerializationContext.Default.OnlineTrack);
+            if (track is not null) map[id] = track;
+        }
+
+        List<IAudioTrack<ulong>> queue = new();
+        foreach (var id in ids)
+        {
+            if (map.TryGetValue(id, out var track)) queue.Add(track);
+            else return null;
+        }
+        
+        await using var indexCmd = connection.CreateCommand();
+        indexCmd.CommandText = SQL.Personal.Get;
+        indexCmd.Parameters.AddWithValue("$id", PlaybackQueueIndexKey);
+        indexCmd.Parameters.AddWithValue("$minTime", 0);
+        indexCmd.Parameters.AddWithValue("$version", 1);
+        
+        await using var indexReader = await indexCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await indexReader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
+        var indexPayload = (byte[])indexReader["Payload"];
+        var index = JsonSerializer.Deserialize(indexPayload, NativeModelSerializationContext.Default.Int32);
+        if (index < 0 || index >= queue.Count) return null;
+        
+        return (queue.ToArray(), index);
+    }
+
+    public async Task SavePlaybackQueueAsync(IReadOnlyList<IAudioTrack<ulong>> queue, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            
+            var queueCmd = connection.CreateCommand();
+            queueCmd.Transaction = (SqliteTransaction)transaction;
+            queueCmd.CommandText = SQL.Personal.Upsert;
+            queueCmd.Parameters.AddWithValue("$id", PlaybackQueueKey);
+            var ids = queue.Select(t => t.TrackId).ToArray();
+            var idsJson = JsonSerializer.SerializeToUtf8Bytes(ids, NativeModelSerializationContext.Default.UInt64Array);
+            queueCmd.Parameters.AddWithValue("$payload", idsJson);
+            queueCmd.Parameters.AddWithValue("$updatedAt", now);
+            queueCmd.Parameters.AddWithValue("$version", 1);
+            await queueCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            
+            var trackCmd = connection.CreateCommand();
+            trackCmd.Transaction = (SqliteTransaction)transaction;
+            trackCmd.CommandText = SQL.Track.Upsert;
+            
+            var pId = trackCmd.Parameters.Add("$id", SqliteType.Integer);
+            var pPayload = trackCmd.Parameters.Add("$payload", SqliteType.Blob);
+            var pUpdatedAt = trackCmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var pVersion = trackCmd.Parameters.Add("$version", SqliteType.Integer);
+
+            foreach (var track in queue)
+            {
+                if (track is not OnlineTrack ot) return;
+                pId.Value = unchecked((long)ot.TrackId);
+                pPayload.Value = JsonSerializer.SerializeToUtf8Bytes(ot, NativeModelSerializationContext.Default.OnlineTrack);
+                pUpdatedAt.Value = now;
+                pVersion.Value = Version.TrackCache;
+                
+                await trackCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task SavePlaybackQueueIndexAsync(int index, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+            await using var cmd = connection.CreateCommand();
+            cmd.CommandText = SQL.Personal.Upsert;
+            cmd.Parameters.AddWithValue("$id", PlaybackQueueIndexKey);
+            var indexJson = JsonSerializer.SerializeToUtf8Bytes(index, NativeModelSerializationContext.Default.Int32);
+            cmd.Parameters.AddWithValue("$payload", indexJson);
+            cmd.Parameters.AddWithValue("$updatedAt", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            cmd.Parameters.AddWithValue("$version", 1);
+            
+            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task ClearPlaybackQueueAsync(CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            
+            var queueCmd = connection.CreateCommand();
+            queueCmd.Transaction = (SqliteTransaction)transaction;
+            queueCmd.CommandText = SQL.Personal.Delete;
+            queueCmd.Parameters.AddWithValue("$id", PlaybackQueueKey);
+            await queueCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            
+            var indexCmd = connection.CreateCommand();
+            indexCmd.Transaction = (SqliteTransaction)transaction;
+            indexCmd.CommandText = SQL.Personal.Delete;
+            indexCmd.Parameters.AddWithValue("$id", PlaybackQueueIndexKey);
+            await indexCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         }

@@ -1,4 +1,5 @@
 using Cirrus.Models.Business.Lyrics;
+using Cirrus.Models.Business.Playback;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Shared.User;
@@ -57,6 +58,24 @@ public interface ICacheService
     
     Task SavePersonalPlaylistsAsync(
         IReadOnlyList<OnlinePlaylist> playlists,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task<(IAudioTrack<ulong>[] Queue, int Index)?> GetPlaybackQueueAsync(
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SavePlaybackQueueAsync(
+        IReadOnlyList<IAudioTrack<ulong>> queue,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SavePlaybackQueueIndexAsync(
+        int index,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task ClearPlaybackQueueAsync(
         CancellationToken cancellationToken = default
     );
 }
