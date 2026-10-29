@@ -12,8 +12,7 @@ public partial class QuickAccessPlaylist : ObservableObject, IPlaylist
 
 public class QuickAccessPlaylistEqualityComparer : IEqualityComparer<QuickAccessPlaylist>
 {
-    private static QuickAccessPlaylistEqualityComparer? _instance;
-    public static QuickAccessPlaylistEqualityComparer Instance => _instance ??= new();
+    public static QuickAccessPlaylistEqualityComparer Default => field ??= new();
     
     public bool Equals(QuickAccessPlaylist? x, QuickAccessPlaylist? y)
     {

@@ -207,6 +207,7 @@ public partial class UserDetailViewModel : ViewModel<ulong>
                 inner.RemoveRange(_readyPlaylistCounts[ii], inner.Count - _readyPlaylistCounts[ii]);
             });
         }
+        (Application.Current as App)?.CurrentAccount?.QuickAccessPlaylists?.Update(toCache);
     }
 
     private void AddPlaylist(OnlinePlaylist playlist)

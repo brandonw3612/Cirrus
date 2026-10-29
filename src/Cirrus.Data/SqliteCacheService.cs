@@ -6,7 +6,6 @@ using Cirrus.Models.Business.Track;
 using Cirrus.Models.Serialization;
 using Cirrus.Models.Shared.User;
 using Microsoft.Data.Sqlite;
-using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;

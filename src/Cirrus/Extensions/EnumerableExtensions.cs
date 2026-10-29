@@ -13,6 +13,20 @@ public static class EnumerableExtensions
         for (var i = 0; i < count && enumerator.MoveNext(); i++)
             yield return enumerator.Current;
     }
+    
+    public static async IAsyncEnumerable<T> TakeAtMostAsync<T>(this IAsyncEnumerable<T> source, int count)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        if (count == 0) yield break;
+        var i = 0;
+        await foreach (var item in source)
+        {
+            if (i >= count) yield break;
+            yield return item;
+            i++;
+        }
+    }
 
     public static bool IsEquivalentWith<T>(this IEnumerable<T> sequence, IEnumerable<T> another)
     {

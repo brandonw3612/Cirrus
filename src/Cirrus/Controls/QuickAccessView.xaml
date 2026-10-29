@@ -35,12 +35,6 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Margin="8 8 8 0" Orientation="Horizontal" Spacing="4">
-                <Button Command="{x:Bind Account.QuickAccessPlaylists.RefreshCommand}" Width="32" Height="32" Padding="0">
-                    <FontIcon Glyph="&#xE710;" FontSize="14" />
-                </Button>
-                <Button Command="{x:Bind Account.QuickAccessPlaylists.RefreshCommand}" Width="32" Height="32" Padding="0">
-                    <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                </Button>
             </StackPanel>
             <Button Grid.Row="1" CornerRadius="4" Margin="8" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                     Command="{StaticResource NavigateCommand}" CommandParameter="{x:Bind Account.QuickAccessPlaylists.FavList, Mode=OneWay}"
