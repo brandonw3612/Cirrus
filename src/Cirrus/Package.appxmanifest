@@ -10,7 +10,7 @@
   <Identity
     Name="17588BrandonWong.Cirrus"
     Publisher="CN=7D8F1308-0EF5-4B46-933A-B95D0B266158"
-    Version="0.3.2.0" />
+    Version="0.3.3.0" />
 
   <Properties>
     <DisplayName>Cirrus</DisplayName>
