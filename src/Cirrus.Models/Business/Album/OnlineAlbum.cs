@@ -20,4 +20,5 @@ public class OnlineAlbum : IAlbum
     public required string? AlbumSubtype { get; init; }
     public required int TrackCount { get; init; }
     public required bool IsSubscribed { get; set; }
+    public required ulong[] TrackIds { get; set; }
 }

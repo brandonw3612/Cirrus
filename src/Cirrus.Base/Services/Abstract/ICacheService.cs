@@ -1,3 +1,4 @@
+using Cirrus.Models.Business.Album;
 using Cirrus.Models.Business.Lyrics;
 using Cirrus.Models.Business.Playback;
 using Cirrus.Models.Business.Playlist;
@@ -43,6 +44,16 @@ public interface ICacheService
         CancellationToken cancellationToken = default
     );
     
+    Task<Dictionary<ulong, OnlineAlbum>> GetAlbumsAsync(
+        IReadOnlyList<ulong> albumIds,
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SaveAlbumsAsync(
+        IReadOnlyList<OnlineAlbum> albums,
+        CancellationToken cancellationToken = default
+    );
+    
     Task<UserProfile?> GetPersonalProfileAsync(
         CancellationToken cancellationToken = default
     );
@@ -58,6 +69,15 @@ public interface ICacheService
     
     Task SavePersonalPlaylistsAsync(
         IReadOnlyList<OnlinePlaylist> playlists,
+        CancellationToken cancellationToken = default
+    );
+    
+    IAsyncEnumerable<OnlineAlbumBrief> GetPersonalAlbumsAsync(
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SavePersonalAlbumsAsync(
+        IReadOnlyList<OnlineAlbumBrief> albums,
         CancellationToken cancellationToken = default
     );
     
@@ -78,4 +98,17 @@ public interface ICacheService
     Task ClearPlaybackQueueAsync(
         CancellationToken cancellationToken = default
     );
+}
+
+public static class CacheServiceExtensions
+{
+    public static async Task<OnlineAlbum?> GetAlbumAsync(
+        this ICacheService cacheService,
+        ulong albumId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var albums = await cacheService.GetAlbumsAsync(new List<ulong> { albumId }, cancellationToken);
+        return albums.GetValueOrDefault(albumId);
+    }
 }

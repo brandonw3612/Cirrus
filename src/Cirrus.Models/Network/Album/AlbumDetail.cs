@@ -136,7 +136,8 @@ public class AlbumDetail : IAlbum
         AlbumType = AlbumType,
         AlbumSubtype = AlbumSubtype,
         TrackCount = TrackCount,
-        IsSubscribed = IsSubscribed
+        IsSubscribed = IsSubscribed,
+        TrackIds = []
     };
 }
 
@@ -185,4 +186,15 @@ public class AlbumDetail2 : IAlbum
     /// Translations for the album's title.
     /// </summary>
     [JsonPropertyName("transNames")] public List<string> TitleTranslations { get; init; } = new();
+    
+    public OnlineAlbumBrief ToBusinessModel() => new()
+    {
+        AlbumId = AlbumId,
+        Title = Title,
+        Alias = Alias.ToArray(),
+        TitleTranslations = TitleTranslations.ToArray(),
+        Artists = Artists.ToArray(),
+        ArtworkImageUrl = ArtworkImageUrl,
+        TrackCount = TrackCount,
+    };
 }

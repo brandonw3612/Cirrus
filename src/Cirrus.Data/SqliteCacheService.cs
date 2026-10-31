@@ -9,6 +9,7 @@ using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using Cirrus.Models.Business.Album;
 
 namespace Cirrus.Data;
 
@@ -48,6 +49,7 @@ public class SqliteCacheService : ICacheService
         sb.AppendLine(SQL.Meta.TracksCache);
         sb.AppendLine(SQL.Meta.LyricsCache);
         sb.AppendLine(SQL.Meta.PlaylistsCache);
+        sb.AppendLine(SQL.Meta.AlbumsCache);
         sb.AppendLine(SQL.Meta.PersonalCache);
         return sb.ToString();
     }
@@ -182,8 +184,8 @@ public class SqliteCacheService : ICacheService
         {
             var id = unchecked((ulong)reader.GetInt64(0));
             var payloadBytes = (byte[])reader["Payload"];
-            var track = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.OnlinePlaylist);
-            if (track is not null) result[id] = track;
+            var playlist = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.OnlinePlaylist);
+            if (playlist is not null) result[id] = playlist;
         }
         return result;
     }
@@ -216,6 +218,73 @@ public class SqliteCacheService : ICacheService
                 pPayload.Value = JsonSerializer.SerializeToUtf8Bytes(playlist, NativeModelSerializationContext.Default.OnlinePlaylist);
                 pUpdatedAt.Value = now;
                 pVersion.Value = Version.PlaylistCache;
+                
+                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task<Dictionary<ulong, OnlineAlbum>> GetAlbumsAsync(IReadOnlyList<ulong> albumIds, CancellationToken cancellationToken = default)
+    {
+        var result = new Dictionary<ulong, OnlineAlbum>(albumIds.Count);
+        if (albumIds.Count == 0) return result;
+        
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = SQL.Album.Get;
+        var idsJson = JsonSerializer.Serialize(albumIds.ToArray(), NativeModelSerializationContext.Default.UInt64Array);
+        var minValidTime = DateTimeOffset.UtcNow.Subtract(TTL.Album).ToUnixTimeSeconds();
+        cmd.Parameters.AddWithValue("$idsJson", idsJson);
+        cmd.Parameters.AddWithValue("$minTime", minValidTime);
+        cmd.Parameters.AddWithValue("$version", Version.AlbumCache);
+        
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)reader.GetInt64(0));
+            var payloadBytes = (byte[])reader["Payload"];
+            var album = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.OnlineAlbum);
+            if (album is not null) result[id] = album;
+        }
+        return result;
+    }
+
+    public async Task SaveAlbumsAsync(IReadOnlyList<OnlineAlbum> albums, CancellationToken cancellationToken = default)
+    {
+        if (albums.Count == 0) return;
+
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            
+            await using var cmd = connection.CreateCommand();
+            cmd.Transaction = (SqliteTransaction)transaction;
+            cmd.CommandText = SQL.Album.Upsert;
+            var pId = cmd.Parameters.Add("$id", SqliteType.Integer);
+            var pPayload = cmd.Parameters.Add("$payload", SqliteType.Blob);
+            var pUpdatedAt = cmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var pVersion = cmd.Parameters.Add("$version", SqliteType.Integer);
+            
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            foreach (var album in albums)
+            {
+                pId.Value = unchecked((long)album.AlbumId);
+                pPayload.Value = JsonSerializer.SerializeToUtf8Bytes(album, NativeModelSerializationContext.Default.OnlineAlbum);
+                pUpdatedAt.Value = now;
+                pVersion.Value = Version.AlbumCache;
                 
                 await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -358,6 +427,103 @@ public class SqliteCacheService : ICacheService
                 pVersion.Value = Version.PlaylistCache;
 
                 await plCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    private const string PersonalAlbumKey = "Albums";
+    
+    public async IAsyncEnumerable<OnlineAlbumBrief> GetPersonalAlbumsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var now = DateTimeOffset.UtcNow;
+        
+        await using var idCmd = connection.CreateCommand();
+        idCmd.CommandText = SQL.Personal.Get;
+        idCmd.Parameters.AddWithValue("$id", PersonalAlbumKey);
+        var idMvt = now.Subtract(TTL.Personal.Albums).ToUnixTimeSeconds();
+        idCmd.Parameters.AddWithValue("$minTime", idMvt);
+        idCmd.Parameters.AddWithValue("$version", Version.Personal.AlbumsCache);
+        
+        await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) yield break;
+        var payloadBytes = (byte[])idReader["Payload"];
+        var ids = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UInt64Array);
+        if (ids is null || ids.Length == 0) yield break;
+        
+        await using var alCmd = connection.CreateCommand();
+        alCmd.CommandText = SQL.Album.GetBrief;
+        var idsJson = JsonSerializer.Serialize(ids, NativeModelSerializationContext.Default.UInt64Array);
+        alCmd.Parameters.AddWithValue("$idsJson", idsJson);
+        var alMvt = now.Subtract(TTL.Album).ToUnixTimeSeconds();
+        alCmd.Parameters.AddWithValue("$minTime", alMvt);
+        alCmd.Parameters.AddWithValue("$version", Version.AlbumCache);
+        
+        var map = new Dictionary<ulong, OnlineAlbumBrief>(ids.Length);
+        await using var alReader = await alCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await alReader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)alReader.GetInt64(0));
+            var alPayloadBytes = (byte[])alReader["Payload"];
+            var album = JsonSerializer.Deserialize(alPayloadBytes, NativeModelSerializationContext.Default.OnlineAlbumBrief);
+            if (album is not null) map[id] = album;
+        }
+        
+        foreach (var id in ids)
+        {
+            if (map.TryGetValue(id, out var album)) yield return album;
+            else yield break;
+        }
+    }
+
+    public async Task SavePersonalAlbumsAsync(IReadOnlyList<OnlineAlbumBrief> albums, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            await using var idCmd = connection.CreateCommand();
+            idCmd.Transaction = (SqliteTransaction)transaction;
+            idCmd.CommandText = SQL.Personal.Upsert;
+
+            idCmd.Parameters.AddWithValue("$id", PersonalPlaylistKey);
+            var ids = albums.Select(a => a.AlbumId).ToArray();
+            var idsJson = JsonSerializer.SerializeToUtf8Bytes(ids, NativeModelSerializationContext.Default.UInt64Array);
+            idCmd.Parameters.AddWithValue("$payload", idsJson);
+            idCmd.Parameters.AddWithValue("$updatedAt", now);
+            idCmd.Parameters.AddWithValue("$version", Version.Personal.AlbumsCache);
+            
+            await idCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            
+            var alCmd = connection.CreateCommand();
+            alCmd.Transaction = (SqliteTransaction)transaction;
+            alCmd.CommandText = SQL.Playlist.UpsertBrief;
+            var aId = alCmd.Parameters.Add("$id", SqliteType.Integer);
+            var aPayload = alCmd.Parameters.Add("$payload", SqliteType.Blob);
+            var aUpdatedAt = alCmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var aVersion = alCmd.Parameters.Add("$version", SqliteType.Integer);
+            
+            foreach (var album in albums)
+            {
+                aId.Value = unchecked((long)album.AlbumId);
+                aPayload.Value = JsonSerializer.SerializeToUtf8Bytes(album, NativeModelSerializationContext.Default.OnlineAlbumBrief);
+                aUpdatedAt.Value = now;
+                aVersion.Value = Version.AlbumCache;
+
+                await alCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             }
             
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

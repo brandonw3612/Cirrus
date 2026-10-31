@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Cirrus.Models.Business.Album;
 using Cirrus.Models.Business.Lyrics;
 using Cirrus.Models.Business.Playlist;
 using Cirrus.Models.Business.Track;
@@ -13,5 +14,7 @@ namespace Cirrus.Models.Serialization;
 [JsonSerializable(typeof(OnlineTrack))]
 [JsonSerializable(typeof(TrackLyrics))]
 [JsonSerializable(typeof(OnlinePlaylist))]
+[JsonSerializable(typeof(OnlineAlbum))]
+[JsonSerializable(typeof(OnlineAlbumBrief))]
 [JsonSerializable(typeof(UserProfile))]
 public partial class NativeModelSerializationContext : JsonSerializerContext;
