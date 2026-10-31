@@ -10,7 +10,7 @@ public record IndexedOnlineTrack
     public string Plays { get; init; } = string.Empty;
 }
 
-public partial record IndexedOnlineAlbumTrack : IndexedOnlineTrack
+public record IndexedOnlineAlbumTrack : IndexedOnlineTrack
 {
     public required bool AreArtistsShown { get; init; }
 }

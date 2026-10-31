@@ -1,29 +1,37 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using Cirrus.Base.Services.Abstract;
+using Cirrus.Constants;
 using Cirrus.Extensions;
 using Cirrus.LiveModels;
 using Cirrus.Models.Business.Album;
 using Cirrus.Models.Business.Playback;
 using Cirrus.Models.Business.Track;
 using Cirrus.Models.Network.Artist;
-using Cirrus.Models.Network.Response.Artist;
 using Cirrus.Network;
 using Cirrus.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI;
+using DynamicData;
+using DynamicData.Binding;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
 
 namespace Cirrus.ViewModels;
 
 public partial class AlbumDetailViewModel : ViewModel<ulong>
 {
+    private readonly SourceList<object> _trackSource = new();
+    private readonly IDisposable _trackSubscription;
+
     [ObservableProperty] public partial OnlineAlbum? Album { get; set; }
     [ObservableProperty] public partial bool IsDescriptionTeachingTipOpen { get; set; }
     [ObservableProperty] public partial string TrackCountDurationString { get; set; } = string.Empty;
     [ObservableProperty] public partial string PublishDateString { get; set; } = string.Empty;
     [ObservableProperty] public partial string CopyrightString { get; set; } = string.Empty;
-    public CollectionViewSource CollectionViewSource { get; } = new();
+    [ObservableProperty] public partial bool IsSourceGrouped { get; set; }
+    public ReadOnlyObservableCollection<object> TrackItems { get; }
     public List<IAudioTrack<ulong>> PlayableTracks { get; } = new();
     public ObservableCollection<ArtistDetail2> Artists { get; } = new();
 
@@ -33,62 +41,114 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
 
     public override string ViewIdentifier => $"Album{Parameter}";
 
+    public AlbumDetailViewModel()
+    {
+        var synchronizationContext = ISynchronizationContextService.GetService()?.Get()
+            ?? SynchronizationContext.Current
+            ?? new SynchronizationContext();
+        _trackSubscription = _trackSource
+            .Connect()
+            .ObserveOn(synchronizationContext)
+            .Bind(out var trackItems, BindingOptions.NeverFireReset())
+            .Subscribe();
+        TrackItems = trackItems;
+    }
+
     public override async Task LoadDataAsync()
     {
-        var detailResponse = await Client.Album.GetDetailsAsync(Parameter);
-        if (detailResponse.Album is not { } album) return;
-        var currentUserId = (Application.Current as App)?.CurrentAccount?.UserProfile?.UserId;
-        Album = album.ToBusinessModel();
-        IsSubscribable = currentUserId is not null && !album.IsSubscribed;
-        IsSubscribed = currentUserId is not null && album.IsSubscribed;
-
-        PlayableTracks.Clear();
-        var tracksResponse =
-            await Client.Track.GetDetailsAsync(detailResponse.Tracks.Select(static t => t.TrackId).ToList());
-        var discsTitles = tracksResponse.Tracks.Select(static t => t.DiscTitle).Distinct().ToList();
-        var albumArtistsIds = album.Artists.Select(static a => a.ArtistId).ToArray();
-        if (discsTitles.Count > 1)
+        var cacheService = ICacheService.GetService();
+        OnlineAlbum nativeAlbum;
+        if (cacheService is not null &&
+            await cacheService.GetAlbumAsync(Parameter) is { } cachedAlbum)
         {
-            var discs = discsTitles.Select(static t =>
-                new AlbumDisc(Array.Empty<IndexedOnlineAlbumTrack>())
-                {
-                    DiscTitle = t ?? string.Empty
-                }).ToObservableCollection();
-            foreach (var track in tracksResponse.Tracks)
-            {
-                var onlineTrack = track.ToBusinessModel();
-                PlayableTracks.Add(onlineTrack);
-                var trackArtistsIds = onlineTrack.Artists.Select(static a => a.ArtistId).ToArray();
-                var trackDisc = discs.First(d => d.DiscTitle == track.DiscTitle);
-                trackDisc.Add(new()
-                {
-                    Track = onlineTrack,
-                    AreArtistsShown = !albumArtistsIds.IsEquivalentWith(trackArtistsIds),
-                    Index = (trackDisc.Count + 1).ToString()
-                });
-            }
-
-            CollectionViewSource.IsSourceGrouped = true;
-            CollectionViewSource.Source = discs;
+            nativeAlbum = cachedAlbum;
         }
         else
         {
-            ObservableCollection<IndexedOnlineAlbumTrack> tracks = new();
-            foreach (var track in tracksResponse.Tracks)
+            var detailResponse = await Client.Album.GetDetailsAsync(Parameter);
+            if (detailResponse.Album is not { } album) return;
+            nativeAlbum = album.ToBusinessModel();
+            nativeAlbum.TrackIds = detailResponse.Tracks.Select(static t => t.TrackId).ToArray();
+            if (cacheService is not null)
             {
-                var onlineTrack = track.ToBusinessModel();
-                var trackArtistsIds = onlineTrack.Artists.Select(static a => a.ArtistId).ToArray();
-                PlayableTracks.Add(onlineTrack);
-                tracks.Add(new()
+                await cacheService.SaveAlbumsAsync(new List<OnlineAlbum> { nativeAlbum });
+            }
+        }
+        Album = nativeAlbum;
+        var currentUserId = (Application.Current as App)?.CurrentAccount?.UserProfile?.UserId;
+
+        PlayableTracks.Clear();
+        var trackIds = nativeAlbum.TrackIds.ToList();
+        List<OnlineTrack> tracks;
+        Dictionary<ulong, OnlineTrack> cachedTracks = new();
+        if (cacheService is not null)
+        {
+            cachedTracks = await cacheService.GetOnlineTracksAsync(trackIds);
+        }
+        if (trackIds.Any(id => !cachedTracks.ContainsKey(id))) 
+        {
+            var tracksResponse = await Client.Track.GetDetailsAsync(trackIds);
+            tracks = tracksResponse.Tracks.Select(t => t.ToBusinessModel()).ToList();
+            if (cacheService is not null && Album.IsSubscribed)
+            {
+                await cacheService.SaveOnlineTracksAsync(tracks);
+            }
+        }
+        else
+        {
+            tracks = trackIds.Select(id => cachedTracks[id]).ToList();
+        }
+        
+        var discsTitles = tracks.Select(static t => t.DiscTitle).Distinct().ToList();
+        var albumArtistsIds = Album.Artists.Select(static a => a.ArtistId).ToArray();
+        var grouping = discsTitles.Count > 1;
+        if (grouping)
+        {
+            var discs = discsTitles.Select(static t =>
+                new AlbumDisc([])
                 {
-                    Track = onlineTrack,
+                    DiscTitle = t
+                }).ToDictionary(d => d.DiscTitle, d => d);
+            foreach (var track in tracks)
+            {
+                PlayableTracks.Add(track);
+                var trackArtistsIds = track.Artists.Select(static a => a.ArtistId).ToArray();
+                discs[track.DiscTitle].Add(new()
+                {
+                    Track = track,
                     AreArtistsShown = !albumArtistsIds.IsEquivalentWith(trackArtistsIds),
-                    Index = (tracks.Count + 1).ToString()
+                    Index = (discs[track.DiscTitle].Count + 1).ToString()
                 });
             }
 
-            CollectionViewSource.IsSourceGrouped = false;
-            CollectionViewSource.Source = tracks;
+            IsSourceGrouped = true;
+            _trackSource.Edit(items =>
+            {
+                items.Clear();
+                items.AddRange(discs.Values);
+            });
+        }
+        else
+        {
+            List<IndexedOnlineAlbumTrack> targetTracks = []; 
+            foreach (var track in tracks)
+            {
+                var trackArtistsIds = track.Artists.Select(static a => a.ArtistId).ToArray();
+                PlayableTracks.Add(track);
+                targetTracks.Add(new()
+                {
+                    Track = track,
+                    AreArtistsShown = !albumArtistsIds.IsEquivalentWith(trackArtistsIds),
+                    Index = (targetTracks.Count + 1).ToString()
+                });
+            }
+
+            IsSourceGrouped = false;
+            _trackSource.Edit(items =>
+            {
+                items.Clear();
+                items.AddRange(targetTracks);
+            });
         }
 
         var totalDuration = TimeSpan.FromSeconds(PlayableTracks.Sum(static t => t.Duration.TotalSeconds));
@@ -97,29 +157,35 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
             : $"{Math.Floor(totalDuration.TotalHours):0}:{totalDuration.Minutes:00}:{totalDuration.Seconds:00}";
         TrackCountDurationString =
             string.Format("Views/AlbumDetailView/TrackCountDurationFormat".GetLocalized() ?? "{InvalidResource}",
-                album.TrackCount, durationString);
+                nativeAlbum.TrackCount, durationString);
         PublishDateString =
             string.Format("Views/AlbumDetailView/PublishDateFormat".GetLocalized() ?? "{InvalidResource}",
                 Album.PublishTime.ToLocalTime().ToString("d"));
         CopyrightString = Album.Company is { Length: > 0 } ? $"(p) {Album.Company}" : string.Empty;
 
-        var artistsIds = album.Artists.Select(static a => a.ArtistId).ToHashSet();
-        foreach (var artist in PlayableTracks.OfType<OnlineTrack>().SelectMany(static t => t.Artists))
-        {
-            artistsIds.Add(artist.ArtistId);
-        }
-
-        var batchResponse = await Client.Advanced.SendMultipleRequestsAsync(
-            artistsIds.Select(static id => ((string, string, object?))("artist", "details", id))
-                .ToArray()
-        );
-        foreach (var artist in batchResponse.OfType<ArtistDetailsApiResponse>().Select(static r => r.Artist))
-        {
-            if (artist is null) continue;
-            Artists.Add(artist);
-        }
+        // var artistsIds = album.Artists.Select(static a => a.ArtistId).ToHashSet();
+        // foreach (var artist in PlayableTracks.OfType<OnlineTrack>().SelectMany(static t => t.Artists))
+        // {
+        //     artistsIds.Add(artist.ArtistId);
+        // }
+        //
+        // var batchResponse = await Client.Advanced.SendMultipleRequestsAsync(
+        //     artistsIds.Select(static id => ((string, string, object?))("artist", "details", id))
+        //         .ToArray()
+        // );
+        // foreach (var artist in batchResponse.OfType<ArtistDetailsApiResponse>().Select(static r => r.Artist))
+        // {
+        //     if (artist is null) continue;
+        //     Artists.Add(artist);
+        // }
     }
-
+    
     [RelayCommand]
     private void ShowDescriptionTeachingTip() => IsDescriptionTeachingTipOpen = true;
+
+    public override void RecycleDisposable()
+    {
+        _trackSubscription.Dispose();
+        _trackSource.Dispose();
+    }
 }
