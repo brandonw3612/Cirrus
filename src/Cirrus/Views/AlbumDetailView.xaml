@@ -224,26 +224,26 @@
                                         <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
                                     </StackPanel>
                                 </Button>
-                                <!-- <Button Margin="4 0 0 0" -->
-                                <!--         Command="{StaticResource SubscribePlaylistCommand}" -->
-                                <!--         CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" -->
-                                <!--         Visibility="{x:Bind ViewModel.IsSubscribable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"> -->
-                                <!--     <StackPanel Orientation="Horizontal" Spacing="6"> -->
-                                <!--         <FontIcon Glyph="{StaticResource FontIconGlyphCollectionAdd}" -->
-                                <!--                   FontFamily="{StaticResource CirrusIconSetFontFamily}" -->
-                                <!--                   FontSize="16" /> -->
-                                <!--         <TextBlock x:Uid="Views/PlaylistDetailView/SubscribeButtonContent" /> -->
-                                <!--     </StackPanel> -->
-                                <!-- </Button> -->
-                                <!-- <Button Margin="4 0 0 0" -->
-                                <!--         Command="{StaticResource UnsubscribePlaylistCommand}" -->
-                                <!--         CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" -->
-                                <!--         Visibility="{x:Bind ViewModel.IsSubscribed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"> -->
-                                <!--     <StackPanel Orientation="Horizontal" Spacing="8"> -->
-                                <!--         <FontIcon Glyph="&#xE73E;" FontSize="14" /> -->
-                                <!--         <TextBlock x:Uid="Views/PlaylistDetailView/UnsubscribeButtonContent" /> -->
-                                <!--     </StackPanel> -->
-                                <!-- </Button> -->
+                                <Button Margin="4 0 0 0"
+                                        Command="{StaticResource SubscribeAlbumCommand}"
+                                        CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsSubscribable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Glyph="{StaticResource FontIconGlyphCollectionAdd}"
+                                                  FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                                  FontSize="16" />
+                                        <TextBlock x:Uid="Views/AlbumDetailView/SubscribeButtonContent" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Margin="4 0 0 0"
+                                        Command="{StaticResource UnsubscribeAlbumCommand}"
+                                        CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsSubscribed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                                        <TextBlock x:Uid="Views/AlbumDetailView/UnsubscribeButtonContent" />
+                                    </StackPanel>
+                                </Button>
                                 <Button Margin="4 0 0 0" VerticalAlignment="Stretch">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"

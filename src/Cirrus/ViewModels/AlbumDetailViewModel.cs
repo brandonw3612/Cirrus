@@ -163,6 +163,15 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
                 Album.PublishTime.ToLocalTime().ToString("d"));
         CopyrightString = Album.Company is { Length: > 0 } ? $"(p) {Album.Company}" : string.Empty;
 
+        var dynamicResponse = await Client.Album.GetDynamicInfoAsync(Parameter);
+        Album.IsSubscribed = dynamicResponse.IsSubscribing;
+        if (cacheService is not null)
+        {
+            await cacheService.SaveAlbumsAsync(new List<OnlineAlbum> { Album });
+        }
+        IsSubscribable = currentUserId is not null && !Album.IsSubscribed;
+        IsSubscribed = currentUserId is not null && Album.IsSubscribed;
+
         // var artistsIds = album.Artists.Select(static a => a.ArtistId).ToHashSet();
         // foreach (var artist in PlayableTracks.OfType<OnlineTrack>().SelectMany(static t => t.Artists))
         // {
@@ -183,9 +192,21 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
     [RelayCommand]
     private void ShowDescriptionTeachingTip() => IsDescriptionTeachingTipOpen = true;
 
+    public override void AllocateDisposable()
+    {
+        WeakReferenceMessenger.Default.Register(this, MessengerTokens.AlbumSubscriptionStatusChanged,
+            static (AlbumDetailViewModel viewModel, OnlineAlbum oa) =>
+            {
+                if (oa.AlbumId != viewModel.Album?.AlbumId) return;
+                viewModel.IsSubscribable = !oa.IsSubscribed;
+                viewModel.IsSubscribed = oa.IsSubscribed;
+            });
+    }
+
     public override void RecycleDisposable()
     {
         _trackSubscription.Dispose();
         _trackSource.Dispose();
+        WeakReferenceMessenger.Default.Unregister<OnlineAlbum, string>(this, MessengerTokens.AlbumSubscriptionStatusChanged);
     }
 }
