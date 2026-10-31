@@ -16,6 +16,7 @@ public class OnlineTrack : IAudioTrack<ulong>, ITrack
     public required TrackAlbum? Album { get; init; }
     public required DateTimeOffset PublishDate { get; init; }
     public required int DiscNumber { get; init; }
+    public required string DiscTitle { get; init; }
     public required int NumberInDisc { get; init; }
     public required double Popularity { get; init; }
     public required TrackPermission Permission { get; init; }

@@ -171,6 +171,7 @@ public class TrackDetail
         Album = Album,
         PublishDate = DateTimeOffset.FromUnixTimeMilliseconds(PublishTimestamp),
         DiscNumber = int.TryParse(DiscTitle, out var number) ? number : -1,
+        DiscTitle = DiscTitle ?? string.Empty,
         NumberInDisc = NumberInDisc,
         Popularity = Popularity,
         Permission = new()
@@ -262,6 +263,7 @@ public class TrackDetail2
         } : null,
         PublishDate = DateTimeOffset.FromUnixTimeMilliseconds(0),
         DiscNumber = -1,
+        DiscTitle = string.Empty,
         NumberInDisc = -1,
         Popularity = 0,
         Permission = new()
@@ -450,6 +452,7 @@ public class TrackDetail3
         } : null,
         PublishDate = DateTimeOffset.FromUnixTimeMilliseconds(PublishTimestamp),
         DiscNumber = int.TryParse(DiscTitle, out var number) ? number : -1,
+        DiscTitle = DiscTitle ?? string.Empty,
         NumberInDisc = NumberInDisc,
         Popularity = Popularity,
         Permission = new()
