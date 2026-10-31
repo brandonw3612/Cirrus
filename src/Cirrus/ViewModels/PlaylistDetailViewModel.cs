@@ -280,7 +280,6 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
         CreatedDateString =
             string.Format("Views/PlaylistDetailView/CreatedDateFormat".GetLocalized() ?? "{InvalidResource}",
                 Playlist!.CreatedTime.ToLocalTime().ToString("d"));
-
     }
 
     private bool IsCurrent(int generation, CancellationToken cancellationToken) =>
@@ -306,17 +305,12 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
 
     public override void AllocateDisposable()
     {
-        WeakReferenceMessenger.Default.Register(this, MessengerTokens.PlaylistSubscribed,
-            static (PlaylistDetailViewModel viewModel, OnlinePlaylist _) =>
+        WeakReferenceMessenger.Default.Register(this, MessengerTokens.PlaylistSubscriptionStatusChanged,
+            static (PlaylistDetailViewModel viewModel, OnlinePlaylist op) =>
             {
-                viewModel.IsSubscribable = false;
-                viewModel.IsSubscribed = true;
-            });
-        WeakReferenceMessenger.Default.Register(this, MessengerTokens.PlaylistUnsubscribed,
-            static (PlaylistDetailViewModel viewModel, OnlinePlaylist _) =>
-            {
-                viewModel.IsSubscribable = true;
-                viewModel.IsSubscribed = false;
+                if (op.PlaylistId != viewModel.Playlist?.PlaylistId) return;
+                viewModel.IsSubscribable = !op.IsSubscribed;
+                viewModel.IsSubscribed = op.IsSubscribed;
             });
     }
 
@@ -326,7 +320,6 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
         _loadCancellation?.Dispose();
         _tracksSubscription.Dispose();
         _tracksSource.Dispose();
-        WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistSubscribed);
-        WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistUnsubscribed);
+        WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistSubscriptionStatusChanged);
     }
 }

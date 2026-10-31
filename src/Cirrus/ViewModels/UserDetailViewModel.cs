@@ -244,13 +244,14 @@ public partial class UserDetailViewModel : ViewModel<ulong>
             WeakReferenceMessenger.Default.Register<UserDetailViewModel, OnlinePlaylist, string>(this,
                 MessengerTokens.PlaylistDeleted, OnPlaylistRemoved);
             WeakReferenceMessenger.Default.Register<UserDetailViewModel, OnlinePlaylist, string>(this,
-                MessengerTokens.PlaylistUnsubscribed, OnPlaylistRemoved);
+                MessengerTokens.PlaylistSubscriptionStatusChanged, OnPlaylistRemoved);
         }
 
         return;
 
         static void OnPlaylistRemoved(UserDetailViewModel viewModel, OnlinePlaylist playlist)
         {
+            if (playlist.IsSubscribed) return;
             foreach (var source in viewModel._playlistSources)
                 if (source.Remove(playlist)) return;
         }
@@ -263,6 +264,6 @@ public partial class UserDetailViewModel : ViewModel<ulong>
         foreach (var source in _playlistSources)
             source.Dispose();
         WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistDeleted);
-        WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistUnsubscribed);
+        WeakReferenceMessenger.Default.Unregister<OnlinePlaylist, string>(this, MessengerTokens.PlaylistSubscriptionStatusChanged);
     }
 }
