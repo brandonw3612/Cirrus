@@ -634,25 +634,45 @@
     <value>Playlist removed.</value>
     <comment>消息提示 - 歌单成功移除</comment>
   </data>
+  <data name="MessageBoxes.UnsubscribeAlbum.CancelButton.Content" xml:space="preserve">
+    <value>Keep</value>
+    <comment>消息框 - 专辑取消收藏 CancelButtonContent</comment>
+  </data>
   <data name="MessageBoxes.UnsubscribePlaylist.CancelButton.Content" xml:space="preserve">
     <value>Keep subscription.</value>
     <comment>消息框 - 歌单取消订阅确认 CancelButtonContent</comment>
   </data>
   <data name="MessageBoxes.UnsubscribePlaylist.Content" xml:space="preserve">
-    <value>Are you sure to unsubscribe the playlist.</value>
+    <value>Are you sure to unsubscribe the playlist?</value>
     <comment>消息框 - 歌单取消订阅确认 Content</comment>
+  </data>
+  <data name="MessageBoxes.UnsubscribeAlbum.Content" xml:space="preserve">
+    <value>Are you sure to remove the album from your library?</value>
+    <comment>消息框 - 专辑取消收藏确认 Content</comment>
   </data>
   <data name="MessageBoxes.UnsubscribePlaylist.PrimaryButton.Content" xml:space="preserve">
     <value>Sure, unsubscribe it.</value>
     <comment>消息框 - 歌单取消订阅确认 PrimaryButtonContent</comment>
   </data>
+  <data name="MessageBoxes.UnsubscribeAlbum.PrimaryButton.Content" xml:space="preserve">
+    <value>Remove</value>
+    <comment>消息框 - 专辑取消收藏确认 PrimaryButtonContent</comment>
+  </data>
   <data name="Notifications.PlaylistUnsubscriptionFailed" xml:space="preserve">
     <value>We failed to unsubscribe the playlist.</value>
     <comment>消息提示 - 歌单取消订阅失败</comment>
   </data>
+  <data name="Notifications.AlbumUnsubscriptionFailed" xml:space="preserve">
+    <value>We failed to remove the album from your library.</value>
+    <comment>消息提示 - 专辑取消收藏失败</comment>
+  </data>
   <data name="Notifications.PlaylistUnsubscriptionSucceeded" xml:space="preserve">
     <value>Playlist unsubscribed.</value>
     <comment>消息提示 - 歌单成功取消订阅</comment>
+  </data>
+  <data name="Notifications.AlbumUnsubscriptionSucceeded" xml:space="preserve">
+    <value>Album removed from your library.</value>
+    <comment>消息提示 - 专辑成功取消收藏</comment>
   </data>
   <data name="MenuFlyoutItems.CopyLink.Text" xml:space="preserve">
     <value>Copy link</value>
@@ -678,9 +698,17 @@
     <value>We failed to subscribe to the playlist.</value>
     <comment>消息提示 - 歌单订阅失败</comment>
   </data>
+  <data name="Notifications.AlbumSubscriptionFailed" xml:space="preserve">
+    <value>We failed to add the album to your library.</value>
+    <comment>消息提示 - 专辑收藏失败</comment>
+  </data>
   <data name="Notifications.PlaylistSubscriptionSucceeded" xml:space="preserve">
     <value>Playlist subscribed.</value>
     <comment>消息提示 - 歌单成功订阅</comment>
+  </data>
+  <data name="Notifications.AlbumSubscriptionSucceeded" xml:space="preserve">
+    <value>Album added to your library.</value>
+    <comment>消息提示 - 专辑成功收藏</comment>
   </data>
   <data name="Notifications.LinkCopied" xml:space="preserve">
     <value>Link copied.</value>
@@ -750,9 +778,17 @@
     <value>Subscribe</value>
     <comment>歌单详情页 - 收藏Button - Text</comment>
   </data>
+  <data name="Views.AlbumDetailView.SubscribeButtonContent.Text" xml:space="preserve">
+    <value>Add to library</value>
+    <comment>专辑详情页 - 收藏Button - Text</comment>
+  </data>
   <data name="Views.PlaylistDetailView.UnsubscribeButtonContent.Text" xml:space="preserve">
     <value>Subscribed</value>
     <comment>歌单详情页 - 取消收藏Button - Text</comment>
+  </data>
+  <data name="Views.AlbumDetailView.UnsubscribeButtonContent.Text" xml:space="preserve">
+    <value>Added to library</value>
+    <comment>专辑详情页 - 取消收藏Button - Text</comment>
   </data>
   <data name="Views.AlbumDetailView.PublishDateFormat" xml:space="preserve">
     <value>Released on {0}</value>
