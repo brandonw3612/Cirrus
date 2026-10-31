@@ -100,7 +100,7 @@ public sealed partial class ShowCollectionContextFlyoutCommand : CommandWrapper
             {
                 Text = "MenuFlyoutItems/Subscribe/Text".GetLocalized() ?? "{InvalidResource}",
                 Icon = new FontIcon { Glyph = "\uED0E" },
-                Command = SubscribePlaylistCommand.Instance,
+                Command = SubscribePlaylistCommand.SubscribeInstance,
                 CommandParameter = playlist
             } : null,
             new MenuFlyoutSeparator(),
@@ -141,7 +141,7 @@ public sealed partial class ShowCollectionContextFlyoutCommand : CommandWrapper
                 Text = "MenuFlyoutItems/Unsubscribe/Text".GetLocalized() ?? "{InvalidResource}",
                 Icon = new FontIcon { Glyph = "\uE74D" },
                 Foreground = new SolidColorBrush(Colors.Red),
-                Command = UnsubscribePlaylistCommand.Instance,
+                Command = SubscribePlaylistCommand.UnsubscribeInstance,
                 CommandParameter = playlist
             } : null
         ]);

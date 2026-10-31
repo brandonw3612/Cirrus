@@ -11,7 +11,9 @@
     <local:ShowCollectionContextFlyoutCommand x:Key="ShowCollectionContextFlyoutCommand" />
     <local:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
     <local:SkipToTrackCommand x:Key="SkipToTrackCommand" />
+    <local:SubscribeAlbumCommand x:Key="SubscribeAlbumCommand" />
+    <local:SubscribeAlbumCommand x:Key="UnsubscribeAlbumCommand" Subscribe="False" />
     <local:SubscribePlaylistCommand x:Key="SubscribePlaylistCommand" />
+    <local:SubscribePlaylistCommand x:Key="UnsubscribePlaylistCommand" Subscribe="False" />
     <local:TrackSourceNavigateCommand x:Key="TrackSourceNavigateCommand" />
-    <local:UnsubscribePlaylistCommand x:Key="UnsubscribePlaylistCommand" />
 </ResourceDictionary>
