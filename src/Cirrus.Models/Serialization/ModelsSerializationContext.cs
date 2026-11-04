@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Cirrus.Models.Serialization.Converters;
 
 namespace Cirrus.Models.Serialization;
 
@@ -7,7 +8,10 @@ namespace Cirrus.Models.Serialization;
 /// </summary>
 [JsonSourceGenerationOptions(
     GenerationMode = JsonSourceGenerationMode.Default,
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    Converters = [
+        typeof(FlexibleLongConverter)
+    ]
 )]
 [JsonSerializable(typeof(Network.Account.UserAccount))]
 [JsonSerializable(typeof(Network.Album.AlbumDetail))]
@@ -31,6 +35,7 @@ namespace Cirrus.Models.Serialization;
 [JsonSerializable(typeof(Network.Response.Account.CurrentUserApiResponse))]
 [JsonSerializable(typeof(Network.Response.Account.DailyMixApiResponse))]
 [JsonSerializable(typeof(Network.Response.Account.DailyMixApiResponse.DailyMixApiResponseTracksData))]
+[JsonSerializable(typeof(Network.Response.Account.PersonalizedNewMusicApiResponse))]
 [JsonSerializable(typeof(Network.Response.Account.PersonalizedPlaylistsApiResponse))]
 [JsonSerializable(typeof(Network.Response.Account.RadioApiResponse))]
 [JsonSerializable(typeof(Network.Response.Account.SubscribedAlbumsApiResponse))]
