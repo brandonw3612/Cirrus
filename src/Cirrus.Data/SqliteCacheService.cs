@@ -499,7 +499,7 @@ public class SqliteCacheService : ICacheService
             idCmd.Transaction = (SqliteTransaction)transaction;
             idCmd.CommandText = SQL.Personal.Upsert;
 
-            idCmd.Parameters.AddWithValue("$id", PersonalPlaylistKey);
+            idCmd.Parameters.AddWithValue("$id", PersonalAlbumKey);
             var ids = albums.Select(a => a.AlbumId).ToArray();
             var idsJson = JsonSerializer.SerializeToUtf8Bytes(ids, NativeModelSerializationContext.Default.UInt64Array);
             idCmd.Parameters.AddWithValue("$payload", idsJson);
@@ -510,7 +510,7 @@ public class SqliteCacheService : ICacheService
             
             var alCmd = connection.CreateCommand();
             alCmd.Transaction = (SqliteTransaction)transaction;
-            alCmd.CommandText = SQL.Playlist.UpsertBrief;
+            alCmd.CommandText = SQL.Album.UpsertBrief;
             var aId = alCmd.Parameters.Add("$id", SqliteType.Integer);
             var aPayload = alCmd.Parameters.Add("$payload", SqliteType.Blob);
             var aUpdatedAt = alCmd.Parameters.Add("$updatedAt", SqliteType.Integer);
