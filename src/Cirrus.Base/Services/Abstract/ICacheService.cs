@@ -98,6 +98,15 @@ public interface ICacheService
     Task ClearPlaybackQueueAsync(
         CancellationToken cancellationToken = default
     );
+    
+    IAsyncEnumerable<OnlineTrack> GetDailyMixAsync(
+        CancellationToken cancellationToken = default
+    );
+    
+    Task SaveDailyMixAsync(
+        IReadOnlyList<OnlineTrack> tracks,
+        CancellationToken cancellationToken = default
+    );
 }
 
 public static class CacheServiceExtensions

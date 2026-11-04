@@ -698,4 +698,108 @@ public class SqliteCacheService : ICacheService
             _writeLock.Release();
         }
     }
+
+    private const string DailyMixKey = "DailyMix";
+    
+    public async IAsyncEnumerable<OnlineTrack> GetDailyMixAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await using var connection = new SqliteConnection(_conStr);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var now = DateTimeOffset.UtcNow;
+        
+        await using var idCmd = connection.CreateCommand();
+        idCmd.CommandText = SQL.Personal.Get;
+        idCmd.Parameters.AddWithValue("$id", DailyMixKey);
+        var timeZoneShanghai = TimeZoneInfo.FindSystemTimeZoneById("Asia/Shanghai");
+        var timeInShanghai = TimeZoneInfo.ConvertTime(now, timeZoneShanghai);
+        DateTimeOffset startOfDayShanghai = new(
+            timeInShanghai.Year, timeInShanghai.Month, timeInShanghai.Day,
+            0, 0, 0,
+            TimeSpan.FromHours(8)
+        );
+        var idMvt = startOfDayShanghai.ToLocalTime().ToUnixTimeSeconds(); 
+        idCmd.Parameters.AddWithValue("$minTime", idMvt);
+        idCmd.Parameters.AddWithValue("$version", Version.Personal.DailyMixCache);
+        
+        await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) yield break;
+        var payloadBytes = (byte[])idReader["Payload"];
+        var ids = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UInt64Array);
+        if (ids is null || ids.Length == 0) yield break;
+        
+        await using var trCmd = connection.CreateCommand();
+        trCmd.CommandText = SQL.Track.Get;
+        var idsJson = JsonSerializer.Serialize(ids, NativeModelSerializationContext.Default.UInt64Array);
+        trCmd.Parameters.AddWithValue("$idsJson", idsJson);
+        var trMvt = now.Subtract(TTL.Track).ToUnixTimeSeconds();
+        trCmd.Parameters.AddWithValue("$minTime", trMvt);
+        trCmd.Parameters.AddWithValue("$version", Version.TrackCache);
+        
+        var map = new Dictionary<ulong, OnlineTrack>(ids.Length);
+        await using var alReader = await trCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await alReader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var id = unchecked((ulong)alReader.GetInt64(0));
+            var alPayloadBytes = (byte[])alReader["Payload"];
+            var album = JsonSerializer.Deserialize(alPayloadBytes, NativeModelSerializationContext.Default.OnlineTrack);
+            if (album is not null) map[id] = album;
+        }
+        
+        foreach (var id in ids)
+        {
+            if (map.TryGetValue(id, out var track)) yield return track;
+            else yield break;
+        }
+    }
+
+    public async Task SaveDailyMixAsync(IReadOnlyList<OnlineTrack> tracks, CancellationToken cancellationToken = default)
+    {
+        await _writeLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using var connection = new SqliteConnection(_conStr);
+            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            await using var idCmd = connection.CreateCommand();
+            idCmd.Transaction = (SqliteTransaction)transaction;
+            idCmd.CommandText = SQL.Personal.Upsert;
+
+            idCmd.Parameters.AddWithValue("$id", DailyMixKey);
+            var ids = tracks.Select(t => t.TrackId).ToArray();
+            var idsJson = JsonSerializer.SerializeToUtf8Bytes(ids, NativeModelSerializationContext.Default.UInt64Array);
+            idCmd.Parameters.AddWithValue("$payload", idsJson);
+            idCmd.Parameters.AddWithValue("$updatedAt", now);
+            idCmd.Parameters.AddWithValue("$version", Version.Personal.DailyMixCache);
+            
+            await idCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            
+            var trCmd = connection.CreateCommand();
+            trCmd.Transaction = (SqliteTransaction)transaction;
+            trCmd.CommandText = SQL.Track.Upsert;
+            var tId = trCmd.Parameters.Add("$id", SqliteType.Integer);
+            var tPayload = trCmd.Parameters.Add("$payload", SqliteType.Blob);
+            var tUpdatedAt = trCmd.Parameters.Add("$updatedAt", SqliteType.Integer);
+            var tVersion = trCmd.Parameters.Add("$version", SqliteType.Integer);
+            
+            foreach (var track in tracks)
+            {
+                tId.Value = unchecked((long)track.TrackId);
+                tPayload.Value = JsonSerializer.SerializeToUtf8Bytes(track, NativeModelSerializationContext.Default.OnlineTrack);
+                tUpdatedAt.Value = now;
+                tVersion.Value = Version.TrackCache;
+
+                await trCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            }
+            
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
 }

@@ -12,5 +12,6 @@ public static class Version
         public const int ProfileCache = 1;
         public const int PlaylistsCache = 1;
         public const int AlbumsCache = 1;
+        public const int DailyMixCache = 1;
     }
 }
