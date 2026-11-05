@@ -701,7 +701,7 @@ public class SqliteCacheService : ICacheService
 
     private const string DailyMixKey = "DailyMix";
     
-    public async IAsyncEnumerable<OnlineTrack> GetDailyMixAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async Task<OnlineTrack[]?> GetDailyMixAsync(CancellationToken cancellationToken = default)
     {
         await using var connection = new SqliteConnection(_conStr);
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -723,10 +723,10 @@ public class SqliteCacheService : ICacheService
         idCmd.Parameters.AddWithValue("$version", Version.Personal.DailyMixCache);
         
         await using var idReader = await idCmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) yield break;
+        if (!await idReader.ReadAsync(cancellationToken).ConfigureAwait(false)) return null;
         var payloadBytes = (byte[])idReader["Payload"];
         var ids = JsonSerializer.Deserialize(payloadBytes, NativeModelSerializationContext.Default.UInt64Array);
-        if (ids is null || ids.Length == 0) yield break;
+        if (ids is null || ids.Length == 0) return null;
         
         await using var trCmd = connection.CreateCommand();
         trCmd.CommandText = SQL.Track.Get;
@@ -742,15 +742,17 @@ public class SqliteCacheService : ICacheService
         {
             var id = unchecked((ulong)alReader.GetInt64(0));
             var alPayloadBytes = (byte[])alReader["Payload"];
-            var album = JsonSerializer.Deserialize(alPayloadBytes, NativeModelSerializationContext.Default.OnlineTrack);
-            if (album is not null) map[id] = album;
+            var track = JsonSerializer.Deserialize(alPayloadBytes, NativeModelSerializationContext.Default.OnlineTrack);
+            if (track is not null) map[id] = track;
         }
         
+        List<OnlineTrack> tracks = new();
         foreach (var id in ids)
         {
-            if (map.TryGetValue(id, out var track)) yield return track;
-            else yield break;
+            if (map.TryGetValue(id, out var track)) tracks.Add(track);
+            else return null;
         }
+        return tracks.ToArray();
     }
 
     public async Task SaveDailyMixAsync(IReadOnlyList<OnlineTrack> tracks, CancellationToken cancellationToken = default)

@@ -99,7 +99,7 @@ public interface ICacheService
         CancellationToken cancellationToken = default
     );
     
-    IAsyncEnumerable<OnlineTrack> GetDailyMixAsync(
+    Task<OnlineTrack[]?> GetDailyMixAsync(
         CancellationToken cancellationToken = default
     );
     
