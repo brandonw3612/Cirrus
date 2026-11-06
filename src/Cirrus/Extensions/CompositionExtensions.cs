@@ -3,10 +3,11 @@ using Windows.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Cirrus.Extensions;
 
-public static class CompositionVisualExtensions
+public static class CompositionExtensions
 {
     public static void SetChildElementVisual(this UIElement element, Visual visual)
     {
@@ -53,6 +54,42 @@ public static class CompositionVisualExtensions
         return visual;
     }
     
+    public static ContainerVisual BuildContainerVisual(this Compositor compositor,
+        Vector2? size = null, Vector3? offset = null, Vector3? scale = null,
+        Vector2? relativeSizeAdjustment = null, Vector3? relativeOffsetAdjustment = null,
+        Visual[]? children = null, CompositionClip? clip = null,
+        bool? isVisible = null, float? opacity = null)
+    {
+        var visual = compositor.CreateContainerVisual();
+        if (size is not null) visual.Size = size.Value;
+        if (offset is not null) visual.Offset = offset.Value;
+        if (scale is not null) visual.Scale = scale.Value;
+        if (relativeSizeAdjustment is not null) visual.RelativeSizeAdjustment = relativeSizeAdjustment.Value;
+        if (relativeOffsetAdjustment is not null) visual.RelativeOffsetAdjustment = relativeOffsetAdjustment.Value;
+        if (children is not null)
+        {
+            foreach (var child in children)
+            {
+                visual.Children.InsertAtTop(child);
+            }
+        }
+        if (clip is not null) visual.Clip = clip;
+        if (isVisible is not null) visual.IsVisible = isVisible.Value;
+        if (opacity is not null) visual.Opacity = opacity.Value;
+        return visual;
+    }
+
+    public static ContainerVisual BuildContainerVisual(this Compositor compositor, out ContainerVisual visual,
+        Vector2? size = null, Vector3? offset = null, Vector3? scale = null,
+        Vector2? relativeSizeAdjustment = null, Vector3? relativeOffsetAdjustment = null,
+        Visual[]? children = null, CompositionClip? clip = null,
+        bool? isVisible = null, float? opacity = null)
+    {
+        visual = compositor.BuildContainerVisual(size, offset, scale, relativeSizeAdjustment, relativeOffsetAdjustment,
+            children, clip, isVisible, opacity);
+        return visual;
+    }
+    
     public static CompositionColorBrush BuildColorBrush(this Compositor compositor, out CompositionColorBrush brush,
         Color color)
     {
@@ -61,18 +98,20 @@ public static class CompositionVisualExtensions
     }
     
     public static CompositionRoundedRectangleGeometry BuildRoundedRectangleGeometry(this Compositor compositor,
-        Vector2? cornerRadius = null, Vector2? size = null)
+        Vector2? cornerRadius = null, Vector2? size = null, Vector2? offset = null)
     {
         var geometry = compositor.CreateRoundedRectangleGeometry();
         if (cornerRadius is not null) geometry.CornerRadius = cornerRadius.Value;
         if (size is not null) geometry.Size = size.Value;
+        if (offset is not null) geometry.Offset = offset.Value;
         return geometry;
     }
     
     public static CompositionRoundedRectangleGeometry BuildRoundedRectangleGeometry(this Compositor compositor,
-        out CompositionRoundedRectangleGeometry geometry, Vector2? cornerRadius = null, Vector2? size = null)
+        out CompositionRoundedRectangleGeometry geometry, Vector2? cornerRadius = null, Vector2? size = null,
+        Vector2? offset = null)
     {
-        geometry = compositor.BuildRoundedRectangleGeometry(cornerRadius, size);
+        geometry = compositor.BuildRoundedRectangleGeometry(cornerRadius, size, offset);
         return geometry;
     }
     
@@ -164,5 +203,10 @@ public static class CompositionVisualExtensions
             strokeDashArray, strokeDashCap, strokeDashOffset, strokeStartCap, strokeEndCap, strokeMiterLimit,
             strokeLineJoin, isStrokeNonScaling);
         return shape;
+    }
+
+    public static CompositionPropertySet GetManipulationPropertySet(this ScrollViewer scrollViewer)
+    {
+        return ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
     }
 }
