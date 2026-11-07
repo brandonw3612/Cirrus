@@ -21,6 +21,8 @@ internal sealed partial class NeteaseImageResizeConverter : IValueConverter
             _ => null
         };
         var sizedUrl = originalUrl.StartsWith("http") ? $"{originalUrl}?param={size}y{size}" : originalUrl;
+        if (targetType == typeof(string)) return sizedUrl;
+        if (targetType == typeof(Uri)) return new Uri(sizedUrl); 
         return new BitmapImage(new(sizedUrl));
     }
 
