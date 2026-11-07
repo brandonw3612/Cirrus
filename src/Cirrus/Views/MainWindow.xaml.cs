@@ -1,10 +1,12 @@
 using Cirrus.Base.Services;
+using Cirrus.Constants;
 using Cirrus.Controls;
 using Cirrus.Enums;
 using Cirrus.Models.Business.Appearance;
 using Cirrus.Utilities;
 using Cirrus.ViewModels;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using H.NotifyIcon;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -94,6 +96,12 @@ public sealed partial class MainWindow
             DisplayTheme.Dark => Color.FromArgb(255, 255, 255, 255),
             _ => null
         };
+    }
+
+    [RelayCommand]
+    private void BroadcastThemeChanged()
+    {
+        WeakReferenceMessenger.Default.Send((object)HostFrame.ActualTheme, MessengerTokens.ThemeChanged);
     }
 
     public void ApplyKeyboardHandler(KeyboardActionHandler? handler)

@@ -19,6 +19,9 @@
             <behaviors:LoadedEventTriggerBehavior>
                 <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
             </behaviors:LoadedEventTriggerBehavior>
+            <behaviors:ActualThemeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind BroadcastThemeChangedCommand}" />
+            </behaviors:ActualThemeChangedEventTriggerBehavior>
         </interactivity:Interaction.Behaviors>
         <Grid x:Name="RootGrid">
             <controls:SidebarView x:Name="RootSidebarView" Margin="0 48 0 0">
