@@ -1,4 +1,5 @@
-﻿using Cirrus.Extensions;
+﻿using Cirrus.Composition;
+using Cirrus.Extensions;
 using Cirrus.ViewModels;
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.Input;
@@ -15,10 +16,15 @@ public sealed partial class PlaybackControlBar
     public PlaybackControlBarViewModel ViewModel { get; }
     private bool _isFocused;
 
+    private readonly ThemeAwareDualStateBorderComposition _borderComposition;
+
     public PlaybackControlBar()
     {
         ViewModel = new();
         InitializeComponent();
+        var compositor = this.GetVisual().Compositor;
+        _borderComposition = new(compositor, false);
+        _borderComposition.ToggleCompact(true);
     }
 
     [RelayCommand]
@@ -30,22 +36,31 @@ public sealed partial class PlaybackControlBar
             > 400 => "Basic",
             _ => "Compact"
         }, false);
+        _borderComposition.CompactDimensions = new(
+            0f, 0f,
+            args.NewSize._width, args.NewSize._height,
+            1f, 8f
+        );
+        _borderComposition.ExpandedDimensions = new(
+            0f, -20f,
+            args.NewSize._width, args.NewSize._height + 20f,
+            1f, 8f
+        );
     }
 
     [RelayCommand]
     private void OnLoaded()
     {
-        var backgroundBorderVisual = BackgroundBorder.GetVisual();
+        _borderComposition.ForceApplyTheme(ActualTheme);
+        BackgroundBorder.SetChildElementVisual(_borderComposition.Visual);
         var albumArtworkBorderVisual = AlbumArtworkBorder.GetVisual();
         var trackInfoPanelVisual = TrackInfoPanel.GetVisual();
 
-        backgroundBorderVisual.Scale = new(1f);
-        backgroundBorderVisual.Offset = new(0f);
         albumArtworkBorderVisual.Scale = new(1f);
         albumArtworkBorderVisual.Offset = new(6f, 6f, 0f);
         trackInfoPanelVisual.Offset = trackInfoPanelVisual.Offset with { X = 60f };
     }
-
+    
     [RelayCommand]
     private void OnTapped(TappedRoutedEventArgs args)
     {
@@ -63,23 +78,12 @@ public sealed partial class PlaybackControlBar
     {
         if (e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Touch) return;
         if (_isFocused) return;
-        var backgroundBorderVisual = BackgroundBorder.GetVisual();
+        var compositor = this.GetVisual().Compositor;
         var albumArtworkBorderVisual = AlbumArtworkBorder.GetVisual();
         var trackInfoPanelVisual = TrackInfoPanel.GetVisual();
-        var compositor = backgroundBorderVisual.Compositor;
 
-        backgroundBorderVisual.StartAnimationGroup(compositor.BuildAnimationGroupWith(
-            compositor.BuildVector3KeyFrameAnimation(
-                finalValue: new(1f, 1f + 20f / (float)RootGrid.ActualHeight, 1f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(backgroundBorderVisual.Scale)
-            ),
-            compositor.BuildVector3KeyFrameAnimation(
-                finalValue: new(0f, -20f, 0f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(backgroundBorderVisual.Offset)
-            )
-        ));
+        _borderComposition.ToggleCompact(false);
+        
         albumArtworkBorderVisual.StartAnimationGroup(compositor.BuildAnimationGroupWith(
             compositor.BuildVector3KeyFrameAnimation(
                 finalValue: new(68f / 48f, 68f / 48f, 1f),
@@ -105,43 +109,27 @@ public sealed partial class PlaybackControlBar
     protected override void OnPointerExited(PointerRoutedEventArgs e)
     {
         if (!_isFocused) return;
-        var backgroundBorderVisual = BackgroundBorder.GetVisual();
+        var compositor = this.GetVisual().Compositor;
         var albumArtworkBorderVisual = AlbumArtworkBorder.GetVisual();
         var trackInfoPanelVisual = TrackInfoPanel.GetVisual();
-        var compositor = backgroundBorderVisual.Compositor;
 
-        backgroundBorderVisual.StartAnimationGroup(compositor.BuildAnimationGroupWith(
-            compositor.BuildVector3KeyFrameAnimation(
-                finalValue: new(1f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(backgroundBorderVisual.Scale),
-                delay: TimeSpan.FromMilliseconds(100)
-            ),
-            compositor.BuildVector3KeyFrameAnimation(
-                finalValue: new(0f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(backgroundBorderVisual.Offset),
-                delay: TimeSpan.FromMilliseconds(100)
-            )
-        ));
+        _borderComposition.ToggleCompact(true);
+        
         albumArtworkBorderVisual.StartAnimationGroup(compositor.BuildAnimationGroupWith(
             compositor.BuildVector3KeyFrameAnimation(
                 finalValue: new(1f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(albumArtworkBorderVisual.Scale),
-                delay: TimeSpan.FromMilliseconds(100)
+                duration: TimeSpan.FromMilliseconds(400),
+                target: nameof(albumArtworkBorderVisual.Scale)
             ),
             compositor.BuildVector3KeyFrameAnimation(
                 finalValue: new(6f, 6f, 0f),
-                duration: TimeSpan.FromMilliseconds(500),
-                target: nameof(albumArtworkBorderVisual.Offset),
-                delay: TimeSpan.FromMilliseconds(100)
+                duration: TimeSpan.FromMilliseconds(400),
+                target: nameof(albumArtworkBorderVisual.Offset)
             )
         ));
         trackInfoPanelVisual.StartAnimation("Offset.X", compositor.BuildScalarKeyFrameAnimation(
             finalValue: 60f,
-            duration: TimeSpan.FromMilliseconds(500),
-            delay: TimeSpan.FromMilliseconds(100)
+            duration: TimeSpan.FromMilliseconds(400)
         ));
         TimelineSlider.Visibility = Visibility.Collapsed;
 

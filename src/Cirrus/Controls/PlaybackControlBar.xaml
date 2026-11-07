@@ -44,8 +44,7 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Border Grid.RowSpan="2" Grid.ColumnSpan="3" x:Name="BackgroundBorder"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="8" BorderThickness="1" />
+                Background="Transparent" />
         <controls:GlidySlider x:Name="TimelineSlider" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="2"
                               Margin="60 -6 22 0" Opacity="0" VerticalAlignment="Top" Height="16"
                               Minimum="0"
