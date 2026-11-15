@@ -30,9 +30,9 @@ public class BorderComposition
             relativeSizeAdjustment: new(1f, 1f)
         );
         _outerGeometry = compositor.BuildRoundedRectangleGeometry(
-            offset: new(borderThickness, borderThickness),
-            size: new(width, height),
-            cornerRadius: new(cornerRadius, cornerRadius)
+            offset: new(borderThickness / 2f, borderThickness / 2f),
+            size: new(width - borderThickness, height - borderThickness),
+            cornerRadius: new(cornerRadius + borderThickness / 2f, cornerRadius + borderThickness / 2f)
         );
         foreach (var strokeBrush in strokeBrushes)
         {
@@ -62,8 +62,8 @@ public class BorderComposition
             compositor.BuildRoundedRectangleGeometry(
                 out _innerGeometry,
                 offset: new(borderThickness, borderThickness),
-                size: new(width, height),
-                cornerRadius: new(cornerRadius - borderThickness, cornerRadius - borderThickness)
+                size: new(width - 2f * borderThickness, height - 2f * borderThickness),
+                cornerRadius: new(cornerRadius, cornerRadius)
             )
         );
         foreach (var backgroundBrush in backgroundBrushes)
@@ -84,14 +84,14 @@ public class BorderComposition
                 innerVisual,
                 outerVisual
             ],
-            offset: new(-borderThickness, -borderThickness, 0f),
-            size: new(width + 2 * borderThickness, height + 2 * borderThickness),
+            offset: new(0f, 0f, 0f),
+            size: new(width, height),
             clip: compositor.CreateGeometricClip(
                 compositor.BuildRoundedRectangleGeometry(
                     out _containerGeometry,
                     offset: new(0f, 0f),
-                    size: new(width + 2 * borderThickness, height + 2 * borderThickness),
-                    cornerRadius: new(cornerRadius, cornerRadius)
+                    size: new(width, height),
+                    cornerRadius: new(cornerRadius + borderThickness, cornerRadius + borderThickness)
                 )
             )
         );
@@ -106,19 +106,19 @@ public class BorderComposition
     {
         _outerGeometry.StartAnimationGroup(_compositor.BuildAnimationGroupWith(
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(borderThickness, borderThickness),
+                finalValue: new(borderThickness / 2f, borderThickness / 2f),
                 duration: duration,
                 delay: delay,
                 target: nameof(_outerGeometry.Offset)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(width, height),
+                finalValue: new(width - borderThickness, height - borderThickness),
                 duration: duration,
                 delay: delay,
                 target: nameof(_outerGeometry.Size)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(cornerRadius, cornerRadius),
+                finalValue: new(cornerRadius + borderThickness / 2f, cornerRadius + borderThickness / 2f),
                 duration: duration,
                 delay: delay,
                 target: nameof(_outerGeometry.CornerRadius)
@@ -140,13 +140,13 @@ public class BorderComposition
                 target: nameof(_innerGeometry.Offset)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(width, height),
+                finalValue: new(width - 2f * borderThickness, height - 2f * borderThickness),
                 duration: duration,
                 delay: delay,
                 target: nameof(_innerGeometry.Size)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(cornerRadius - borderThickness, cornerRadius - borderThickness),
+                finalValue: new(cornerRadius, cornerRadius),
                 duration: duration,
                 delay: delay,
                 target: nameof(_innerGeometry.CornerRadius)
@@ -154,13 +154,13 @@ public class BorderComposition
         ));
         _containerVisual.StartAnimationGroup(_compositor.BuildAnimationGroupWith(
             _compositor.BuildVector3KeyFrameAnimation(
-                finalValue: new(x - borderThickness, y - borderThickness, 0),
+                finalValue: new(x, y, 0f),
                 duration: duration,
                 delay: delay,
                 target: nameof(_containerVisual.Offset)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(width + 2 * borderThickness, height + 2 * borderThickness),
+                finalValue: new(width, height),
                 duration: duration,
                 delay: delay,
                 target: nameof(_containerVisual.Size)
@@ -174,13 +174,13 @@ public class BorderComposition
                 target: nameof(_containerGeometry.Offset)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(width + 2 * borderThickness, height + 2 * borderThickness),
+                finalValue: new(width, height),
                 duration: duration,
                 delay: delay,
                 target: nameof(_containerGeometry.Size)
             ),
             _compositor.BuildVector2KeyFrameAnimation(
-                finalValue: new(cornerRadius, cornerRadius),
+                finalValue: new(cornerRadius + borderThickness, cornerRadius + borderThickness),
                 duration: duration,
                 delay: delay,
                 target: nameof(_containerGeometry
