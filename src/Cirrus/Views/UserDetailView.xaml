@@ -14,6 +14,7 @@
     xmlns:liveModels="using:Cirrus.LiveModels"
     xmlns:modelPlaylist="using:Cirrus.Models.Business.Playlist"
     xmlns:modelUser="using:Cirrus.Models.Business.User"
+    xmlns:themes="using:Cirrus.Themes"
     mc:Ignorable="d">
     <Page.Resources>
         <CollectionViewSource x:Name="PlaylistCollectionViewSource"
@@ -104,16 +105,16 @@
                 </Style>
             </GridView.ItemContainerStyle>
             <GridView.ItemTemplateSelector>
-                <local:UserPlaylistDataTemplateSelector>
-                    <local:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
+                <themes:UserPlaylistDataTemplateSelector>
+                    <themes:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
                         <DataTemplate x:DataType="modelUser:TopChart">
                             <controls:NavigatiableDisplayCard Image="ms-appx:///Assets/Images/PlaybackRecord.svg"
                                                               Title="{x:Bind Nickname, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/PlaybackRecord/Title/Format}"
                                                               Subtitle="{x:Bind PlayedTrackCount, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/UserDetailView/PlaybackRecord/Subtitle/Format}"
                                                               DataContext="{Binding Mode=OneWay}" />
                         </DataTemplate>
-                    </local:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
-                    <local:UserPlaylistDataTemplateSelector.PlaylistTemplate>
+                    </themes:UserPlaylistDataTemplateSelector.PlaybackRecordTemplate>
+                    <themes:UserPlaylistDataTemplateSelector.PlaylistTemplate>
                         <DataTemplate x:DataType="modelPlaylist:OnlinePlaylist">
                             <controls:NavigatiableDisplayCard
                                 Image="{x:Bind CoverImageUrl, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
@@ -134,8 +135,8 @@
                                 </Grid>
                             </controls:NavigatiableDisplayCard>
                         </DataTemplate>
-                    </local:UserPlaylistDataTemplateSelector.PlaylistTemplate>
-                </local:UserPlaylistDataTemplateSelector>
+                    </themes:UserPlaylistDataTemplateSelector.PlaylistTemplate>
+                </themes:UserPlaylistDataTemplateSelector>
             </GridView.ItemTemplateSelector>
             <GridView.Header>
                 <StackPanel x:Name="ViewHeader"

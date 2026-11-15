@@ -3,7 +3,7 @@ using Cirrus.Models.Business.User;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Cirrus.Views;
+namespace Cirrus.Themes;
 
 public partial class UserPlaylistDataTemplateSelector : DataTemplateSelector
 {
