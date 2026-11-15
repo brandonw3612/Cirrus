@@ -2,7 +2,6 @@ using Windows.UI;
 using Cirrus.Composition;
 using Cirrus.Primitives;
 using Microsoft.UI.Composition;
-using Microsoft.UI;
 
 namespace Cirrus.Extensions;
 

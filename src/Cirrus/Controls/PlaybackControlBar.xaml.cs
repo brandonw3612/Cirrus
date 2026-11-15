@@ -16,14 +16,14 @@ public sealed partial class PlaybackControlBar
     public PlaybackControlBarViewModel ViewModel { get; }
     private bool _isFocused;
 
-    private readonly ThemeAwareDualStateBorderComposition _borderComposition;
+    private readonly DualStateBorderComposition _borderComposition;
 
     public PlaybackControlBar()
     {
         ViewModel = new();
         InitializeComponent();
         var compositor = this.GetVisual().Compositor;
-        _borderComposition = new(compositor, false);
+        _borderComposition = DualStateBorderComposition.CreateAcrylicBar(compositor);
         _borderComposition.ToggleCompact(true);
     }
 

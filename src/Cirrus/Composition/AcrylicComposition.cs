@@ -5,6 +5,7 @@ using Windows.Graphics.Effects;
 using Windows.System.Power;
 using Windows.UI;
 using Windows.UI.ViewManagement;
+using Cirrus.Primitives;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.UI.Composition;
@@ -80,7 +81,7 @@ public sealed class AcrylicComposition : IDisposable
     public CompositionBrush Brush => _brush;
 
     /// <summary>Raised when the underlying CompositionBrush is replaced.</summary>
-    public event EventHandler? BrushChanged;
+    public event EventHandler<BrushChangedEventArgs>? BrushChanged;
 
     /// <summary>
     /// The content to blur. Defaults to null, which uses CreateBackdropBrush() (whatever sits behind the visual in the same visual tree).
@@ -317,7 +318,11 @@ public sealed class AcrylicComposition : IDisposable
         _brush = newBrush;
 
         foreach (var v in _targets) v.Brush = newBrush;
-        BrushChanged?.Invoke(this, EventArgs.Empty);
+        BrushChanged?.Invoke(this, new BrushChangedEventArgs
+        {
+            OldBrush = old,
+            NewBrush = newBrush
+        });
 
         old?.Dispose();
     }
