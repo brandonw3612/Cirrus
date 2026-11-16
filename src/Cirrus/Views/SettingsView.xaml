@@ -9,29 +9,55 @@
                         xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
                         xmlns:controls="using:Cirrus.Controls"
                         xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-                        xmlns:liveModels="using:Cirrus.LiveModels">
-    <interactivity:Interaction.Behaviors>
-        <behaviors:LoadedEventTriggerBehavior>
-            <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
-        </behaviors:LoadedEventTriggerBehavior>
-    </interactivity:Interaction.Behaviors>
+                        xmlns:liveModels="using:Cirrus.LiveModels"
+                        xmlns:animations="using:CommunityToolkit.WinUI.Animations">
+    <Page.Resources>
+        <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+            <animations:OffsetAnimation Duration="0:0:0.400" />
+            <animations:SizeAnimation Duration="0:0:0.400" />
+            <animations:OpacityAnimation Duration="0:0:0.400" />
+        </animations:ImplicitAnimationSet>
+    </Page.Resources>
     <Grid>
-        <Grid Canvas.ZIndex="1" Margin="16" MaxWidth="968" VerticalAlignment="Top">
-            <Border x:Name="HeaderFloatingBackBorder"
-                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefault}" BorderThickness="1"
-                    CornerRadius="8" Height="80" Margin="16 0"
-                    Opacity="1">
-            </Border>
-            <Border VerticalAlignment="Center">
-                <TextBlock x:Name="HeaderTextBlock" x:Uid="Views/SettingsView/Header"
-                           CharacterSpacing="-20" FontSize="24" FontWeight="Bold" MaxLines="2"
-                           TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
-            </Border>
+        <interactivity:Interaction.Behaviors>
+            <behaviors:LoadedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+            </behaviors:LoadedEventTriggerBehavior>
+            <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+            </behaviors:SizeChangedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="76" />
+                        <Setter Target="ViewHeader.Padding" Value="16" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="152" />
+                        <Setter Target="ViewHeader.Padding" Value="24 92 24 16" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid x:Name="ViewHeader"
+              Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+              Height="76" Margin="0 16" Padding="16" Background="Transparent"
+              animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Border x:Name="HeaderBackgroundBorder" Margin="-16"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <TextBlock x:Name="HeaderTextBlock" x:Uid="Views/SettingsView/Header"
+                       CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis" TextWrapping="Wrap"
+                       animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
         </Grid>
         <ScrollViewer x:Name="RootScrollViewer">
             <Border HorizontalAlignment="Stretch">
-                <StackPanel Margin="16 112 16 92" Spacing="32" MaxWidth="1000">
+                <StackPanel Margin="16 116 16 92" Spacing="32" MaxWidth="1000">
                     <!--Account-->
                     <StackPanel Spacing="4">
                         <TextBlock x:Uid="Views/SettingsView/SectionHeaders/Account"

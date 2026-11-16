@@ -13,7 +13,6 @@
     xmlns:communityControls="using:CommunityToolkit.WinUI.Controls"
     xmlns:controls="using:Cirrus.Controls"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:layout="using:Cirrus.Layout"
     xmlns:themes="using:Cirrus.Themes"
     mc:Ignorable="d">
     <Page.Resources>
@@ -30,6 +29,11 @@
                                               Title="{x:Bind Name}"
                                               DataContext="{Binding Mode=OneWay}" />
         </DataTemplate>
+        <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+            <animations:OffsetAnimation Duration="0:0:0.400" />
+            <animations:SizeAnimation Duration="0:0:0.400" />
+            <animations:OpacityAnimation Duration="0:0:0.400" />
+        </animations:ImplicitAnimationSet>
     </Page.Resources>
     <Grid>
         <interactivity:Interaction.Behaviors>
@@ -37,48 +41,62 @@
                 <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
             </behaviors:LoadedEventTriggerBehavior>
             <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
                 <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.SizeChangedCommand}" />
             </behaviors:SizeChangedEventTriggerBehavior>
         </interactivity:Interaction.Behaviors>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="76" />
+                        <Setter Target="ViewHeader.Padding" Value="16 0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="152" />
+                        <Setter Target="ViewHeader.Padding" Value="24 76 24 0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
                      Background="Transparent"
                      IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-        <Border x:Name="FloatingHeader"
-                Canvas.ZIndex="1"
-                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
-                Visibility="Collapsed"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                CornerRadius="4" Margin="32 16" Padding="24">
-            <animations:Implicit.ShowAnimations>
-                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
-            </animations:Implicit.HideAnimations>
-            <layout:Row
-                Spacing="16" HorizontalAlignment="Stretch">
-                <TextBlock x:Uid="Views/LibraryView/Header"
-                           CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
-                           VerticalAlignment="Center" />
-                <layout:Spacer layout:Row.ColumnWidth="*" />
-                <communityControls:Segmented
-                    SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Albums">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="&#xE93C;" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Artists">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
-                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                </communityControls:Segmented>
-            </layout:Row>
-        </Border>
-        <ListView x:Name="ContentListView" Padding="8 8 8 80"
+        <Grid x:Name="ViewHeader"
+              Background="Transparent"
+              Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+              Margin="0 16" Height="76" Padding="16 0"
+              animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="HeaderBackgroundBorder" Grid.ColumnSpan="3" Margin="-16 0"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <TextBlock Grid.Column="0" x:Uid="Views/LibraryView/Header"
+                       CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <communityControls:Segmented Grid.Column="2"
+                SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Albums">
+                    <communityControls:SegmentedItem.Icon>
+                        <FontIcon Glyph="&#xE93C;" />
+                    </communityControls:SegmentedItem.Icon>
+                </communityControls:SegmentedItem>
+                <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Artists">
+                    <communityControls:SegmentedItem.Icon>
+                        <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
+                                  FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
+                    </communityControls:SegmentedItem.Icon>
+                </communityControls:SegmentedItem>
+            </communityControls:Segmented>
+        </Grid>
+        <ListView x:Name="ContentListView" Padding="8 100 8 80"
                   ItemsSource="{x:Bind ViewModel.DisplayItems}">
             <ListView.ItemTemplateSelector>
                 <themes:LibraryCollectionItemTemplateSelector
@@ -102,33 +120,6 @@
                     </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
-            <ListView.Header>
-                <layout:Row x:Name="ViewHeader"
-                            Margin="32"
-                            Spacing="16" HorizontalAlignment="Stretch">
-                    <animations:Implicit.Animations>
-                        <animations:OpacityAnimation Duration="0:0:0.300" />
-                    </animations:Implicit.Animations>
-                    <TextBlock x:Uid="Views/LibraryView/Header"
-                               CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
-                               VerticalAlignment="Center" />
-                    <layout:Spacer layout:Row.ColumnWidth="*" />
-                    <communityControls:Segmented
-                        SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Albums">
-                            <communityControls:SegmentedItem.Icon>
-                                <FontIcon Glyph="&#xE93C;" />
-                            </communityControls:SegmentedItem.Icon>
-                        </communityControls:SegmentedItem>
-                        <communityControls:SegmentedItem x:Uid="Views/LibraryView/Categories/Artists">
-                            <communityControls:SegmentedItem.Icon>
-                                <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
-                                          FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                            </communityControls:SegmentedItem.Icon>
-                        </communityControls:SegmentedItem>
-                    </communityControls:Segmented>
-                </layout:Row>
-            </ListView.Header>
             <ListView.Footer>
                 <Button x:Uid="Views/LibraryView/FooterButton"
                         Visibility="{x:Bind ViewModel.CanLoadMore, Converter={StaticResource BoolToVisibilityConverter}}"

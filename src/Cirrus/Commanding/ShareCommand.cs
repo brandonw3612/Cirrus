@@ -57,6 +57,12 @@ public sealed partial class ShareCommand : CommandWrapper
                 package.SetWebLink(new($"https://music.163.com/artist?id={artist.ArtistId}"));
                 break;
             }
+            case IUser user:
+            {
+                package.Properties.Title = user.Nickname;
+                package.SetWebLink(new($"https://music.163.com/user?id={user.UserId}"));
+                break;
+            }
         }
     }
 }

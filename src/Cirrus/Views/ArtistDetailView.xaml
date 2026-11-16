@@ -11,7 +11,6 @@
     xmlns:community="using:CommunityToolkit.WinUI"
     xmlns:controls="using:Cirrus.Controls"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:layout="using:Cirrus.Layout"
     xmlns:liveModels="using:Cirrus.LiveModels"
     xmlns:modelAlbums="using:Cirrus.Models.Business.Album"
     xmlns:modelArtist="using:Cirrus.Models.Network.Artist"
@@ -19,6 +18,11 @@
     <Page.Resources>
         <commanding:PlayFromListCommand x:Key="PlayFromListCommand" />
         <commanding:ShowTrackContextFlyoutCommand x:Key="ShowTrackContextFlyoutCommand" />
+        <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+            <animations:OffsetAnimation Duration="0:0:0.400" />
+            <animations:SizeAnimation Duration="0:0:0.400" />
+            <animations:OpacityAnimation Duration="0:0:0.400" />
+        </animations:ImplicitAnimationSet>
         <Style x:Key="AlbumListViewStyle" TargetType="ListView">
             <Setter Property="SelectionMode" Value="None" />
             <Setter Property="ItemsPanel">
@@ -56,6 +60,14 @@
         </Style>
     </Page.Resources>
     <Grid>
+        <interactivity:Interaction.Behaviors>
+            <behaviors:LoadedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+            </behaviors:LoadedEventTriggerBehavior>
+            <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+            </behaviors:SizeChangedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="FullLengthAlbumsVisibilityGroup">
                 <VisualState x:Name="FullLengthAlbumsCollapsed" />
@@ -115,61 +127,78 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Padding" Value="16" />
+
+                        <Setter Target="HeaderContentPanel.Margin" Value="0" />
+                        <Setter Target="HeaderContentPanel.Orientation" Value="Vertical" />
+
+                        <Setter Target="HeaderAvatarImage.Width" Value="200" />
+                        <Setter Target="HeaderAvatarImage.Height" Value="200" />
+
+                        <Setter Target="HeaderNameTextBlock.FontSize" Value="32" />
+
+                        <Setter Target="AdditionalActionsContainer.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Padding" Value="8 288 8 18" />
+
+                        <Setter Target="HeaderContentPanel.Margin" Value="8 4" />
+                        <Setter Target="HeaderContentPanel.Orientation" Value="Horizontal" />
+
+                        <Setter Target="HeaderAvatarImage.Width" Value="50" />
+                        <Setter Target="HeaderAvatarImage.Height" Value="50" />
+
+                        <Setter Target="HeaderNameTextBlock.FontSize" Value="24" />
+
+                        <Setter Target="AdditionalActionsContainer.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
                      Background="Transparent"
                      IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-        <Border x:Name="FloatingHeader"
-                Canvas.ZIndex="1"
-                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
-                Visibility="Collapsed"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                CornerRadius="4" Margin="32 16" Padding="16">
-            <animations:Implicit.ShowAnimations>
-                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
-            </animations:Implicit.HideAnimations>
-            <layout:Row Spacing="16">
-                <Border Width="50" Height="50" CornerRadius="25"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <Image
-                        Source="{x:Bind ViewModel.Artist.SquaredAvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
-                        Width="50" Height="50" Margin="-1" />
-                </Border>
-                <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" FontSize="20" FontWeight="SemiBold"
-                           VerticalAlignment="Center" />
-            </layout:Row>
-        </Border>
-        <ScrollViewer x:Name="RootScrollViewer">
-            <interactivity:Interaction.Behaviors>
-                <behaviors:ViewChangedEventTriggerBehavior>
-                    <behaviors:InvokeCommandActionEx Command="{x:Bind ScrollViewerViewChangedCommand}" />
-                </behaviors:ViewChangedEventTriggerBehavior>
-            </interactivity:Interaction.Behaviors>
-            <StackPanel Padding="16 16 16 80">
-                <StackPanel x:Name="ViewHeader" Canvas.ZIndex="1" VerticalAlignment="Top"
-                            Spacing="8"
-                            Visibility="{x:Bind ViewModel.Artist, Mode=OneWay, Converter={StaticResource EmptyObjectJudgeConverter}}">
-                    <animations:Implicit.Animations>
-                        <animations:OpacityAnimation Duration="0:0:0.300" />
-                    </animations:Implicit.Animations>
-                    <Border x:Name="ArtistAvatarBorder" Width="200" Height="200" CornerRadius="100"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                        <Image
-                            Source="{x:Bind ViewModel.Artist.SquaredAvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
-                            Width="200" Height="200" Margin="-1" />
-                    </Border>
-                    <layout:Row>
-                        <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" FontSize="24"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center" />
-                        <layout:Spacer layout:Row.ColumnWidth="*" />
-                        <Button VerticalAlignment="Center" HorizontalAlignment="Right">
+        <Grid x:Name="ViewHeader"
+                    Visibility="{x:Bind ViewModel.Artist, Mode=OneWay, Converter={StaticResource EmptyObjectJudgeConverter}}"
+                    Background="Transparent" Padding="16"
+                    Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Border x:Name="HeaderBackgroundBorder" Grid.ColumnSpan="3" Margin="-16"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <StackPanel x:Name="HeaderContentPanel"
+                        Spacing="8" Orientation="Vertical"
+                        VerticalAlignment="Center" Margin="0"
+                        animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <controls:GlidyImage x:Name="HeaderAvatarImage"
+                                     Width="200" Height="200"
+                                     VerticalAlignment="Center"
+                                     ImageUriSource="{x:Bind ViewModel.Artist.SquaredAvatarImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=400}"
+                                     animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+                <TextBlock x:Name="HeaderNameTextBlock"
+                           Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" FontSize="32"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                           animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+                <StackPanel x:Name="HeaderActionButtons"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                    <StackPanel x:Name="AdditionalActionsContainer"
+                                Orientation="Horizontal"
+                                animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                        <animations:Implicit.ShowAnimations>
+                            <animations:OpacityAnimation From="0" To="1" Duration="0:0:0.4" />
+                            <animations:TranslationAnimation From="4,0,0" To="0" Duration="0:0:0.4" />
+                        </animations:Implicit.ShowAnimations>
+                        <animations:Implicit.HideAnimations>
+                            <animations:OpacityAnimation From="1" To="0" Duration="0:0:0.2" />
+                        </animations:Implicit.HideAnimations>
+                        <Button VerticalAlignment="Center" HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
                                           Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}" FontSize="16" />
@@ -192,12 +221,16 @@
                                 </MenuFlyout>
                             </Button.Flyout>
                         </Button>
-                    </layout:Row>
+                    </StackPanel>
                 </StackPanel>
+            </StackPanel>
+        </Grid>
+        <ScrollViewer x:Name="RootScrollViewer">
+            <StackPanel Padding="16 300 16 80">
                 <Grid Margin="0 16"
                       Visibility="{x:Bind ViewModel.Tracks.Count, Mode=OneWay, Converter={StaticResource PositiveNumberVisibilityConverter}}">
                     <TextBlock x:Uid="Views/ArtistDetailView/Sections/Tracks/Header"
-                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumColor}"
                                VerticalAlignment="Center" />
                     <Button Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Right"
                             Command="{StaticResource PlayFromListCommand}">
@@ -229,7 +262,7 @@
                 </ListView>
                 <StackPanel x:Name="FullLengthAlbumsPanel" Margin="0 12 0 0">
                     <TextBlock x:Uid="Views/ArtistDetailView/Sections/FullLengthAlbums/Header"
-                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumColor}"
                                VerticalAlignment="Center" />
                     <ListView ItemsSource="{x:Bind ViewModel.FullLengthAlbums}"
                               Style="{StaticResource AlbumListViewStyle}">
@@ -240,7 +273,7 @@
                 </StackPanel>
                 <StackPanel x:Name="SingleAlbumsPanel" Margin="0 12 0 0">
                     <TextBlock x:Uid="Views/ArtistDetailView/Sections/SingleAlbums/Header"
-                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumColor}"
                                VerticalAlignment="Center" />
                     <ListView ItemsSource="{x:Bind ViewModel.SingleAlbums}"
                               Style="{StaticResource AlbumListViewStyle}">
@@ -251,7 +284,7 @@
                 </StackPanel>
                 <StackPanel x:Name="LiveAlbumsPanel" Margin="0 12 0 0">
                     <TextBlock x:Uid="Views/ArtistDetailView/Sections/LiveAlbums/Header"
-                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                               FontSize="20" FontWeight="Medium" Foreground="{ThemeResource SystemBaseMediumColor}"
                                VerticalAlignment="Center" />
                     <ListView ItemsSource="{x:Bind ViewModel.LiveAlbums}"
                               Style="{StaticResource AlbumListViewStyle}">
@@ -269,7 +302,7 @@
                                 Margin="0 12">
                         <TextBlock x:Uid="Views/ArtistDetailView/Sections/Description/Header"
                                    FontSize="20" FontWeight="Medium"
-                                   Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}"
                                    VerticalAlignment="Center" />
                         <Button Style="{StaticResource TextBlockButtonStyle}"
                                 Margin="-4 10" MaxHeight="150" Padding="4" CornerRadius="4"
@@ -294,7 +327,7 @@
                                 Grid.Column="1" Margin="0 12">
                         <TextBlock x:Uid="Views/ArtistDetailView/Sections/SimilarArtists/Header"
                                    FontSize="20" FontWeight="Medium"
-                                   Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                                   Foreground="{ThemeResource SystemBaseMediumColor}"
                                    VerticalAlignment="Center" />
                         <ListView ItemsSource="{x:Bind ViewModel.SimilarArtists}"
                                   Margin="-4 0" Padding="0"

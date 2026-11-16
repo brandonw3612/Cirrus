@@ -13,7 +13,6 @@
     xmlns:controls="using:Cirrus.Controls"
     xmlns:ctk="using:CommunityToolkit.WinUI"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:layout="using:Cirrus.Layout"
     xmlns:liveModels="using:Cirrus.LiveModels"
     mc:Ignorable="d">
     <Page.Resources>
@@ -25,12 +24,20 @@
                                         x:Key="WeeklyTracksPlayFromListCommand" />
         <commanding:PlayFromListCommand x:Name="AllTimeTracksPlayFromListCommand"
                                         x:Key="AllTimeTracksPlayFromListCommand" />
+        <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+            <animations:OffsetAnimation Duration="0:0:0.400" />
+            <animations:SizeAnimation Duration="0:0:0.400" />
+            <animations:OpacityAnimation Duration="0:0:0.400" />
+        </animations:ImplicitAnimationSet>
     </Page.Resources>
     <Grid>
         <interactivity:Interaction.Behaviors>
             <behaviors:LoadedEventTriggerBehavior>
                 <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
             </behaviors:LoadedEventTriggerBehavior>
+            <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+            </behaviors:SizeChangedEventTriggerBehavior>
         </interactivity:Interaction.Behaviors>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -56,56 +63,50 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="76" />
+                        <Setter Target="ViewHeader.Padding" Value="16 0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="152" />
+                        <Setter Target="ViewHeader.Padding" Value="24 76 24 0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
                      Background="Transparent"
                      IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-        <Border x:Name="FloatingHeader"
-                Canvas.ZIndex="1"
-                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
-                Visibility="Collapsed"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                CornerRadius="4" Margin="32 16" Padding="24">
-            <animations:Implicit.ShowAnimations>
-                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
-            </animations:Implicit.HideAnimations>
-            <layout:Row
-                Spacing="16" HorizontalAlignment="Stretch">
-                <TextBlock
-                    Text="{x:Bind ViewModel.Nickname, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/ChartView/HeaderFormat}"
-                    CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
-                    VerticalAlignment="Center" />
-                <layout:Spacer layout:Row.ColumnWidth="*" />
-                <communityControls:Segmented
-                    SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/OneWeek" />
-                    <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/AllTime" />
-                </communityControls:Segmented>
-            </layout:Row>
-        </Border>
+        <Grid x:Name="ViewHeader"
+              Background="Transparent"
+              Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+              Margin="0 16" Height="76" Padding="16 0"
+              animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="HeaderBackgroundBorder" Grid.ColumnSpan="3" Margin="-16 0"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <TextBlock Grid.Column="0" x:Uid="Views/LibraryView/Header"
+                       CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <communityControls:Segmented Grid.Column="2"
+                SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/OneWeek" />
+                <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/AllTime" />
+            </communityControls:Segmented>
+        </Grid>
         <ListView x:Name="TrackListView" Style="{StaticResource TrackListViewStyle}"
-                  Padding="16 16 16 80"
+                  Padding="16 108 16 80"
                   ItemsSource="{x:Bind ViewModel.DisplayItems, Mode=OneWay}">
-            <ListView.Header>
-                <layout:Row x:Name="ViewHeader"
-                            Margin="32"
-                            Spacing="16">
-                    <TextBlock
-                        Text="{x:Bind ViewModel.Nickname, Mode=OneWay, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/ChartView/HeaderFormat}"
-                        CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
-                        VerticalAlignment="Center" />
-                    <layout:Spacer layout:Row.ColumnWidth="*" />
-                    <communityControls:Segmented
-                        SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/OneWeek" />
-                        <communityControls:SegmentedItem x:Uid="Views/ChartView/Categories/AllTime" />
-                    </communityControls:Segmented>
-                </layout:Row>
-            </ListView.Header>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="liveModels:IndexedOnlineTrack">
                     <controls:TrackListItem Style="{StaticResource TopChartTrackListItemStyle}"

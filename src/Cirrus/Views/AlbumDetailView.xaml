@@ -21,8 +21,21 @@
         <CollectionViewSource x:Name="TrackCollectionViewSource"
                               IsSourceGrouped="{x:Bind ViewModel.IsSourceGrouped, Mode=OneWay}"
                               Source="{x:Bind ViewModel.TrackItems, Mode=OneWay}" />
+        <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+            <animations:OffsetAnimation Duration="0:0:0.400" />
+            <animations:SizeAnimation Duration="0:0:0.400" />
+            <animations:OpacityAnimation Duration="0:0:0.400" />
+        </animations:ImplicitAnimationSet>
     </Page.Resources>
     <Grid>
+        <interactivity:Interaction.Behaviors>
+            <behaviors:LoadedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
+            </behaviors:LoadedEventTriggerBehavior>
+            <behaviors:SizeChangedEventTriggerBehavior>
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
+            </behaviors:SizeChangedEventTriggerBehavior>
+        </interactivity:Interaction.Behaviors>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState />
@@ -35,76 +48,204 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.ColumnSpacing" Value="16" />
+                        <Setter Target="ViewHeader.Padding" Value="16" />
+
+                        <Setter Target="HeaderCoverImage.Width" Value="240" />
+                        <Setter Target="HeaderCoverImage.Height" Value="240" />
+                        <Setter Target="HeaderTextContainer.VerticalAlignment" Value="Bottom" />
+                        <Setter Target="HeaderTextContainer.Margin" Value="0 0 0 36" />
+
+                        <Setter Target="HeaderTitleTextBlock.FontSize" Value="24" />
+                        <Setter Target="HeaderArtistsButton.FontSize" Value="20" />
+
+                        <Setter Target="HeaderExtendedInfoContainer.Visibility" Value="Visible" />
+
+                        <Setter Target="HeaderActionButtons.(Grid.Column)" Value="1" />
+                        <Setter Target="HeaderActionButtons.VerticalAlignment" Value="Bottom" />
+                        <Setter Target="AdditionalActionsContainer.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.ColumnSpacing" Value="8" />
+                        <Setter Target="ViewHeader.Padding" Value="8 280 8 8" />
+
+                        <Setter Target="HeaderCoverImage.Width" Value="60" />
+                        <Setter Target="HeaderCoverImage.Height" Value="60" />
+                        <Setter Target="HeaderTextContainer.VerticalAlignment" Value="Center" />
+                        <Setter Target="HeaderTextContainer.Margin" Value="0" />
+
+                        <Setter Target="HeaderTitleTextBlock.FontSize" Value="20" />
+                        <Setter Target="HeaderArtistsButton.FontSize" Value="16" />
+
+                        <Setter Target="HeaderExtendedInfoContainer.Visibility" Value="Collapsed" />
+
+                        <Setter Target="HeaderActionButtons.(Grid.Column)" Value="2" />
+                        <Setter Target="HeaderActionButtons.VerticalAlignment" Value="Center" />
+                        <Setter Target="AdditionalActionsContainer.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
                      Background="Transparent"
                      IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-        <Border x:Name="FloatingHeader"
-                Canvas.ZIndex="1"
-                VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
-                Visibility="Collapsed"
-                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                CornerRadius="4" Margin="32 16" Padding="16">
-            <animations:Implicit.ShowAnimations>
-                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
-            </animations:Implicit.HideAnimations>
-            <layout:Row Spacing="16">
-                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        CornerRadius="8" Width="60" Height="60" x:Name="FloatingHeaderCoverImageContainer">
-                    <Image Stretch="Uniform"
-                           Source="{x:Bind ViewModel.Album.ArtworkImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=480}"
-                           Width="60" Height="60" />
-                </Border>
-                <StackPanel VerticalAlignment="Center"
-                            layout:Row.ColumnWidth="*">
-                    <layout:Row Spacing="2">
-                        <TextBlock Text="{x:Bind ViewModel.Album.Title, Mode=OneWay}"
-                                   FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis" />
-                        <FontIcon Glyph="{ThemeResource FontIconGlyphExplicit}"
-                                  FontFamily="{StaticResource CirrusIconSetFontFamily}"
-                                  Visibility="{x:Bind ViewModel.Album.IsExplicit, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}"
-                                  Foreground="{ThemeResource ExplicitIconForeground}"
-                                  FontSize="20"
-                                  layout:Row.Priority="1" />
-                    </layout:Row>
-                    <Button
+        <Grid x:Name="ViewHeader"
+              Visibility="{x:Bind ViewModel.Album, Converter={StaticResource EmptyObjectJudgeConverter}, Mode=OneWay}"
+              Background="Transparent"
+              Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+              Margin="16" Padding="16" ColumnSpacing="16"
+              animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border x:Name="HeaderBackgroundBorder" Grid.ColumnSpan="3" Margin="-16"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <controls:GlidyImage x:Name="HeaderCoverImage"
+                                 Grid.Column="0"
+                                 Width="240" Height="240"
+                                 VerticalAlignment="Center"
+                                 ImageUriSource="{x:Bind ViewModel.Album.ArtworkImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=480}"
+                                 animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <StackPanel x:Name="HeaderTextContainer"
+                        Grid.Column="1"
+                        VerticalAlignment="Bottom" Margin="0 0 0 36"
+                        animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <TextBlock x:Name="HeaderTitleTextBlock"
+                           Text="{x:Bind ViewModel.Album.Title, Mode=OneWay}"
+                           FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+                <Button x:Name="HeaderArtistsButton"
                         Content="{x:Bind ViewModel.Album.Artists, Mode=OneWay, Converter={StaticResource MultipleEntityNamesConverter}}"
                         DataContext="{x:Bind ViewModel.Album.Artists, Mode=OneWay}"
-                        Style="{StaticResource TextBlockButtonStyle}" FontSize="16" CornerRadius="4"
-                        Padding="4 2" Margin="-4 0">
-                        <interactivity:Interaction.Behaviors>
-                            <behaviors:TappedEventTriggerBehavior>
-                                <behaviors:InvokeCommandActionEx
-                                    Command="{StaticResource MultipleTargetNavigateCommand}" />
-                            </behaviors:TappedEventTriggerBehavior>
-                        </interactivity:Interaction.Behaviors>
+                        Style="{StaticResource TextBlockButtonStyle}" FontSize="20"
+                        Padding="4 2" Margin="-4 2 -4 -4">
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:TappedEventTriggerBehavior>
+                            <behaviors:InvokeCommandActionEx
+                                Command="{StaticResource MultipleTargetNavigateCommand}" />
+                        </behaviors:TappedEventTriggerBehavior>
+                    </interactivity:Interaction.Behaviors>
+                </Button>
+                <StackPanel x:Name="HeaderExtendedInfoContainer"
+                            animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                    <animations:Implicit.ShowAnimations>
+                        <animations:OpacityAnimation From="0" To="1" Duration="0:0:0.4" />
+                        <animations:TranslationAnimation From="0,8,0" To="0" Duration="0:0:0.4" />
+                    </animations:Implicit.ShowAnimations>
+                    <animations:Implicit.HideAnimations>
+                        <animations:OpacityAnimation From="1" To="0" Duration="0:0:0.2" />
+                    </animations:Implicit.HideAnimations>
+                    <TextBlock Text="{x:Bind ViewModel.Album.PublishTime.Year, Mode=OneWay}"
+                               Foreground="{ThemeResource SystemBaseMediumColor}"
+                               Margin="0 8 0 4" />
+                    <Button Style="{StaticResource TextBlockButtonStyle}" FontSize="12"
+                            CornerRadius="4"
+                            Padding="4 2" Margin="-4 4 -4 0"
+                            Foreground="{ThemeResource SystemBaseMediumLowColor}"
+                            Command="{x:Bind ViewModel.ShowDescriptionTeachingTipCommand}"
+                            Visibility="{x:Bind ViewModel.Album.Description, Mode=OneWay, FallbackValue=Collapsed, Converter={StaticResource EmptyObjectJudgeConverter}}">
+                        <TextBlock
+                            Text="{x:Bind ViewModel.Album.Description, Mode=OneWay, Converter={StaticResource LineBreakRemovalConverter}}"
+                            MaxLines="3" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
                     </Button>
                 </StackPanel>
-                <Button Style="{ThemeResource AccentButtonStyle}"
+                <TeachingTip
+                    IsOpen="{x:Bind ViewModel.IsDescriptionTeachingTipOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PreferredPlacement="Center" IsLightDismissEnabled="True">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{x:Bind ViewModel.Album.Title, Mode=OneWay}"
+                                   TextWrapping="Wrap"
+                                   FontSize="20" FontWeight="SemiBold"
+                                   Foreground="{ThemeResource SystemAccentColor}" />
+                        <TextBlock
+                            Text="{x:Bind ViewModel.Album.Artists, Mode=OneWay, Converter={StaticResource MultipleEntityNamesConverter}}"
+                            TextWrapping="Wrap"
+                            FontSize="16" FontWeight="Medium"
+                            Foreground="{ThemeResource SystemBaseMediumLowColor}" />
+                        <TextBlock Text="{x:Bind ViewModel.Album.Description, Mode=OneWay}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </TeachingTip>
+            </StackPanel>
+            <StackPanel x:Name="HeaderActionButtons"
+                        Grid.Column="1" VerticalAlignment="Bottom" Orientation="Horizontal"
+                        animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <Button x:Name="HeaderPlayButton" Style="{ThemeResource AccentButtonStyle}"
                         Command="{StaticResource PlayFromListCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xF5B0;" FontSize="12" />
                         <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
                     </StackPanel>
                 </Button>
-            </layout:Row>
-        </Border>
+                <StackPanel x:Name="AdditionalActionsContainer"
+                            Orientation="Horizontal"
+                            animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                    <animations:Implicit.ShowAnimations>
+                        <animations:OpacityAnimation From="0" To="1" Duration="0:0:0.4" />
+                        <animations:TranslationAnimation From="4,0,0" To="0" Duration="0:0:0.4" />
+                    </animations:Implicit.ShowAnimations>
+                    <animations:Implicit.HideAnimations>
+                        <animations:OpacityAnimation From="1" To="0" Duration="0:0:0.2" />
+                    </animations:Implicit.HideAnimations>
+                    <Button Margin="4 0 0 0"
+                            Command="{StaticResource SubscribeAlbumCommand}"
+                            CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.IsSubscribable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="{StaticResource FontIconGlyphCollectionAdd}"
+                                      FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                      FontSize="16" />
+                            <TextBlock x:Uid="Views/AlbumDetailView/SubscribeButtonContent" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="4 0 0 0"
+                            Command="{StaticResource UnsubscribeAlbumCommand}"
+                            CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.IsSubscribed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE73E;" FontSize="14" />
+                            <TextBlock x:Uid="Views/AlbumDetailView/UnsubscribeButtonContent" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="4 0 0 0" VerticalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
+                                      Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}"
+                                      FontSize="16" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="RightEdgeAlignedTop">
+                                <MenuFlyout.MenuFlyoutPresenterStyle>
+                                    <Style TargetType="MenuFlyoutPresenter">
+                                        <Setter Property="MinWidth" Value="250" />
+                                    </Style>
+                                </MenuFlyout.MenuFlyoutPresenterStyle>
+                                <MenuFlyoutItem x:Uid="MenuFlyoutItems/Share"
+                                                Icon="{community:FontIcon Glyph=&#xE72D;}"
+                                                Command="{StaticResource ShareCommand}"
+                                                CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" />
+                                <MenuFlyoutItem x:Uid="MenuFlyoutItems/CopyLink"
+                                                Icon="{community:FontIcon Glyph=&#xE71B;}"
+                                                Command="{StaticResource CopyLinkCommand}"
+                                                CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
         <ListView x:Name="TrackListView"
                   Style="{StaticResource TrackListViewStyle}"
                   SelectionMode="None"
-                  Padding="16 16 16 80"
+                  Padding="16 304 16 80"
                   ItemsSource="{x:Bind TrackCollectionViewSource.View, Mode=OneWay}">
-            <interactivity:Interaction.Behaviors>
-                <behaviors:LoadedEventTriggerBehavior>
-                    <interactivity:InvokeCommandAction Command="{x:Bind LoadedCommand}" />
-                </behaviors:LoadedEventTriggerBehavior>
-            </interactivity:Interaction.Behaviors>
             <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
@@ -144,135 +285,6 @@
                                             ShowContextFlyoutCommand="{StaticResource ShowTrackContextFlyoutCommand}" />
                 </DataTemplate>
             </ListView.ItemTemplate>
-            <ListView.Header>
-                <Border x:Name="ViewHeader"
-                        Visibility="{x:Bind ViewModel.Album, Converter={StaticResource EmptyObjectJudgeConverter}, Mode=OneWay}"
-                        Margin="0 0 0 16" VerticalAlignment="Top"
-                        Padding="16"
-                        CornerRadius="8"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <animations:Implicit.Animations>
-                        <animations:OpacityAnimation Duration="0:0:0.300" />
-                    </animations:Implicit.Animations>
-                    <layout:Row Spacing="16">
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                CornerRadius="8" Width="240" Height="240">
-                            <Image Stretch="Uniform"
-                                   Source="{x:Bind ViewModel.Album.ArtworkImageUrl, Mode=OneWay, Converter={StaticResource NeteaseImageResizeConverter}, ConverterParameter=480}"
-                                   Width="240" Height="240" />
-                        </Border>
-                        <StackPanel VerticalAlignment="Bottom">
-                            <layout:Row Spacing="2">
-                                <TextBlock Text="{x:Bind ViewModel.Album.Title, Mode=OneWay}"
-                                           FontSize="24" FontWeight="SemiBold" VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                                <FontIcon Glyph="{ThemeResource FontIconGlyphExplicit}"
-                                          FontFamily="{StaticResource CirrusIconSetFontFamily}"
-                                          Visibility="{x:Bind ViewModel.Album.IsExplicit, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}"
-                                          Foreground="{ThemeResource ExplicitIconForeground}"
-                                          FontSize="24"
-                                          layout:Row.Priority="1" />
-                            </layout:Row>
-                            <Button
-                                Content="{x:Bind ViewModel.Album.Artists, Mode=OneWay, Converter={StaticResource MultipleEntityNamesConverter}}"
-                                DataContext="{x:Bind ViewModel.Album.Artists, Mode=OneWay}"
-                                Style="{StaticResource TextBlockButtonStyle}" FontSize="20" CornerRadius="4"
-                                Padding="4 2" Margin="-4 4 -4 0">
-                                <interactivity:Interaction.Behaviors>
-                                    <behaviors:TappedEventTriggerBehavior>
-                                        <behaviors:InvokeCommandActionEx
-                                            Command="{StaticResource MultipleTargetNavigateCommand}" />
-                                    </behaviors:TappedEventTriggerBehavior>
-                                </interactivity:Interaction.Behaviors>
-                            </Button>
-                            <TextBlock Text="{x:Bind ViewModel.Album.PublishTime.Year, Mode=OneWay}" FontSize="16"
-                                       Margin="0 4 0 0" FontWeight="Medium"
-                                       Foreground="{ThemeResource SystemBaseMediumColor}" />
-                            <Button Style="{StaticResource TextBlockButtonStyle}" FontSize="12" CornerRadius="4"
-                                    Padding="4 2" Margin="-4 4 -4 0"
-                                    Foreground="{ThemeResource SystemBaseMediumLowColor}"
-                                    Command="{x:Bind ViewModel.ShowDescriptionTeachingTipCommand}"
-                                    Visibility="{x:Bind ViewModel.Album.Description, Mode=OneWay, FallbackValue=Collapsed, Converter={StaticResource EmptyObjectJudgeConverter}}">
-                                <TextBlock
-                                    Text="{x:Bind ViewModel.Album.Description, Mode=OneWay, Converter={StaticResource LineBreakRemovalConverter}}"
-                                    MaxLines="3" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
-                            </Button>
-                            <TeachingTip
-                                IsOpen="{x:Bind ViewModel.IsDescriptionTeachingTipOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                PreferredPlacement="Center" IsLightDismissEnabled="True">
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="{x:Bind ViewModel.Album.Title, Mode=OneWay}"
-                                               TextWrapping="Wrap"
-                                               FontSize="20" FontWeight="SemiBold"
-                                               Foreground="{ThemeResource SystemAccentColor}" />
-                                    <TextBlock
-                                        Text="{x:Bind ViewModel.Album.Artists, Mode=OneWay, Converter={StaticResource MultipleEntityNamesConverter}}"
-                                        TextWrapping="Wrap"
-                                        FontSize="16" FontWeight="Medium"
-                                        Foreground="{ThemeResource SystemBaseMediumLowColor}" />
-                                    <TextBlock Text="{x:Bind ViewModel.Album.Description, Mode=OneWay}"
-                                               TextWrapping="Wrap" />
-                                </StackPanel>
-                            </TeachingTip>
-                            <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
-                                <Button Style="{ThemeResource AccentButtonStyle}"
-                                        Command="{StaticResource PlayFromListCommand}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xF5B0;" FontSize="12" />
-                                        <TextBlock x:Uid="Views/PlaylistDetailView/PlayAllButtonContent" />
-                                    </StackPanel>
-                                </Button>
-                                <Button Margin="4 0 0 0"
-                                        Command="{StaticResource SubscribeAlbumCommand}"
-                                        CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
-                                        Visibility="{x:Bind ViewModel.IsSubscribable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon Glyph="{StaticResource FontIconGlyphCollectionAdd}"
-                                                  FontFamily="{StaticResource CirrusIconSetFontFamily}"
-                                                  FontSize="16" />
-                                        <TextBlock x:Uid="Views/AlbumDetailView/SubscribeButtonContent" />
-                                    </StackPanel>
-                                </Button>
-                                <Button Margin="4 0 0 0"
-                                        Command="{StaticResource UnsubscribeAlbumCommand}"
-                                        CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}"
-                                        Visibility="{x:Bind ViewModel.IsSubscribed, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="14" />
-                                        <TextBlock x:Uid="Views/AlbumDetailView/UnsubscribeButtonContent" />
-                                    </StackPanel>
-                                </Button>
-                                <Button Margin="4 0 0 0" VerticalAlignment="Stretch">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon FontFamily="{StaticResource CirrusIconSetFontFamily}"
-                                                  Glyph="{StaticResource FontIconGlyphMoreHorizontalFilled}"
-                                                  FontSize="16" />
-                                    </StackPanel>
-                                    <Button.Flyout>
-                                        <MenuFlyout Placement="RightEdgeAlignedTop">
-                                            <MenuFlyout.MenuFlyoutPresenterStyle>
-                                                <Style TargetType="MenuFlyoutPresenter">
-                                                    <Setter Property="MinWidth" Value="250" />
-                                                </Style>
-                                            </MenuFlyout.MenuFlyoutPresenterStyle>
-                                            <MenuFlyoutItem x:Uid="MenuFlyoutItems/Share"
-                                                            Icon="{community:FontIcon Glyph=&#xE72D;}"
-                                                            Command="{StaticResource ShareCommand}"
-                                                            CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" />
-                                            <MenuFlyoutItem x:Uid="MenuFlyoutItems/CopyLink"
-                                                            Icon="{community:FontIcon Glyph=&#xE71B;}"
-                                                            Command="{StaticResource CopyLinkCommand}"
-                                                            CommandParameter="{x:Bind ViewModel.Album, Mode=OneWay}" />
-                                        </MenuFlyout>
-                                    </Button.Flyout>
-                                </Button>
-                            </StackPanel>
-                        </StackPanel>
-                    </layout:Row>
-                </Border>
-            </ListView.Header>
             <ListView.Footer>
                 <StackPanel>
                     <StackPanel Margin="12" Spacing="4">

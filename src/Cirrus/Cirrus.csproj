@@ -66,6 +66,7 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.MarkdownTextBlock" Version="0.1.261027-build.2704" />
+        <PackageReference Include="CommunityToolkit.Labs.WinUI.Controls.TokenView" Version="0.1.261027-build.2704" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.3.260402-preview2" />
         <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.3.260402-preview2" />

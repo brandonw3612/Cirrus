@@ -32,6 +32,7 @@ public partial class UserDetailViewModel : ViewModel<ulong>
 
     [ObservableProperty] public partial UserProfile? Profile { get; private set; }
     [ObservableProperty] public partial double NavigatiableCardWidth { get; private set; }
+    [ObservableProperty] public partial bool IsDescriptionTeachingTipOpen { get; set; }
 
     public NavigatiableGroup[] Playlists { get; } =
     [
@@ -232,6 +233,9 @@ public partial class UserDetailViewModel : ViewModel<ulong>
         }
     }
 
+    [RelayCommand]
+    private void ShowDescriptionTeachingTip() => IsDescriptionTeachingTipOpen = true;
+    
     [RelayCommand]
     private void OnSizeChanged(SizeChangedEventArgs args)
     {

@@ -307,6 +307,11 @@
                                                   Title="{x:Bind Nickname}"
                                                   DataContext="{Binding Mode=OneWay}" />
             </DataTemplate>
+            <animations:ImplicitAnimationSet x:Key="LayoutImplicitAnimations">
+                <animations:OffsetAnimation Duration="0:0:0.400" />
+                <animations:SizeAnimation Duration="0:0:0.400" />
+                <animations:OpacityAnimation Duration="0:0:0.400" />
+            </animations:ImplicitAnimationSet>
         </ResourceDictionary>
     </Page.Resources>
     <Grid>
@@ -316,6 +321,7 @@
             </behaviors:LoadedEventTriggerBehavior>
             <behaviors:SizeChangedEventTriggerBehavior>
                 <interactivity:InvokeCommandAction Command="{x:Bind ViewModel.SizeChangedCommand}" />
+                <interactivity:InvokeCommandAction Command="{x:Bind SizeChangedCommand}" />
             </behaviors:SizeChangedEventTriggerBehavior>
         </interactivity:Interaction.Behaviors>
         <VisualStateManager.VisualStateGroups>
@@ -451,120 +457,81 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="Expanded">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="120" />
+                        <Setter Target="ViewHeader.Padding" Value="16 0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Compact">
+                    <VisualState.Setters>
+                        <Setter Target="ViewHeader.Height" Value="240" />
+                        <Setter Target="ViewHeader.Padding" Value="24 120 24 0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <ProgressBar VerticalAlignment="Top" Canvas.ZIndex="2"
                      Background="Transparent"
                      IsIndeterminate="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-        <StackPanel x:Name="FloatingHeader"
-                    Visibility="Collapsed" Canvas.ZIndex="1"
-                    VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="1000"
-                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    CornerRadius="4" Margin="32 16" Padding="24" Spacing="16">
-            <animations:Implicit.ShowAnimations>
-                <animations:TranslationAnimation From="0,-120,0" To="0" Duration="0:0:0.300" />
-            </animations:Implicit.ShowAnimations>
-            <animations:Implicit.HideAnimations>
-                <animations:TranslationAnimation From="0" To="0,-120,0" Duration="0:0:0.300" />
-            </animations:Implicit.HideAnimations>
-            <TextBlock
-                Text="{x:Bind ViewModel.Parameter, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/SearchResultView/Header/Format, Mode=OneWay}"
-                TextTrimming="CharacterEllipsis"
-                CharacterSpacing="-20" FontSize="24" FontWeight="Bold" />
-            <communityControls:Segmented Style="{ThemeResource ButtonSegmentedStyle}"
-                                         SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <communityControls:Segmented.Items>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/TopResultsSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="&#xECAD;" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/ArtistsSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
-                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/AlbumsSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="&#xE93C;" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/TracksSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="&#xEC4F;" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/PlaylistsSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="{ThemeResource FontIconGlyphAppsListDetail}"
-                                      FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                    <communityControls:SegmentedItem x:Uid="Views/SearchResultView/Categories/ProfilesSegmentedItem">
-                        <communityControls:SegmentedItem.Icon>
-                            <FontIcon Glyph="&#xE716;" />
-                        </communityControls:SegmentedItem.Icon>
-                    </communityControls:SegmentedItem>
-                </communityControls:Segmented.Items>
-            </communityControls:Segmented>
-        </StackPanel>
+        <Grid x:Name="ViewHeader"
+              Canvas.ZIndex="1" VerticalAlignment="Top" HorizontalAlignment="Center"
+              Margin="16" Padding="16" RowSpacing="16" Background="Transparent"
+              animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border x:Name="HeaderBackgroundBorder" Grid.RowSpan="4" Margin="-16 0"
+                    animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}" />
+            <TextBlock Grid.Row="1"
+                       Text="{x:Bind ViewModel.Parameter, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/SearchResultView/Header/Format, Mode=OneWay}"
+                       TextTrimming="CharacterEllipsis"
+                       CharacterSpacing="-20" FontSize="24" FontWeight="Bold"
+                       animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}"/>
+            <communityControls:TokenView Grid.Row="2" SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         animations:Implicit.Animations="{StaticResource LayoutImplicitAnimations}">
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/TopResultsSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="&#xECAD;" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/ArtistsSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
+                                  FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/AlbumsSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="&#xE93C;" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/TracksSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="&#xEC4F;" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/PlaylistsSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="{ThemeResource FontIconGlyphAppsListDetail}"
+                                  FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+                <communityControls:TokenItem x:Uid="Views/SearchResultView/Categories/ProfilesSegmentedItem">
+                    <communityControls:TokenItem.Icon>
+                        <FontIcon Glyph="&#xE716;" />
+                    </communityControls:TokenItem.Icon>
+                </communityControls:TokenItem>
+            </communityControls:TokenView>
+        </Grid>
         <ListView x:Name="ResultListView"
                   ItemsSource="{x:Bind ViewModel.DisplayItems}"
-                  Padding="8 8 8 80"
+                  Padding="8 156 8 80"
                   SelectionMode="None">
-            <ListView.Header>
-                <StackPanel x:Name="ViewHeader"
-                            Margin="24 24 24 16" Spacing="16">
-                    <TextBlock
-                        Text="{x:Bind ViewModel.Parameter, Converter={StaticResource LanguageResourceConverter}, ConverterParameter=Views/SearchResultView/Header/Format, Mode=OneWay}"
-                        TextTrimming="CharacterEllipsis"
-                        CharacterSpacing="-20" FontSize="24" FontWeight="Bold" />
-                    <communityControls:Segmented Style="{ThemeResource ButtonSegmentedStyle}"
-                                                 SelectedIndex="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <communityControls:Segmented.Items>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/TopResultsSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="&#xECAD;" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/ArtistsSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="{ThemeResource FontIconGlyphArtist}"
-                                              FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/AlbumsSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="&#xE93C;" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/TracksSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="&#xEC4F;" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/PlaylistsSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="{ThemeResource FontIconGlyphAppsListDetail}"
-                                              FontFamily="{ThemeResource CirrusIconSetFontFamily}" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                            <communityControls:SegmentedItem
-                                x:Uid="Views/SearchResultView/Categories/ProfilesSegmentedItem">
-                                <communityControls:SegmentedItem.Icon>
-                                    <FontIcon Glyph="&#xE716;" />
-                                </communityControls:SegmentedItem.Icon>
-                            </communityControls:SegmentedItem>
-                        </communityControls:Segmented.Items>
-                    </communityControls:Segmented>
-                </StackPanel>
-            </ListView.Header>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Template">
