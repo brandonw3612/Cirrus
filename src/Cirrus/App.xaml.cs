@@ -1,7 +1,7 @@
-﻿using Windows.Storage;
-using Cirrus.Base.Services;
+﻿using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Data;
+using Cirrus.LiveModels;
 using Cirrus.Network;
 using Cirrus.Playback.PlaybackServices;
 using Cirrus.Playback.Primitives;
@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.AppLifecycle;
+using Windows.Storage;
 
 namespace Cirrus;
 
@@ -33,8 +34,9 @@ public sealed partial class App
                 .AddSingleton<IConfigurationService, ConfigurationService>()
                 .AddSingleton<IScrobbleService, LastFmService>()
                 .AddSingleton<ICacheService>(new SqliteCacheService(ApplicationData.Current.LocalCacheFolder.Path))
-                // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
-                // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
+                .AddSingleton<PlaybackServiceBridge>()
+        // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
+        // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );
         if (UserPreferenceService.GetService() is { } userPreferenceService)
             Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =

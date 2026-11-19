@@ -54,7 +54,7 @@ public sealed partial class MainWindow
         {
             RootGrid.Children.Add(new SystemTrayIcon());
         }
-        PlaybackDrawer.Navigate(typeof(PlaybackControlView));
+        PlaybackDrawer.SetTargetPage(typeof(PlaybackControlView));
         if (Application.Current is App { CurrentAccount: { IsLoggedIn: true, UserAccount: { UserId: { } userId } } })
         {
             Navigate(typeof(UserDetailView), userId);
