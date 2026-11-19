@@ -25,7 +25,7 @@ public partial class PlaybackControlViewModel : ViewModel
     private readonly UserPreferenceService _preference = UserPreferenceService.GetService()!;
     private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
     private readonly ICacheService? _cacheService = ICacheService.GetService();
-    public PlaybackServiceBridge PlaybackServiceBridge { get; } = new();
+    public PlaybackServiceBridge PlaybackServiceBridge { get; } = ServicesProvider.GetService<PlaybackServiceBridge>()!;
 
     public TrackLyrics? CurrentTrackLyrics { get; private set; }
     public bool LyricsScrollerOccupied { get; private set; }
@@ -77,13 +77,31 @@ public partial class PlaybackControlViewModel : ViewModel
         OnPropertyChanged(nameof(LyricsBaseFontSize));
     }
 
-    public override Task LoadDataAsync()
+    public override async Task LoadDataAsync()
+    {
+        SwitchPlaybackMode();
+        var track = PlaybackServiceBridge.CurrentTrack;
+        if (track == null) return;
+        var resp = await Network.Client.Track.GetLyricsAsync(track.TrackId);
+        DispatcherQueue!.TryEnqueue(() =>
+        {
+            var lyrics = resp.ToLocal(track.Duration);
+            RenderLyrics?.Invoke(lyrics);
+            CurrentTrackLyrics = lyrics;
+        });
+    }
+    public override void AllocateDisposable()
+    {
+        PlaybackServiceBridge.CurrentTrackChanged += OnCurrentTrackChanged;
+        PlaybackServiceBridge.PlaybackPositionChanged += OnPlaybackPositionChanged;
+    }
+    public override void RecycleDisposable()
     {
         PlaybackServiceBridge.CurrentTrackChanged -= OnCurrentTrackChanged;
-        PlaybackServiceBridge.CurrentTrackChanged += OnCurrentTrackChanged;
         PlaybackServiceBridge.PlaybackPositionChanged -= OnPlaybackPositionChanged;
-        PlaybackServiceBridge.PlaybackPositionChanged += OnPlaybackPositionChanged;
-        return Task.CompletedTask;
+        RenderLyrics = null;
+        SyncLyrics = null;
+        ToggleLyricsPreview = null;
     }
 
     private void OnPlaybackPositionChanged(object? sender, PlaybackPositionChangedEventArgs e)
