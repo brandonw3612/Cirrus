@@ -24,7 +24,7 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
             var colorIsDark = result.RGBVectorLStarIsDark();
             return Task.FromResult(new ThemeColorResult(result, colorIsDark));
         }
-        public async Task<PaletteResult> CreatePalette(Dictionary<Vector3, int> sourceColor, int clusterCount, bool ignoreWhite = false, bool? isDark = null)
+        public async Task<PaletteResult> CreatePalette(Dictionary<Vector3, int> sourceColor, int clusterCount, bool ignoreWhite = false)
         {
             var quantizer = new PaletteQuantizer();
             if (sourceColor.Count == 1)
@@ -33,46 +33,25 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
             }
             var builder = sourceColor.AsEnumerable();
             var colorResult = await CreateThemeColor(sourceColor, ignoreWhite);
-            var colorIsDark = false;
-            if (isDark == null)
+            if (colorResult.ColorIsDark)
             {
-                if (ignoreWhite)
+                builder = builder.Where(t => t.Key.RGBVectorLStarIsDark());
+                if (!builder.Any())
                 {
-                    builder = builder.Where(t => t.Key.X <= 250 || t.Key.Y <= 250 || t.Key.Z <= 250);
-                }
-                colorIsDark = colorResult.ColorIsDark;
-                if (colorIsDark)
-                {
-                    builder = builder.Where(t => t.Key.RGBVectorLStarIsDark());
-                }
-                else
-                {
-                    builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark());
+                    builder = sourceColor.AsEnumerable().Where(t => !t.Key.RGBVectorLStarIsDark());
+                    // 压暗这些颜色
+                    var darkenedItems = new List<KeyValuePair<Vector3, int>>(builder);
+                    foreach (var item in builder.ToList())
+                    {
+                        var darkened = item.Key.RGBVectorDarken(50f);
+                        darkenedItems.Add(new KeyValuePair<Vector3, int>(darkened, item.Value));
+                    }
+                    builder = darkenedItems.AsEnumerable();
                 }
             }
             else
             {
-                colorIsDark = isDark.Value;
-                if (colorIsDark)
-                {
-                    builder = builder.Where(t => t.Key.RGBVectorLStarIsDark());
-                    if (!builder.Any())
-                    {
-                        builder = sourceColor.AsEnumerable().Where(t => !t.Key.RGBVectorLStarIsDark());
-                        // 压暗这些颜色
-                        var darkenedItems = new List<KeyValuePair<Vector3, int>>(builder);
-                        foreach (var item in builder.ToList())
-                        {
-                            var darkened = item.Key.RGBVectorDarken(50f);
-                            darkenedItems.Add(new KeyValuePair<Vector3, int>(darkened, item.Value));
-                        }
-                        builder = darkenedItems.AsEnumerable();
-                    }
-                }
-                else
-                {
-                    builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark());
-                }
+                builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark());
             }
             var targetColor = builder.ToDictionary(t => t.Key, t => t.Value);
             foreach (var color in targetColor)
@@ -104,7 +83,7 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
             {
                 result = quantizeResult;
             }
-            return new PaletteResult(result, colorIsDark, colorResult);
+            return new PaletteResult(result, colorResult.ColorIsDark, colorResult);
         }
 
         private class PaletteQuantizer

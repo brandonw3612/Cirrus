@@ -38,14 +38,12 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
             }
             var colorResult = await CreateThemeColor(sourceColor, ignoreWhite, toLab);
             var builder = sourceColor.AsEnumerable();
-            var colorIsDark = true; // colorResult.ColorIsDark;
-            if (colorIsDark)
+            if (colorResult.ColorIsDark)
             {
                 builder = builder.Where(t => t.Key.RGBVectorLStarIsDark());
                 if (!builder.Any())
                 {
                     builder = sourceColor.AsEnumerable().Where(t => !t.Key.RGBVectorLStarIsDark());
-                    // ??????
                     var darkenedItems = new List<KeyValuePair<Vector3, int>>(builder);
                     foreach (var item in builder.ToList())
                     {
@@ -54,31 +52,10 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
                     }
                     builder = darkenedItems.AsEnumerable();
                 }
-                //var processedItems = new List<KeyValuePair<Vector3, int>>(builder);
-                //foreach (var item in builder.ToList())
-                //{
-                //    if (item.Key.RGBVectorLStarIsDark())
-                //    {
-                //        processedItems.Add(item);
-                //    }
-                //    else
-                //    {
-                //        var darkened = item.Key.RGBVectorDarken(50f);
-                //        processedItems.Add(new KeyValuePair<Vector3, int>(darkened, item.Value));
-                //    }
-                //}
-                //builder = processedItems.AsEnumerable();
             }
             else
             {
-                if (!ignoreWhite)
-                {
-                    builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark());
-                }
-                else
-                {
-                    builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark() && (t.Key.X <= 250 || t.Key.Y <= 250 || t.Key.Z <= 250));
-                }
+                builder = builder.Where(t => !t.Key.RGBVectorLStarIsDark());
             }
             if (toLab)
             {
@@ -103,7 +80,7 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
                 // You know, it is always hard to fullfill a palette when you have no enough colors. So please forgive me when placing the same color over and over again.
                 result.Add(dominantColors[i % count]);
             }
-            return new PaletteResult(result, colorIsDark, colorResult);
+            return new PaletteResult(result, colorResult.ColorIsDark, colorResult);
         }
         static Vector3[] KMeansCluster(Dictionary<Vector3, int> colors, int numClusters, bool useKMeansPP)
         {

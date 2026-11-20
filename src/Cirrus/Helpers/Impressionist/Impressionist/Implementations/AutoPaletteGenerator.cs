@@ -8,7 +8,7 @@ namespace Cirrus.Helpers.Impressionist.Impressionist.Implementations
         public static async Task<PaletteResult> CreatePalette(Dictionary<Vector3, int> sourceColor, int clusterCount, bool ignoreWhite = false, bool toLab = false, bool useKMeansPP = false)
         {
             var kmeansTask = PaletteGenerators.KMeansPaletteGenerator.CreatePalette(sourceColor, clusterCount, ignoreWhite, toLab, useKMeansPP);
-            var octTreeTask = PaletteGenerators.OctTreePaletteGenerator.CreatePalette(sourceColor, clusterCount, ignoreWhite, true);
+            var octTreeTask = PaletteGenerators.OctTreePaletteGenerator.CreatePalette(sourceColor, clusterCount, ignoreWhite);
 
             await Task.WhenAll(kmeansTask, octTreeTask);
 
