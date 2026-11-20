@@ -79,16 +79,10 @@ public partial class PlaybackControlViewModel : ViewModel
 
     public override async Task LoadDataAsync()
     {
-        var track = PlaybackServiceBridge.CurrentTrack;
-        if (track == null) return;
-        var resp = await Network.Client.Track.GetLyricsAsync(track.TrackId);
-        DispatcherQueue!.TryEnqueue(() =>
-        {
-            var lyrics = resp.ToLocal(track.Duration);
-            RenderLyrics?.Invoke(lyrics);
-            CurrentTrackLyrics = lyrics;
-        });
+        await RefreshLyrics(PlaybackServiceBridge.CurrentTrack);
+        OnPropertyChanged(nameof(ViewModel));
     }
+    
     public override void AllocateDisposable()
     {
         PlaybackServiceBridge.CurrentTrackChanged += OnCurrentTrackChanged;
@@ -115,11 +109,17 @@ public partial class PlaybackControlViewModel : ViewModel
 
     private async void OnCurrentTrackChanged(object? sender, CurrentTrackChangedEventArgs<ulong> e)
     {
-        if (e.CurrentTrack is not { } track)
+        await RefreshLyrics(e.CurrentTrack);
+    }
+
+    private async Task RefreshLyrics(IAudioTrack<ulong>? track)
+    {
+        if (track is null)
         {
             DispatcherQueue!.TryEnqueue(() =>
             {
                 RenderLyrics?.Invoke(null);
+                CurrentTrackLyrics = null;
             });
             return;
         }

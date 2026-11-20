@@ -55,7 +55,7 @@ public sealed partial class AnimationPresenter
 
     private static Unicolour Black => field ??= new(ColourSpace.Rgb, 0, 0, 0);
 
-    private readonly Unicolour[] _currentColors = Enumerable.Repeat<Unicolour>(new(ColourSpace.Rgb, 0, 0, 0), 4).ToArray();
+    private readonly Unicolour[] _currentColors = Enumerable.Repeat(Black, 4).ToArray();
     private readonly Unicolour[] _targetColors = new Unicolour[4];
     private ColorPalette4? _pendingTargetColors;
     private bool _hasReceivedPalette;
