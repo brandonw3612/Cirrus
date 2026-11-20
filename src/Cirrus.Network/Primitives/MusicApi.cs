@@ -214,7 +214,7 @@ internal static class RequestInvoker
     {
         Dictionary<string, string> requestHeaders = new()
         {
-            ["User-Agent"] = UserAgents.Current[apiConfig.UserAgentPlatform]
+            ["User-Agent"] = Client.UserCredentials?["Headers"]?["User-Agent"]?.ToString() ?? UserAgents.Current[apiConfig.UserAgentPlatform]
         };
         if (method == HttpMethod.Post)
         {
