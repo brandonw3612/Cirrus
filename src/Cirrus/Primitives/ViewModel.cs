@@ -11,7 +11,9 @@ public abstract partial class ViewModel : ObservableObject
     public DispatcherQueue? DispatcherQueue { get; set; } = MainWindow.Current?.DispatcherQueue;
 
     [ObservableProperty] public partial bool IsLoading { get; set; } = false;
-    
+
+    public bool Recycled { get; private set; } = false;
+
     public abstract Task LoadDataAsync();
 
     public virtual void AllocateDisposable()
@@ -21,6 +23,7 @@ public abstract partial class ViewModel : ObservableObject
     
     public virtual void RecycleDisposable()
     {
-        // Do nothing.
+        // Mark as recycled to prevent multiple recycling attempts.
+        Recycled = true;
     }
 }

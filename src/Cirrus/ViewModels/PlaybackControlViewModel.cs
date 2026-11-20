@@ -79,7 +79,6 @@ public partial class PlaybackControlViewModel : ViewModel
 
     public override async Task LoadDataAsync()
     {
-        SwitchPlaybackMode();
         var track = PlaybackServiceBridge.CurrentTrack;
         if (track == null) return;
         var resp = await Network.Client.Track.GetLyricsAsync(track.TrackId);
@@ -97,6 +96,7 @@ public partial class PlaybackControlViewModel : ViewModel
     }
     public override void RecycleDisposable()
     {
+        base.RecycleDisposable();
         PlaybackServiceBridge.CurrentTrackChanged -= OnCurrentTrackChanged;
         PlaybackServiceBridge.PlaybackPositionChanged -= OnPlaybackPositionChanged;
         RenderLyrics = null;

@@ -37,12 +37,12 @@ public sealed partial class Drawer
         {
             var frame = new Frame();
             frame.Navigate(drawer._contentType, null, new SuppressNavigationTransitionInfo());
-            drawer.Content.Content = frame;
+            drawer.ContentControl.Content = frame;
         }
         else 
         {
             ratio = 1d - ratio;
-            drawer.Content.Content = null;
+            drawer.ContentControl.Content = null;
         }
         animation.Duration = TimeSpan.FromMilliseconds(Math.Max(500 * ratio, 200));
         visual.StartAnimation(nameof(visual.Offset), animation);
