@@ -62,7 +62,7 @@ public sealed partial class PlaybackControlBar
     }
     
     [RelayCommand]
-    private void OnTapped(TappedRoutedEventArgs args)
+    protected override void OnTapped(TappedRoutedEventArgs args)
     {
         if (MainWindow.Current is not { } window) return;
         var current = args.OriginalSource as DependencyObject;

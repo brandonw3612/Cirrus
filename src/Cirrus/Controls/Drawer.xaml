@@ -15,7 +15,7 @@
         </behaviors:SizeChangedEventTriggerBehavior>
     </interactivity:Interaction.Behaviors>
     <ContentControl
-        x:Name="Content"
+        x:Name="ContentControl"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"

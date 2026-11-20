@@ -316,6 +316,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
 
     public override void RecycleDisposable()
     {
+        base.RecycleDisposable();
         _loadCancellation?.Cancel();
         _loadCancellation?.Dispose();
         _tracksSubscription.Dispose();

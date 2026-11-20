@@ -1,5 +1,5 @@
 using Cirrus.Behaviors;
-using Cirrus.Helpers;
+using Cirrus.Helpers.Impressionist;
 using Cirrus.Helpers.Impressionist.Impressionist.Implementations;
 using Cirrus.Resources;
 using CommunityToolkit.Mvvm.Input;
@@ -37,7 +37,7 @@ public sealed partial class AnimationPresenter
             new PropertyMetadata(false, OnIsPlayingChanged));
 
     private Vector3[]? displayColors;
-    private readonly PixelShaderEffect<Isolation> shaderEffect = new();
+    private PixelShaderEffect<Isolation>? shaderEffect = new();
     private Vector2 canvasSize;
 
     public AnimationPresenter()
@@ -45,10 +45,8 @@ public sealed partial class AnimationPresenter
         InitializeComponent();
         this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(new RelayCommand(() =>
         {
-            BackgroundPresenter.RemoveFromVisualTree();
-            BackgroundPresenter = null;
-            shaderEffect.Dispose();
-
+            Interlocked.Exchange(ref BackgroundPresenter, null)?.RemoveFromVisualTree();
+            Interlocked.Exchange(ref shaderEffect, null)?.Dispose();
         }));
         this.AttachEventTriggerBehaviorToCommand<FrameworkElement, SizeChangedEventTriggerBehavior>(new RelayCommand<SizeChangedEventArgs>(args =>
         {
@@ -64,8 +62,8 @@ public sealed partial class AnimationPresenter
         using var stream = await reference.OpenReadAsync();
         var decoder = await BitmapDecoder.CreateAsync(stream);
         var colors = await ImageColorHelper.GetPixelColor(decoder);
-        var result = await AutoPaletteGenerator.CreatePalette(colors, 4, toLab: true, useKMeansPP: true);
-        background.displayColors = [.. result.Palette.Select(t => t / 255)];
+        var palette = await AutoPaletteGenerator.CreatePalette(colors, 4, false, false, true);
+        background.displayColors = [.. palette.Palette.Select(t => t / 255)];
     }
 
     private static async void OnIsPlayingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

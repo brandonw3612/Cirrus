@@ -205,6 +205,7 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
 
     public override void RecycleDisposable()
     {
+        base.RecycleDisposable();
         _trackSubscription.Dispose();
         _trackSource.Dispose();
         WeakReferenceMessenger.Default.Unregister<OnlineAlbum, string>(this, MessengerTokens.AlbumSubscriptionStatusChanged);

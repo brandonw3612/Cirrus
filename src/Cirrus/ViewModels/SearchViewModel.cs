@@ -58,6 +58,7 @@ public sealed partial class SearchViewModel : ViewModel
 
     public override void RecycleDisposable()
     {
+        base.RecycleDisposable();
         _suggestionQuerySubscription?.Dispose();
         _suggestionQuerySubscription = null;
         _suggestionQueryInput?.Dispose();
