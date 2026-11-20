@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Windows.Graphics.Imaging;
 
-namespace Cirrus.Helpers
+namespace Cirrus.Helpers.Impressionist
 {
     public static class ImageColorHelper
     {
