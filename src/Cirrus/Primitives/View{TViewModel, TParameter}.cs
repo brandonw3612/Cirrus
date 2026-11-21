@@ -1,8 +1,10 @@
 ﻿using Cirrus.Base.Primitives;
 using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
+using Cirrus.Behaviors;
 using Cirrus.ViewModels;
 using Cirrus.Views;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -26,6 +28,10 @@ public abstract class View<TViewModel, TParameter> : Page
     {
         ViewModel = new();
         NavigationCacheMode = NavigationCacheMode.Disabled;
+        this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(new RelayCommand(() =>
+        {
+            ViewModel.TryRecycleDisposable();
+        }));
     }
     
     protected virtual Task LoadVisualContentAsync()
@@ -67,7 +73,7 @@ public abstract class View<TViewModel, TParameter> : Page
                     return;
 #endif
             }
-            ViewModel.AllocateDisposable();
+            ViewModel.TryAllocateDisposable();
             await LoadVisualContentAsync();
         }
         catch (Exception exception)
@@ -116,7 +122,7 @@ public abstract class View<TViewModel, TParameter> : Page
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-        ViewModel.RecycleDisposable();
+        ViewModel.TryRecycleDisposable();
         base.OnNavigatedFrom(e);
     }
 

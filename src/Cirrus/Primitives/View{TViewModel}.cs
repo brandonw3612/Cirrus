@@ -29,8 +29,7 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
         NavigationCacheMode = NavigationCacheMode.Disabled;
         this.AttachEventTriggerBehaviorToCommand<FrameworkElement, UnloadedEventTriggerBehavior>(new RelayCommand(() =>
         {
-            if (!ViewModel.Recycled)
-                ViewModel.RecycleDisposable();
+            ViewModel.TryRecycleDisposable();
         }));
     }
 
@@ -70,7 +69,7 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
 #endif
             }
 
-            ViewModel.AllocateDisposable();
+            ViewModel.TryAllocateDisposable();
             await LoadVisualContentAsync();
         }
         catch (Exception exception)
@@ -127,8 +126,7 @@ public abstract class View<TViewModel> : Page where TViewModel : ViewModel, new(
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-        if(!ViewModel.Recycled)
-            ViewModel.RecycleDisposable();
+        ViewModel.TryRecycleDisposable();
         base.OnNavigatedFrom(e);
     }
 

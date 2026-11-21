@@ -244,7 +244,7 @@ public partial class UserDetailViewModel : ViewModel<ulong>
         NavigatiableCardWidth = width / cardPerRow;
     }
 
-    public override void AllocateDisposable()
+    protected override void AllocateDisposable()
     {
         if (Application.Current is App { CurrentAccount.UserAccount: { } account } && Parameter == account.UserId)
         {
@@ -264,9 +264,8 @@ public partial class UserDetailViewModel : ViewModel<ulong>
         }
     }
 
-    public override void RecycleDisposable()
+    protected override void RecycleDisposable()
     {
-        base.RecycleDisposable();
         foreach (var subscription in _playlistSubscriptions)
             subscription.Dispose();
         foreach (var source in _playlistSources)

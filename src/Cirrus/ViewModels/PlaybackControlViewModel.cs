@@ -82,15 +82,14 @@ public partial class PlaybackControlViewModel : ViewModel
         await RefreshLyrics(PlaybackServiceBridge.CurrentTrack);
         OnPropertyChanged(nameof(ViewModel));
     }
-    
-    public override void AllocateDisposable()
+
+    protected override void AllocateDisposable()
     {
         PlaybackServiceBridge.CurrentTrackChanged += OnCurrentTrackChanged;
         PlaybackServiceBridge.PlaybackPositionChanged += OnPlaybackPositionChanged;
     }
-    public override void RecycleDisposable()
+    protected override void RecycleDisposable()
     {
-        base.RecycleDisposable();
         PlaybackServiceBridge.CurrentTrackChanged -= OnCurrentTrackChanged;
         PlaybackServiceBridge.PlaybackPositionChanged -= OnPlaybackPositionChanged;
         RenderLyrics = null;

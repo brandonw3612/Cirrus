@@ -12,18 +12,34 @@ public abstract partial class ViewModel : ObservableObject
 
     [ObservableProperty] public partial bool IsLoading { get; set; } = false;
 
-    public bool Recycled { get; private set; } = false;
+    public bool Recycled { get; private set; } = true;
 
     public abstract Task LoadDataAsync();
 
-    public virtual void AllocateDisposable()
+    protected virtual void AllocateDisposable()
     {
         // Do nothing.
     }
-    
-    public virtual void RecycleDisposable()
+    public void TryAllocateDisposable()
     {
-        // Mark as recycled to prevent multiple recycling attempts.
-        Recycled = true;
+        if (Recycled)
+        {
+            AllocateDisposable();
+            Recycled = false;
+        }
+    }
+
+    protected virtual void RecycleDisposable()
+    {
+        // Do nothing.
+    }
+
+    public void TryRecycleDisposable()
+    {
+        if (!Recycled)
+        {
+            RecycleDisposable();
+            Recycled = true;
+        }
     }
 }

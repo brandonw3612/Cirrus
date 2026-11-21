@@ -29,7 +29,7 @@ public sealed partial class SearchViewModel : ViewModel
     private Subject<string>? _suggestionQueryInput;
     private IDisposable? _suggestionQuerySubscription;
 
-    public override void AllocateDisposable()
+    protected override void AllocateDisposable()
     {
         _suggestionQueryInput = new();
         _suggestionQuerySubscription = _suggestionQueryInput
@@ -56,9 +56,8 @@ public sealed partial class SearchViewModel : ViewModel
             });
     }
 
-    public override void RecycleDisposable()
+    protected override void RecycleDisposable()
     {
-        base.RecycleDisposable();
         _suggestionQuerySubscription?.Dispose();
         _suggestionQuerySubscription = null;
         _suggestionQueryInput?.Dispose();
