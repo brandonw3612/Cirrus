@@ -259,12 +259,10 @@ public sealed partial class AnimationPresenter
 
     private void UpdateCanvasSize(CanvasAnimatedControl presenter)
     {
-        var widthDip = presenter.Size.Width > 0 ? presenter.Size.Width : ActualWidth;
-        var heightDip = presenter.Size.Height > 0 ? presenter.Size.Height : ActualHeight;
 
         var size = new Vector2(
-            MathF.Max(1f, presenter.ConvertDipsToPixels((float)widthDip, CanvasDpiRounding.Round)),
-            MathF.Max(1f, presenter.ConvertDipsToPixels((float)heightDip, CanvasDpiRounding.Round)));
+            MathF.Max(1f, presenter.ConvertDipsToPixels((float)ActualWidth, CanvasDpiRounding.Round)),
+            MathF.Max(1f, presenter.ConvertDipsToPixels((float)ActualHeight, CanvasDpiRounding.Round)));
 
         lock (_effectLock)
         {
