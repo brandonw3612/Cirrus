@@ -14,7 +14,7 @@ internal partial class SystemTrayIconViewModel : ObservableObject
 {
     public string ApplicationName => Package.Current.DisplayName;
 
-    public PlaybackServiceBridge PSB { get; } = ServicesProvider.GetService<PlaybackServiceBridge>()!;
+    public PlaybackServiceBridge PSB => PlaybackServiceBridge.Current;
 
     [RelayCommand]
     private void RestoreMainWindow()

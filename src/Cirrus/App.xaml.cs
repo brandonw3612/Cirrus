@@ -34,7 +34,6 @@ public sealed partial class App
                 .AddSingleton<IConfigurationService, ConfigurationService>()
                 .AddSingleton<IScrobbleService, LastFmService>()
                 .AddSingleton<ICacheService>(new SqliteCacheService(ApplicationData.Current.LocalCacheFolder.Path))
-                .AddSingleton<PlaybackServiceBridge>()
         // .AddSingleton<ISoftwareUpdateService, SoftwareUpdateService>()
         // .RegisterHttpClientForConsumerService<SoftwareUpdateService>()
         );
