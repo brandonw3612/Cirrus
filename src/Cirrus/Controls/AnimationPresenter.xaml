@@ -12,6 +12,7 @@
     <Grid>
         <win2d:CanvasAnimatedControl
             x:Name="BackgroundPresenter"
+            ClearColor="Black"
             CreateResources="BackgroundPresenter_CreateResources"
             Draw="BackgroundPresenter_Draw"
             Update="BackgroundPresenter_Update" />
