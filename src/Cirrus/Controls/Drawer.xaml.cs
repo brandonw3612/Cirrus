@@ -1,6 +1,7 @@
 using Cirrus.Views;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Animations;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
@@ -26,6 +27,7 @@ public sealed partial class Drawer
             e.OldValue == e.NewValue ||
             e.NewValue is not bool isOpen ||
             MainWindow.Current?.Compositor is not { } compositor) return;
+        var batch = compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
         var animation = compositor.CreateVector3KeyFrameAnimation();
         var easingFunc = compositor.CreateCubicBezierEasingFunction(
             isOpen ? 0.4f : 0.6f, 0f, 0.4f, 1f
@@ -42,10 +44,14 @@ public sealed partial class Drawer
         else 
         {
             ratio = 1d - ratio;
-            drawer.ContentControl.Content = null;
+            batch.Completed += (_, _) =>
+            {
+                drawer.ContentControl.Content = null;
+            };
         }
         animation.Duration = TimeSpan.FromMilliseconds(Math.Max(500 * ratio, 200));
         visual.StartAnimation(nameof(visual.Offset), animation);
+        batch.End();
     }
 
     public Drawer()
