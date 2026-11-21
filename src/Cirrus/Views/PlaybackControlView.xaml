@@ -31,7 +31,7 @@
             Grid.RowSpan="3"
             Canvas.ZIndex="-1"
             IsPlaying="{x:Bind ViewModel.PlaybackServiceBridge.IsPlaying, Mode=OneWay}"
-            Opacity="0.8"
+            Opacity="1"
             Source="{x:Bind ViewModel.PlaybackServiceBridge.AlbumArtworkReference, Mode=OneWay}" />
         <Button
             x:Name="CollapseButton"
