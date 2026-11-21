@@ -228,7 +228,6 @@ public sealed partial class AnimationPresenter
 
         if (allSettled)
         {
-            bool shouldPause = false;
             lock (_stateLock)
             {
                 if (_pendingTargetColors is null)
@@ -238,13 +237,7 @@ public sealed partial class AnimationPresenter
                 if (!_isPlaying && !_isTransitioning)
                 {
                     sender.Paused = true;
-                    shouldPause = true;
                 }
-            }
-
-            if (shouldPause)
-            {
-                sender.Invalidate();
             }
         }
     }
@@ -262,18 +255,6 @@ public sealed partial class AnimationPresenter
     private void BackgroundPresenter_CreateResources(CanvasAnimatedControl sender, CanvasCreateResourcesEventArgs args)
     {
         UpdateCanvasSize(sender);
-
-        bool shouldPause;
-        lock (_stateLock)
-        {
-            shouldPause = !(_isPlaying || _isTransitioning);
-            sender.Paused = shouldPause;
-        }
-
-        if (shouldPause)
-        {
-            sender.Invalidate();
-        }
     }
 
     private void UpdateCanvasSize(CanvasAnimatedControl presenter)
