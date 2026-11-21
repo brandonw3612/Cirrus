@@ -25,7 +25,7 @@ public partial class PlaybackControlViewModel : ViewModel
     private readonly UserPreferenceService _preference = UserPreferenceService.GetService()!;
     private readonly IPlaybackService<ulong> _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
     private readonly ICacheService? _cacheService = ICacheService.GetService();
-    public PlaybackServiceBridge PlaybackServiceBridge { get; } = ServicesProvider.GetService<PlaybackServiceBridge>()!;
+    public PlaybackServiceBridge PlaybackServiceBridge => PlaybackServiceBridge.Current;
 
     public TrackLyrics? CurrentTrackLyrics { get; private set; }
     public bool LyricsScrollerOccupied { get; private set; }

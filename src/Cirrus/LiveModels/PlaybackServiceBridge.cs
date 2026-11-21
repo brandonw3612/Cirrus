@@ -40,11 +40,12 @@ public partial class PlaybackServiceBridge : ObservableObject
 
     [ObservableProperty] public partial string Artists { get; set; } = "Dedicated to creators";
 
-    [ObservableProperty] public partial bool IsPlaying { get; set; } = false;
+    [ObservableProperty] public partial bool IsPlaying { get; set; }
 
     [ObservableProperty] public partial string CurrentPlaybackMode { get; set; } = nameof(PlaybackMode.Sequential);
 
     [ObservableProperty] public partial IAudioTrack<ulong>? CurrentTrack { get; set; }
+    public static PlaybackServiceBridge Current { get; } = new();
 
     public double Volume
     {
@@ -81,11 +82,12 @@ public partial class PlaybackServiceBridge : ObservableObject
     public event EventHandler<CurrentTrackChangedEventArgs<ulong>>? CurrentTrackChanged;
     public event EventHandler<PlaybackPositionChangedEventArgs>? PlaybackPositionChanged;
 
-    public PlaybackServiceBridge()
+    private PlaybackServiceBridge()
     {
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _playbackService = ServicesProvider.GetService<IPlaybackService<ulong>>()!;
         Volume = _playbackService.Volume;
+        IsPlaying = _playbackService.IsPlaying ?? false;
         _playbackService.PropertyChanged -= OnPlaybackServicePropertyChanged;
         _playbackService.PropertyChanged += OnPlaybackServicePropertyChanged;
         _playbackQueueProvider = _playbackService.QueueProvider;
