@@ -303,7 +303,7 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
                 .ToArray());
     }
 
-    public override void AllocateDisposable()
+    protected override void AllocateDisposable()
     {
         WeakReferenceMessenger.Default.Register(this, MessengerTokens.PlaylistSubscriptionStatusChanged,
             static (PlaylistDetailViewModel viewModel, OnlinePlaylist op) =>
@@ -314,9 +314,8 @@ public partial class PlaylistDetailViewModel : ViewModel<ulong>
             });
     }
 
-    public override void RecycleDisposable()
+    protected override void RecycleDisposable()
     {
-        base.RecycleDisposable();
         _loadCancellation?.Cancel();
         _loadCancellation?.Dispose();
         _tracksSubscription.Dispose();

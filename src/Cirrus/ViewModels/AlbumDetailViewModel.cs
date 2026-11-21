@@ -192,7 +192,7 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
     [RelayCommand]
     private void ShowDescriptionTeachingTip() => IsDescriptionTeachingTipOpen = true;
 
-    public override void AllocateDisposable()
+    protected override void AllocateDisposable()
     {
         WeakReferenceMessenger.Default.Register(this, MessengerTokens.AlbumSubscriptionStatusChanged,
             static (AlbumDetailViewModel viewModel, OnlineAlbum oa) =>
@@ -203,9 +203,8 @@ public partial class AlbumDetailViewModel : ViewModel<ulong>
             });
     }
 
-    public override void RecycleDisposable()
+    protected override void RecycleDisposable()
     {
-        base.RecycleDisposable();
         _trackSubscription.Dispose();
         _trackSource.Dispose();
         WeakReferenceMessenger.Default.Unregister<OnlineAlbum, string>(this, MessengerTokens.AlbumSubscriptionStatusChanged);
