@@ -26,10 +26,6 @@
     mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="ms-appx:///CommunityToolkit.WinUI.Controls.Segmented/Segmented/Segmented.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <commanding:ShowTrackContextFlyoutCommand x:Name="TopTracksShowContextFlyoutCommand"
                                                       x:Key="TopTracksShowContextFlyoutCommand" />
             <commanding:ShowTrackContextFlyoutCommand x:Name="FullTracksShowContextFlyoutCommand"

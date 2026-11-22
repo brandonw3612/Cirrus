@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using Cirrus.Base.Extensions;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Constants;
-using Cirrus.Extensions;
 using Cirrus.LiveModels;
 using Cirrus.Models.Business.Album;
 using Cirrus.Models.Business.Playback;

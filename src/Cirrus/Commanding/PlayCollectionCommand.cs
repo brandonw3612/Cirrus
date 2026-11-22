@@ -1,7 +1,7 @@
-﻿using Cirrus.Base.Services;
+﻿using Cirrus.Base.Extensions;
+using Cirrus.Base.Services;
 using Cirrus.Base.Services.Abstract;
 using Cirrus.Commanding.Primitives;
-using Cirrus.Extensions;
 using Cirrus.Models.Abstract;
 using Cirrus.Models.Abstract.Primitives;
 using Cirrus.Models.Business.Playback;
