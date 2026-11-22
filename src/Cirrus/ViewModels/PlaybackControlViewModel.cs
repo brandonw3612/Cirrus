@@ -80,7 +80,7 @@ public partial class PlaybackControlViewModel : ViewModel
     public override async Task LoadDataAsync()
     {
         await RefreshLyrics(PlaybackServiceBridge.CurrentTrack);
-        OnPropertyChanged(nameof(ViewModel));
+        OnPropertyChanged(nameof(PlaybackServiceBridge));
     }
 
     protected override void AllocateDisposable()
