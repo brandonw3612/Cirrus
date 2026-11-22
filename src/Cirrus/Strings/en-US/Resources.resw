@@ -766,6 +766,10 @@
     <value>My Favorites</value>
     <comment>歌单详情页 - 本人Likelist - Title Replacement</comment>
   </data>
+  <data name="Controls.QuickAccessView.Favlist.TitleTextBlock.Text" xml:space="preserve">
+    <value>My Favorites</value>
+    <comment>歌单详情页 - 本人Likelist - Title Replacement</comment>
+  </data>
   <data name="Views.PlaylistDetailView.IntelligentPlayButtonContent.Text" xml:space="preserve">
     <value>Start Station</value>
     <comment>歌单详情页 - 心动模式Button - Text</comment>

@@ -34,9 +34,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel Margin="8 8 8 0" Orientation="Horizontal" Spacing="4">
-            </StackPanel>
-            <Button Grid.Row="1" CornerRadius="4" Margin="8" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+            <Button Grid.Row="1" CornerRadius="4" Margin="0 0 0 8" Padding="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                     Command="{StaticResource NavigateCommand}" CommandParameter="{x:Bind Account.QuickAccessPlaylists.FavList, Mode=OneWay}"
                     Style="{ThemeResource CardButtonStyle}">
                 <Grid ColumnSpacing="4">
@@ -52,12 +50,12 @@
                         </Border>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                        <TextBlock FontSize="14">My Favorites</TextBlock>
+                        <TextBlock x:Uid="Controls/QuickAccessView/Favlist/TitleTextBlock" FontSize="14" />
                         <TextBlock Text="{x:Bind Account.UserProfile.Nickname, Mode=OneWay}" FontSize="12" Foreground="{ThemeResource SystemBaseMediumColor}" />
                     </StackPanel>
                 </Grid>
             </Button>
-            <ListView Grid.Row="2" Padding="6 0 14 0"
+            <ListView Grid.Row="2" Padding="6 0 16 0" Margin="-8 0"
                       ItemsSource="{x:Bind Account.QuickAccessPlaylists.Playlists, Mode=OneWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="businessPlaylist:QuickAccessPlaylist">
