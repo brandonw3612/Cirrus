@@ -69,8 +69,8 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
         set
         {
             if (value is null || value.Value == _currentPlaybackMode) return;
-            OnPlaybackModeChanged(_currentPlaybackMode, value.Value);
             _currentPlaybackMode = value.Value;
+            OnPlaybackModeChanged(_currentPlaybackMode, value.Value);
             if (UserPreferenceService.GetService() is { } userPreferenceService)
                 userPreferenceService.Playback.PlaybackMode = value.Value;
             OnPropertyChanged();
@@ -564,7 +564,9 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
     [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     private void UpdateUpcomingTracks()
     {
-        var totalUpcomingTracksCount = _queue.Count - _currentTrackIndex - 1;
+        var totalUpcomingTracksCount = _currentPlaybackMode is PlaybackMode.Sequential
+            ? _queue.Count - _currentTrackIndex - 1
+            : _queue.Count - 1;
         // Clear UpcomingTracks if queue is empty, or we are at the end of the queue.
         if (_queue.Count is 0 || totalUpcomingTracksCount is 0)
         {
@@ -575,6 +577,7 @@ public sealed class NormalQueueProvider<TTrackIdentifier> : PlaybackQueueProvide
         var listSize = Math.Min(totalUpcomingTracksCount, UpcomingTracksMaxCount);
         // Compute the updated list.
         var updatedList = _trackIndexSequence
+            .Repeat(2)
             .Skip(_currentTrackIndex + 1)
             .Take(listSize)
             .Select(i => _queue[i])
