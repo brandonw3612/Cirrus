@@ -122,7 +122,7 @@
                 </Grid>
                 <Grid x:Name="DrawerGrid" Grid.Column="1" CornerRadius="8" BorderThickness="1"
                       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                    <SystemBackdropElement>
+                    <SystemBackdropElement Margin="-8">
                         <SystemBackdropElement.SystemBackdrop>
                             <MicaBackdrop Kind="BaseAlt" />
                         </SystemBackdropElement.SystemBackdrop>

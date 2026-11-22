@@ -37,7 +37,7 @@
                             </interactivity:Interaction.Behaviors>
                         </InfoBar>
                         <controls:PlaybackControlBar VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
-                                                     Margin="32 16" MaxWidth="968" />
+                                                     Margin="32 16" MaxWidth="936" />
                     </Grid>
                 </Grid>
             </controls:SidebarView>
