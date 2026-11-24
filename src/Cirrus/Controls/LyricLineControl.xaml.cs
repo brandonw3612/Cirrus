@@ -384,7 +384,7 @@ public sealed partial class LyricLineControl
             CanvasDevice.GetSharedDevice(),
             _lineFullString,
             format,
-            (float)this.ActualWidth,
+            (float)B2BBackTextBlock.ActualWidth,
             0
         );
         var pos = 0;
